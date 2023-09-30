@@ -18,7 +18,7 @@
 1. Download and Install MySQL Workbench (recommended version 8.0)
 2. Click on the plus icon to Setup New Connection
 3. Enter Connection Name, this is the name displayed on the home page
-4. Hostname = 127.0.0.1, Port = 3306
+4. Hostname = 127.0.0.1, Port = 4000
 5. Username = root
 6. Password -> Store in Vault -> Enter the MySQL Server password
 7. Press 'OK'
