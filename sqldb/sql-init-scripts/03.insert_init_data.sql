@@ -3,8 +3,8 @@ USE let_it_fly;
 -- Insert initial data for user table
 -- first user will have id=10000, and other users will have id auto incremented by 1
 INSERT INTO user (email, password, first_name, last_name, birthdate, gender, address, phone, date_join) VALUES
-		("driveraccount@gmail.com", "test123", "Johnny", "West", "2000-12-06", "male", "3rd Street, San Jose, CA 95121", "4095627864", "2023-09-30"),
-		("passengeraccount@gmail.com", "test123", "Emily", "Marta", "2003-10-06", "female", "4rd Street, San Jose, CA 95121", "4095627864", "2023-09-30");
+		("driveraccount@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq", "Johnny", "West", "2000-12-06", "male", "3rd Street, San Jose, CA 95121", "4095627864", "2023-09-30"),
+		("passengeraccount@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq", "Emily", "Marta", "2003-10-06", "female", "4rd Street, San Jose, CA 95121", "4095627864", "2023-09-30");
         
 
 -- Insert initial data for payment table
