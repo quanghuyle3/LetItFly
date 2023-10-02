@@ -1,18 +1,7 @@
 import React from 'react';
-import { useState } from 'react';
 
 function Login() {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-    };
-
-    return (
-        <p>Hello</p>
-    )
-    
+  return <div>Login</div>;
 }
 
 export default Login;
