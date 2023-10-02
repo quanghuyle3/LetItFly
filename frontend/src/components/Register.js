@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 import { useState } from "react";
 import "./Register.css";
-import "./mock_logo.jpg";
+import logo from './mock_logo.jpg';
 
 function Register() {
   const [name, setName] = useState("");
@@ -38,7 +38,7 @@ function Register() {
   return (
     <div class="reg-box">
       <div>
-        <img src="mock_logo.jpg"></img>
+        <img src={logo}></img>
       </div>
       <h2>Registration</h2>
       <div class="">
