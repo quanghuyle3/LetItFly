@@ -9,7 +9,7 @@ function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [roleName, setRole] = useState("Driver");
+  const [roleName, setRole] = useState("ROLE_DRIVER");
 
   const handleNameChange = (e) => {
     setName(e.target.value);
@@ -21,18 +21,18 @@ function Register() {
     setPassword(e.target.value);
   };
   const handleRoleChange = (e) => {
-    setPassword(e.target.value);
+    setRole(e.target.value);
   };
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("hello");
-    const newAccount = {name, email, password};
-    fetch("https://localhost:8080/registration" , {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(newAccount)
+    const newAccount = { name, email, password, roleName };
+    fetch("http://localhost:8080/registration", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newAccount),
     }).then(() => {
-      console.log("New Account");
+      console.log(newAccount);
     });
   };
   return (
@@ -41,7 +41,7 @@ function Register() {
         <img src={logo}></img>
       </div>
       <h2>Registration</h2>
-      <div class="">
+      <form onSubmit={handleSubmit}>
         <div class="input">
           <p>Name:</p>
           <input
@@ -51,38 +51,40 @@ function Register() {
             onChange={handleNameChange}
             required
           ></input>
+
+          <div class="input">
+            <p>Email:</p>
+            <input
+              type="text"
+              value={email}
+              placeholder="Enter Email"
+              onChange={handleEmailChange}
+              required
+            ></input>
+          </div>
+          <div class="input">
+            <p>Password:</p>
+            <input
+              type="password"
+              value={password}
+              placeholder="Enter Password"
+              onChange={handlePasswordChange}
+              required
+            ></input>
+          </div>
+          <div class="input">
+            <p>Role:</p>
+            <select name="roleName" onChange={handleRoleChange}>
+              <option value="ROLE_DRIVER">Driver</option>
+              <option value="ROLE_PASSENGER">Passenger</option>
+            </select>
+          </div>
+
+          <button type="submit">Create Account</button>
+          <p>{name}</p>
+          <p>{roleName}</p>
         </div>
-        <div class="input">
-          <p>Email:</p>
-          <input
-            type="text"
-            value={email}
-            placeholder="Enter Email"
-            onChange={handleEmailChange}
-            required
-          ></input>
-        </div>
-        <div class="input">
-          <p>Password:</p>
-          <input
-            type="password"
-            value={password}
-            placeholder="Enter Password"
-            onChange={handlePasswordChange}
-            required
-          ></input>
-        </div>
-        <div class="input">
-          <p>Role:</p>
-          <select name="roleName" onChange={handleRoleChange}>
-            <option value="ROLE_DRIVER">Driver</option>
-            <option value="ROLE_PASSENGER">Passenger</option>
-          </select>
-        </div>
-        <Link to="/">
-          <button type="submit" onChange={handleSubmit}>Create Account</button>
-        </Link>
-      </div>
+      </form>
     </div>
   );
 }
