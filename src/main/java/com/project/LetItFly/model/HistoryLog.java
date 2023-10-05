@@ -3,6 +3,8 @@ package com.project.LetItFly.model;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -13,16 +15,18 @@ import jakarta.persistence.Table;
 public class HistoryLog {
 
     @Id
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    //not sure what cascade to put here
+    @ManyToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE,
+            CascadeType.REFRESH })
     @JoinColumn(name = "driver_id")
-    private int driverId;
+    private User driverId;
 
-    //not sure what cascade to put here
+    @ManyToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE,
+            CascadeType.REFRESH })
     @JoinColumn(name = "passenger_id")
-    private int passengerId;
+    private User passengerId;
 
     @Column(name = "date")
     private String date;
@@ -45,9 +49,8 @@ public class HistoryLog {
     public HistoryLog() {
     }
 
-    public HistoryLog(int id, int driverId, int passengerId, String date, String pickupLocation, String destination,
+    public HistoryLog(User driverId, User passengerId, String date, String pickupLocation, String destination,
             String distance, String timeDuration, double cost) {
-        this.id = id;
         this.driverId = driverId;
         this.passengerId = passengerId;
         this.date = date;
@@ -66,19 +69,19 @@ public class HistoryLog {
         this.id = id;
     }
 
-    public int getDriverId() {
+    public User getDriverId() {
         return driverId;
     }
 
-    public void setDriverId(int driverId) {
+    public void setDriverId(User driverId) {
         this.driverId = driverId;
     }
 
-    public int getPassengerId() {
+    public User getPassengerId() {
         return passengerId;
     }
 
-    public void setPassengerId(int passengerId) {
+    public void setPassengerId(User passengerId) {
         this.passengerId = passengerId;
     }
 
@@ -135,5 +138,5 @@ public class HistoryLog {
         return "HistoryLog [id=" + id + ", driverId=" + driverId + ", passengerId=" + passengerId + ", date=" + date
                 + ", pickupLocation=" + pickupLocation + ", destination=" + destination + ", distance=" + distance
                 + ", timeDuration=" + timeDuration + ", cost=" + cost + "]";
-    } 
+    }
 }
