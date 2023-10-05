@@ -50,11 +50,6 @@ public class UserServiceImpl implements UserService {
         // Create a UserDetails object with custome properties
         CustomUserDetails userDetails = new CustomUserDetails(user);
         return userDetails;
-
-        // return new
-        // org.springframework.security.core.userdetails.User(user.getEmail(),
-        // user.getPassword(),
-        // new ArrayList<SimpleGrantedAuthority>());
     }
 
     @Override
@@ -96,21 +91,20 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
 
         if (userRequest.getRoleName() != null) {
-            List<Role> roles = roleRepository.findByName(userRequest.getRoleName());
-            user.addRole(roles.get(0));
+            Role role = roleRepository.findRoleByName(userRequest.getRoleName());
+            user.addRole(role);
         }
 
         // save to db
         userRepository.save(user);
 
         // return roleService.findByName(user.getRoleName());
-        // return "OUTSIDE";
         return "SUCCESS";
     }
 
     @Override
     public User findUserById(int id) {
-        return userRepository.findById(id);
+        return userRepository.findUserById(id);
     }
 
     @Override
@@ -122,9 +116,7 @@ public class UserServiceImpl implements UserService {
     public String updateUser(UserRequest userRequest) {
         User exist = userRepository.findUserByEmail(userRequest.getEmail());
         if (exist == null) {
-            // return roleService.findByName("ROLE_DRIVER");
             return "NOT EXIST";
-            // return exist;
         }
 
         // update to new infor
@@ -140,7 +132,7 @@ public class UserServiceImpl implements UserService {
 
         // add new role to this current user if not have yet
         if (userRequest.getRoleName() != null) {
-            Role role = roleRepository.findByName(userRequest.getRoleName()).get(0);
+            Role role = roleRepository.findRoleByName(userRequest.getRoleName());
             boolean notAdded = true;
             for (Role existingRole : exist.getRoles()) {
                 if (existingRole.getName().equals(role.getName())) {
@@ -154,6 +146,12 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.save(exist);
         return "UPDATED";
+    }
+
+    @Override
+    public List<User> findUsersHold2Roles() {
+        List<Role> roles = roleRepository.findAll();
+        return userRepository.findUsersByTwoRoles(roles.get(0), roles.get(1));
     }
 
 }
