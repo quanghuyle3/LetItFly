@@ -47,7 +47,7 @@ CREATE TABLE vehicle(
         
 CREATE TABLE role(
 		id INT PRIMARY KEY AUTO_INCREMENT,
-        name VARCHAR(50) NOT NULL); 
+        name VARCHAR(50) NOT NULL UNIQUE); 
 
 
 CREATE TABLE user_role(

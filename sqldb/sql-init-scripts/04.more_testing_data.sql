@@ -5,8 +5,8 @@ INSERT INTO user (email, password, first_name, birthdate, address, phone) VALUES
 		("passengeraccount2@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq", "Sally", "2003-06-07", "4rd Street, San Jose, CA 95121", "4095627864");
         
 INSERT INTO user (email, password) VALUES
-		("driveraccount3@gmail.com", "test123"),
-		("passengeraccount3@gmail.com", "test123");
+		("driveraccount3@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq"),
+		("passengeraccount3@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq");
         
 INSERT INTO payment (card_number, expiration, cvv, type, user_id, name, billing_address) VALUES
 		("1000000000000003", "10/2024", 123, "debit", 10002, "Kevin Star", "5rd Street, San Jose, CA 95121"),
