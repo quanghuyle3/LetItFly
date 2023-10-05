@@ -6,6 +6,7 @@ public class CustomUserDetails extends org.springframework.security.core.userdet
     // public class CustomUserDetails {
     private final int id;
     private final String firstName;
+    private final String lastName;
 
     public CustomUserDetails(User user) {
         // super(user.getEmail(), user.getPassword(),
@@ -17,6 +18,7 @@ public class CustomUserDetails extends org.springframework.security.core.userdet
         // super(user.getEmail(), user.getPassword(), null);
         this.id = user.getId();
         this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
     }
 
     public int getId() {
@@ -25,6 +27,10 @@ public class CustomUserDetails extends org.springframework.security.core.userdet
 
     public String getFirstName() {
         return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
 }
