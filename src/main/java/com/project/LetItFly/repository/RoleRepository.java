@@ -13,15 +13,6 @@ import com.project.LetItFly.model.Role;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer> {
 
-    List<Role> findByName(String name);
-
-    @Query("SELECT r FROM Role r WHERE r.name = :customValue")
-    List<Role> findByCustomCriteria(String customValue);
-
-    // find and also fetch lazy attribute
-    // @EntityGraph(attributePaths = "yourLazyAttribute")
-    // List<Role> findByCustomCriteria(String customValue);
-
-    // Add custom query methods here if needed
+    Role findRoleByName(String name);
 
 }
