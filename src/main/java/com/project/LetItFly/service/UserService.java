@@ -5,17 +5,19 @@ import java.util.Optional;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.project.LetItFly.model.Role;
 import com.project.LetItFly.model.User;
 import com.project.LetItFly.requestModel.UserRequest;
 
 public interface UserService extends UserDetailsService {
-    // public interface UserService {
 
     public List<User> findAllUsers();
 
     public User findUserById(int id);
 
     public User findUserByEmail(String email);
+
+    public List<User> findUsersHold2Roles();
 
     // public String saveUser(User user);
 

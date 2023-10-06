@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -13,9 +14,9 @@ import jakarta.persistence.Table;
 public class DriverStatus {
 
     @Id
-    //not sure what cascade to use here
+    @OneToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH })
     @JoinColumn(name = "user_id")
-    private int userId;
+    private User userId;
 
     @Column(name = "dispatch")
     private boolean dispatch;
@@ -26,17 +27,17 @@ public class DriverStatus {
     public DriverStatus() {
     }
 
-    public DriverStatus(int userId, boolean dispatch, int seatAvailable) {
+    public DriverStatus(User userId, boolean dispatch, int seatAvailable) {
         this.userId = userId;
         this.dispatch = dispatch;
         this.seatAvailable = seatAvailable;
     }
 
-    public int getUserId() {
+    public User getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(User userId) {
         this.userId = userId;
     }
 
@@ -59,5 +60,5 @@ public class DriverStatus {
     @Override
     public String toString() {
         return "DriverStatus [userId=" + userId + ", dispatch=" + dispatch + ", seatAvailable=" + seatAvailable + "]";
-    } 
+    }
 }

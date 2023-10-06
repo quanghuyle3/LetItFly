@@ -2,6 +2,7 @@ package com.project.LetItFly.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -62,9 +63,7 @@ public class User {
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH })
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Collection<Role> roles;
-
-    // private String roleName;
+    private List<Role> roles;
 
     public User() {
     }
@@ -194,14 +193,14 @@ public class User {
         this.verified = verified;
     }
 
-    public Collection<Role> getRoles() {
+    public List<Role> getRoles() {
         if (roles == null) {
             roles = new ArrayList<>();
         }
         return roles;
     }
 
-    public void setRoles(Collection<Role> roles) {
+    public void setRoles(List<Role> roles) {
         this.roles = roles;
     }
 
@@ -209,15 +208,7 @@ public class User {
         getRoles().add(role);
     }
 
-    // public String getRoleName() {
-    // return roleName;
-    // }
-
-    // public void setRoleName(String roleName) {
-    // this.roleName = roleName;
-    // }
-
-    public Collection<SimpleGrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
+    public Collection<SimpleGrantedAuthority> mapRolesToAuthorities(List<Role> roles) {
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
         for (Role role : roles) {

@@ -89,17 +89,4 @@ public class LoginController {
 
         return authentication.getPrincipal();
     }
-
-    @PostMapping("/testPost")
-    public User test(@RequestBody User user, Principal principal) {
-        // System.out.println("TEST POST SUCCESS");
-        return user;
-        // return principal != null ? principal.getName() : "null";
-    }
-
-    @GetMapping("/testGet")
-    public String getTest(Principal principal) {
-        System.out.println("TEST GET SUCCESS");
-        return principal != null ? principal.getName() : "null";
-    }
 }
