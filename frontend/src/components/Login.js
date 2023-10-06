@@ -4,11 +4,11 @@ import { useState } from "react";
 
 
 function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   
-  const handleUsernameChange = (e) => {
-    setUsername(e.target.value);
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
   };
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
@@ -23,10 +23,10 @@ function Login() {
       <div class="input">
             <p>Username:</p>
             <input
-              type="text"
-              value={name}
+              type="email"
+              value={email}
               placeholder="Enter Username"
-              onChange={handleUsernameChange}
+              onChange={handleEmailChange}
               required
             ></input>
         </div>

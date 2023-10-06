@@ -1,15 +1,17 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { useState } from "react";
-import "./Register.css";
-import logo from './mock_logo.jpg';
+import "../css/Register.css";
+import logo from "./mock_logo.jpg";
 
 function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [roleName, setRole] = useState("ROLE_DRIVER");
+
+  const navigate = useNavigate();
 
   const handleNameChange = (e) => {
     setName(e.target.value);
@@ -31,10 +33,31 @@ function Register() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newAccount),
-    }).then(() => {
-      console.log(newAccount);
+    }).then((response) => {
+      response
+        .text()
+        .then((result) => {
+          console.log(result);
+
+          if (result === "SUCCESS") {
+            navigate("/");
+            console.log("Registration successful");
+          } else if (result === "EXIST") {
+            // User already exists
+            // Display an error message to the user
+            console.log("User already exists");
+          } else {
+            // Handle other response cases here
+            console.log("Unhandled response:", result);
+          }
+        })
+        .catch((error) => {
+          console.error("Registration failed:", error);
+          // Handle errors here, e.g., display an error message to the user
+        });
     });
   };
+
   return (
     <div class="reg-box">
       <div>
@@ -81,8 +104,7 @@ function Register() {
           </div>
 
           <button type="submit">Create Account</button>
-          <p>{name}</p>
-          <p>{roleName}</p>
+
         </div>
       </form>
     </div>
