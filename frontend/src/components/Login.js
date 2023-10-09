@@ -30,18 +30,16 @@ function Login() {
         .text()
         .then((result) => {
           console.log(result);
-
-          if (result === "SUCCESS") {
-            navigate("/home");
-            console.log("Login successful");
-          } else if (result === "EXIST") {
-            // User already exists
-            // Display an error message to the user
-            console.log("User already exists");
-          } else {
-            // Handle other response cases here
-            console.log("Unhandled response:", result);
-          }
+          navigate("/home");
+        //     console.log("Login successful");
+        //   } else if (result === "EXIST") {
+        //     // User already exists
+        //     // Display an error message to the user
+        //     console.log("User already exists");
+        //   } else {
+        //     // Handle other response cases here
+        //     console.log("Unhandled response:", result);
+        //   }
         })
         .catch((error) => {
           console.error("Registration failed:", error);

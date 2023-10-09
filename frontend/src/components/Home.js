@@ -16,7 +16,7 @@ function Home() {
       console.error(error)
     }
   }
-  getUsers();
+  //getUsers();
   useEffect(() => {
     fetch('http://localhost:8080/api/retrieveAllUsers')
       .then(response => response.json())
