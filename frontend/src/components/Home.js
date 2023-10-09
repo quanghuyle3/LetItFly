@@ -6,7 +6,7 @@ function Home() {
 
   async function getUsers() {
     try {
-      const response = await fetch('http://localhost:8080//retrieveAllUser')
+      const response = await fetch('http://localhost:8080/api/retrieveAllUsers')
       const data = await response.json();
       console.log(data);
       if(!response.ok) {
@@ -18,7 +18,7 @@ function Home() {
   }
   getUsers();
   useEffect(() => {
-    fetch('http://localhost:8080//retrieveAllUser')
+    fetch('http://localhost:8080/api/retrieveAllUsers')
       .then(response => response.json())
       .then(json => setData(json))
       .catch(error => console.error(error));
