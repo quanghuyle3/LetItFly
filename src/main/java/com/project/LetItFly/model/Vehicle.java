@@ -1,7 +1,5 @@
 package com.project.LetItFly.model;
 
-import org.hibernate.annotations.ManyToAny;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +14,7 @@ public class Vehicle {
 
     @Id
     @Column(name = "license_plate")
-    private String licesePlate;
+    private String licensePlate;
 
     @Column(name = "make")
     private String make;
@@ -32,26 +30,26 @@ public class Vehicle {
 
     @ManyToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH })
     @JoinColumn(name = "user_id")
-    private User user;
+    private User userId;
 
     public Vehicle() {
     }
 
-    public Vehicle(String licesePlate, String make, String model, int year, String type, User user) {
-        this.licesePlate = licesePlate;
+    public Vehicle(String licensePlate, String make, String model, int year, String type, User userId) {
+        this.licensePlate = licensePlate;
         this.make = make;
         this.model = model;
         this.year = year;
         this.type = type;
-        this.user = user;
+        this.userId = userId;
     }
 
-    public String getLicesePlate() {
-        return licesePlate;
+    public String getLicensePlate() {
+        return licensePlate;
     }
 
-    public void setLicesePlate(String licesePlate) {
-        this.licesePlate = licesePlate;
+    public void setLicensePlate(String licensePlate) {
+        this.licensePlate = licensePlate;
     }
 
     public String getMake() {
@@ -86,12 +84,18 @@ public class Vehicle {
         this.type = type;
     }
 
-    public User getUser() {
-        return user;
+    public User getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(User userId) {
+        this.userId = userId;
+    }
+
+    @Override
+    public String toString() {
+        return "Vehicle [licensePlate=" + licensePlate + ", make=" + make + ", model=" + model + ", year=" + year
+                + ", type=" + type + ", userId=" + userId + "]";
     }
 
 }
