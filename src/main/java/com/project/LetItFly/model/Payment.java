@@ -10,8 +10,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "payment")
-public class Payment
-{
+public class Payment {
     @Id
     @Column(name = "card_number")
     private String cardNumber;
@@ -27,7 +26,7 @@ public class Payment
 
     @ManyToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH })
     @JoinColumn(name = "user_id")
-    private User user;
+    private User userId;
 
     @Column(name = "name")
     private String name;
@@ -37,20 +36,20 @@ public class Payment
 
     @Column(name = "balance")
     private double balance;
-    
+
     public Payment() {
     }
 
-    public Payment(String expiration, int cvv, String type, User user, String name, String billingAddress, double balance) {
+    public Payment(String expiration, int cvv, String type, User userId, String name, String billingAddress,
+            double balance) {
         this.expiration = expiration;
         this.cvv = cvv;
         this.type = type;
-        this.user = user;
+        this.userId = userId;
         this.name = name;
         this.billingAddress = billingAddress;
         this.balance = balance;
     }
-
 
     public String getExpiration() {
         return this.expiration;
@@ -76,12 +75,12 @@ public class Payment
         this.type = type;
     }
 
-    public User getUser() {
-        return this.user;
+    public User getUserId() {
+        return this.userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 
     public String getName() {
@@ -111,13 +110,13 @@ public class Payment
     @Override
     public String toString() {
         return "{" +
-            " expiration='" + getExpiration() + "'" +
-            ", cvv='" + getCvv() + "'" +
-            ", type='" + getType() + "'" +
-            ", user='" + getUser() + "'" +
-            ", name='" + getName() + "'" +
-            ", billingAddress='" + getBillingAddress() + "'" +
-            ", balance='" + getBalance() + "'" +
-            "}";
-    } 
+                " expiration='" + getExpiration() + "'" +
+                ", cvv='" + getCvv() + "'" +
+                ", type='" + getType() + "'" +
+                ", userId='" + getUserId() + "'" +
+                ", name='" + getName() + "'" +
+                ", billingAddress='" + getBillingAddress() + "'" +
+                ", balance='" + getBalance() + "'" +
+                "}";
+    }
 }
