@@ -1,0 +1,35 @@
+header img {
+  margin-right: 100px;
+}
+
+.navbar-home {
+  display: flex;
+  flex-grow: 0;
+  flex-direction: row-reverse;
+  flex-basis: 50px;
+  list-style: none;
+  gap: 20px;
+  /* outline: 5px solid green; */
+}
+
+.navbar-home > a > li {
+  align-self: center;
+  padding: 20px 40px;
+  cursor: pointer;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: 700;
+  background-color: goldenrod;
+
+  &:hover {
+    background-color: rgb(236, 187, 63);
+  }
+}
+
+.navbar-home > a {
+  text-decoration: none;
+
+  &:active {
+    color: inherit;
+  }
+}
