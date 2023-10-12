@@ -1,10 +1,12 @@
 package com.project.LetItFly.model;
 
-import org.hibernate.annotations.ManyToAny;
+import com.project.LetItFly.requestModel.VehicleRequest;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -15,8 +17,11 @@ import jakarta.persistence.Table;
 public class Vehicle {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
     @Column(name = "license_plate")
-    private String licesePlate;
+    private String licensePlate;
 
     @Column(name = "make")
     private String make;
@@ -30,28 +35,49 @@ public class Vehicle {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "in_use")
+    private boolean inUse = true;
+
     @ManyToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH })
     @JoinColumn(name = "user_id")
-    private User user;
+    private User userId;
 
     public Vehicle() {
     }
 
-    public Vehicle(String licesePlate, String make, String model, int year, String type, User user) {
-        this.licesePlate = licesePlate;
+    public Vehicle(String licensePlate, String make, String model, int year, String type, boolean inUse, User userId) {
+        this.licensePlate = licensePlate;
         this.make = make;
         this.model = model;
         this.year = year;
         this.type = type;
-        this.user = user;
+        this.inUse = inUse;
+        this.userId = userId;
     }
 
-    public String getLicesePlate() {
-        return licesePlate;
+    public Vehicle(VehicleRequest vehicleRequest) {
+        this.licensePlate = vehicleRequest.getLicensePlate();
+        this.make = vehicleRequest.getMake();
+        this.model = vehicleRequest.getModel();
+        this.year = vehicleRequest.getYear();
+        this.type = vehicleRequest.getType();
+        this.inUse = vehicleRequest.isInUse();
     }
 
-    public void setLicesePlate(String licesePlate) {
-        this.licesePlate = licesePlate;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getLicensePlate() {
+        return licensePlate;
+    }
+
+    public void setLicensePlate(String licensePlate) {
+        this.licensePlate = licensePlate;
     }
 
     public String getMake() {
@@ -86,12 +112,26 @@ public class Vehicle {
         this.type = type;
     }
 
-    public User getUser() {
-        return user;
+    public boolean isInUse() {
+        return inUse;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setInUse(boolean inUse) {
+        this.inUse = inUse;
+    }
+
+    public User getUserId() {
+        return userId;
+    }
+
+    public void setUserId(User userId) {
+        this.userId = userId;
+    }
+
+    @Override
+    public String toString() {
+        return "Vehicle [id=" + id + ", licensePlate=" + licensePlate + ", make=" + make + ", model=" + model
+                + ", year=" + year + ", type=" + type + ", inUse=" + inUse + ", userId=" + userId + "]";
     }
 
 }

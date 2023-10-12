@@ -3,9 +3,10 @@ package com.project.LetItFly.model;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -14,6 +15,9 @@ import jakarta.persistence.Table;
 public class DriverStatus {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
     @OneToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH })
     @JoinColumn(name = "user_id")
     private User userId;
@@ -31,6 +35,14 @@ public class DriverStatus {
         this.userId = userId;
         this.dispatch = dispatch;
         this.seatAvailable = seatAvailable;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public User getUserId() {
@@ -59,6 +71,8 @@ public class DriverStatus {
 
     @Override
     public String toString() {
-        return "DriverStatus [userId=" + userId + ", dispatch=" + dispatch + ", seatAvailable=" + seatAvailable + "]";
+        return "DriverStatus [id=" + id + ", userId=" + userId + ", dispatch=" + dispatch + ", seatAvailable="
+                + seatAvailable + "]";
     }
+
 }

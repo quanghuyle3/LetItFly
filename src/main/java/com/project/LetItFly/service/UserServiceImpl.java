@@ -76,12 +76,13 @@ public class UserServiceImpl implements UserService {
     // }
 
     @Override
-    public String saveUser(UserRequest userRequest) {
+    public User saveUser(UserRequest userRequest) {
         User exist = userRepository.findUserByEmail(userRequest.getEmail());
         if (exist != null) {
             // return roleService.findByName("ROLE_DRIVER");
-            return "EXIST";
+            // return "EXIST";
             // return exist;
+            return null;
         }
 
         // convert to user
@@ -96,10 +97,10 @@ public class UserServiceImpl implements UserService {
         }
 
         // save to db
-        userRepository.save(user);
+        return userRepository.save(user);
 
         // return roleService.findByName(user.getRoleName());
-        return "SUCCESS";
+        // return "SUCCESS";
     }
 
     @Override

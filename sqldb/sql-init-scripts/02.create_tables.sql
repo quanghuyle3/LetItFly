@@ -11,6 +11,7 @@ CREATE TABLE user(
         address VARCHAR(150),
         phone VARCHAR(50),
         date_join DATE,
+        driver_license VARCHAR(50),
         active BOOLEAN DEFAULT TRUE,
         verified BOOLEAN DEFAULT FALSE
         )AUTO_INCREMENT = 10000;
@@ -19,28 +20,33 @@ CREATE TABLE user(
 -- name: person's name on the card
 -- expiration: 12/2024
 CREATE TABLE payment(
-		card_number VARCHAR(50) PRIMARY KEY,
+		id INT PRIMARY KEY AUTO_INCREMENT,
+		card_number VARCHAR(50),
         expiration VARCHAR(50),
         cvv INT,
         type VARCHAR(50), 
         user_id INT,
         name VARCHAR(100),
         billing_address VARCHAR(150),
+        in_use BOOLEAN DEFAULT true,
         balance DOUBLE DEFAULT 0.00, 
         CONSTRAINT payment_user_fk FOREIGN KEY (user_id) REFERENCES user(id));
 
 CREATE TABLE driver_status(
-		user_id INT PRIMARY KEY,
+		id INT PRIMARY KEY AUTO_INCREMENT,
+		user_id INT,
         dispatch BOOLEAN, 
         seat_available INT,
         CONSTRAINT driver_status_user_fk FOREIGN KEY (user_id) REFERENCES user(id));
 
 CREATE TABLE vehicle(
-		license_plate VARCHAR(50) PRIMARY KEY,
+		id INT PRIMARY KEY AUTO_INCREMENT,
+		license_plate VARCHAR(50),
         make VARCHAR(50),
         model VARCHAR(50),
         year INT,
         type VARCHAR(50),
+        in_use BOOLEAN DEFAULT TRUE,
         user_id INT,
         CONSTRAINT vehicle_user_fk FOREIGN KEY (user_id) REFERENCES user(id));
         

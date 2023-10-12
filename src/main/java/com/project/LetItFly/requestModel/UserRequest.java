@@ -24,6 +24,8 @@ public class UserRequest {
 
     private String dateJoin;
 
+    private String driverLicense;
+
     private boolean active = true;
 
     private boolean verified;
@@ -34,7 +36,8 @@ public class UserRequest {
     }
 
     public UserRequest(String email, String password, String firstName, String lastName, String birthdate,
-            String gender, String address, String phone, String dateJoin, boolean active, boolean verified,
+            String gender, String address, String phone, String dateJoin, String driverLicense, boolean active,
+            boolean verified,
             String roleName) {
         this.email = email;
         this.password = password;
@@ -45,6 +48,7 @@ public class UserRequest {
         this.address = address;
         this.phone = phone;
         this.dateJoin = dateJoin;
+        this.driverLicense = driverLicense;
         this.active = active;
         this.verified = verified;
         this.roleName = roleName;
@@ -128,6 +132,14 @@ public class UserRequest {
 
     public void setDateJoin(String dateJoin) {
         this.dateJoin = dateJoin;
+    }
+
+    public String getDriverLicense() {
+        return driverLicense;
+    }
+
+    public void setDriverLicense(String driverLicense) {
+        this.driverLicense = driverLicense;
     }
 
     public boolean isActive() {
