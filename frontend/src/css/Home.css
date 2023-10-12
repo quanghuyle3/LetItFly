@@ -1,5 +1,5 @@
 header img {
-  margin-right: 100px;
+  margin-right: 10vw;
 }
 
 .navbar-home {
@@ -32,4 +32,29 @@ header img {
   &:active {
     color: inherit;
   }
+}
+
+.map-container {
+  z-index: 10;
+  border-radius: 1rem;
+  display: block;
+  margin: 40px auto;
+  width: 49%;
+  height: 50vh;
+  border: 5px solid goldenrod;
+}
+
+.search-bar {
+  font-family: "Titillium Web", sans-serif;
+  padding: 10px;
+  padding-left: 20px;
+  position: relative;
+  margin-top: 20px;
+  margin-left: 20px;
+  font-weight: 700;
+  font-size: 20px;
+  z-index: 30;
+  width: 30%;
+  border-radius: 1.25rem;
+  border: 2px solid rgb(113, 113, 113);
 }
