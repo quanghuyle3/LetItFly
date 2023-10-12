@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# stop docker container if running
+docker stop lif-sql-server
+
+# remove docker container if it exists
+docker rm lif-sql-server
+
+# remove docker image if it exists
+docker rmi mysql-server-img
+
 # docker command to build the image from a Dockerfile
 docker build -t mysql-server-img .
 
