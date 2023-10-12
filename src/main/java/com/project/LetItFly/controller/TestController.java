@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.LetItFly.model.DriverStatus;
 import com.project.LetItFly.model.HistoryLog;
 import com.project.LetItFly.model.Payment;
 import com.project.LetItFly.model.Role;
 import com.project.LetItFly.model.User;
 import com.project.LetItFly.model.Vehicle;
 import com.project.LetItFly.requestModel.UserRequest;
+import com.project.LetItFly.service.DriverStatusService;
 import com.project.LetItFly.service.HistoryLogService;
 import com.project.LetItFly.service.PaymentService;
 import com.project.LetItFly.service.RoleService;
@@ -34,16 +36,18 @@ public class TestController {
     private HistoryLogService historyLogService;
     private PaymentService paymentService;
     private VehicleService vehicleService;
+    private DriverStatusService driverStatusService;
     // private Principal principal;
 
     @Autowired
     public TestController(UserService userService, RoleService roleService, HistoryLogService historyLogService,
-            PaymentService paymentService, VehicleService vehicleService) {
+            PaymentService paymentService, VehicleService vehicleService, DriverStatusService driverStatusService) {
         this.userService = userService;
         this.roleService = roleService;
         this.historyLogService = historyLogService;
         this.paymentService = paymentService;
         this.vehicleService = vehicleService;
+        this.driverStatusService = driverStatusService;
         // this.principal = principal;
     }
 
@@ -69,7 +73,7 @@ public class TestController {
     }
 
     @PostMapping("/saveUser")
-    public String saveUser(@RequestBody UserRequest userRequest) {
+    public User saveUser(@RequestBody UserRequest userRequest) {
         return userService.saveUser(userRequest);
     }
 
@@ -123,6 +127,11 @@ public class TestController {
         return paymentService.findAllPayments();
     }
 
+    @GetMapping("/findPaymentById")
+    public Payment findPaymentById(@RequestParam("id") int id) {
+        return paymentService.findPaymentById(id);
+    }
+
     @GetMapping("/findPaymentByCardNumber")
     public Payment findPaymentByCardNumber(@RequestParam("cardNumber") String cardNumber) {
         return paymentService.findPaymentByCardNumber(cardNumber);
@@ -139,6 +148,11 @@ public class TestController {
         return vehicleService.findAllVehicles();
     }
 
+    @GetMapping("/findVehicleById")
+    public Vehicle findVehicleById(@RequestParam("id") int id) {
+        return vehicleService.findVehicleById(id);
+    }
+
     @GetMapping("/findVehicleByLicensePlate")
     public Vehicle findVehicleByLicensePlate(@RequestParam("licensePlate") String licensePlate) {
         return vehicleService.findVehicleByLicensePlate(licensePlate);
@@ -147,6 +161,22 @@ public class TestController {
     @GetMapping("/findVehiclesByUserId")
     public List<Vehicle> findVehiclesByUserId(@RequestParam("userId") int userId) {
         return vehicleService.findVehiclesByUserId(userId);
+    }
+
+    // DRIVER STATUS
+    @GetMapping("/retrieveAllDriverStatus")
+    public List<DriverStatus> retrieveAllDriverStatus() {
+        return driverStatusService.findAllDriverStatus();
+    }
+
+    @GetMapping("/findDriverStatusById")
+    public DriverStatus findDriverStatusById(@RequestParam("id") int id) {
+        return driverStatusService.findDriverStatusById(id);
+    }
+
+    @GetMapping("/findDriverStatusByUserId")
+    public DriverStatus findDriverStatusByUserId(@RequestParam("userId") int userId) {
+        return driverStatusService.findDriverStatusByUserId(userId);
     }
 
 }

@@ -9,7 +9,9 @@ import com.project.LetItFly.model.Payment;
 import com.project.LetItFly.model.User;
 
 @Repository
-public interface PaymentRepository extends JpaRepository<Payment, String> {
+public interface PaymentRepository extends JpaRepository<Payment, Integer> {
+
+    Payment findPaymentById(int id);
 
     Payment findPaymentByCardNumber(String cardNumber);
 

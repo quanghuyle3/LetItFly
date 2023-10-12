@@ -9,6 +9,7 @@ import com.project.LetItFly.model.User;
 import com.project.LetItFly.model.Vehicle;
 import com.project.LetItFly.repository.UserRepository;
 import com.project.LetItFly.repository.VehicleRepository;
+import com.project.LetItFly.requestModel.VehicleRequest;
 
 @Service
 public class VehicleServiceImpl implements VehicleService {
@@ -43,6 +44,26 @@ public class VehicleServiceImpl implements VehicleService {
         // find all vehicles based on user object
         return vehicleRepository.findVehicleByUserId(user);
 
+    }
+
+    @Override
+    public Vehicle findVehicleById(int id) {
+        return vehicleRepository.findVehicleById(id);
+    }
+
+    @Override
+    public Vehicle saveVehicle(VehicleRequest vehicleRequest) {
+        // find associated User object
+        User user = userRepository.findUserById(vehicleRequest.getUserId());
+
+        // convert vehicleRequest to vehicle object
+        Vehicle vehicle = new Vehicle(vehicleRequest);
+
+        // associate User to Vehicle object
+        vehicle.setUserId(user);
+
+        // save vehicle
+        return vehicleRepository.save(vehicle);
     }
 
 }

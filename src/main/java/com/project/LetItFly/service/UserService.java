@@ -21,7 +21,7 @@ public interface UserService extends UserDetailsService {
 
     // public String saveUser(User user);
 
-    public String saveUser(UserRequest userRequest);
+    public User saveUser(UserRequest userRequest);
 
     public String updateUser(UserRequest userRequest);
 }

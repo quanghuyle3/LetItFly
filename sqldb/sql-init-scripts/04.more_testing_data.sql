@@ -1,7 +1,8 @@
 USE let_it_fly;
 
+INSERT INTO user (email, password, first_name, birthdate, address, phone, driver_license) VALUES
+		("driveraccount2@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq", "George", "2001-10-07", "3rd Street, San Jose, CA 95121", "4095627864", "K6728892");
 INSERT INTO user (email, password, first_name, birthdate, address, phone) VALUES
-		("driveraccount2@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq", "George", "2001-10-07", "3rd Street, San Jose, CA 95121", "4095627864"),
 		("passengeraccount2@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq", "Sally", "2003-06-07", "4rd Street, San Jose, CA 95121", "4095627864");
         
 INSERT INTO user (email, password) VALUES

@@ -9,7 +9,9 @@ import com.project.LetItFly.model.User;
 import com.project.LetItFly.model.Vehicle;
 
 @Repository
-public interface VehicleRepository extends JpaRepository<Vehicle, String> {
+public interface VehicleRepository extends JpaRepository<Vehicle, Integer> {
+
+    Vehicle findVehicleById(int id);
 
     Vehicle findVehicleByLicensePlate(String licensePlate);
 

@@ -9,6 +9,7 @@ import com.project.LetItFly.model.Payment;
 import com.project.LetItFly.model.User;
 import com.project.LetItFly.repository.PaymentRepository;
 import com.project.LetItFly.repository.UserRepository;
+import com.project.LetItFly.requestModel.PaymentRequest;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -42,6 +43,26 @@ public class PaymentServiceImpl implements PaymentService {
 
         // find payments based on the user object
         return paymentRepository.findPaymentsByUserId(user);
+    }
+
+    @Override
+    public Payment findPaymentById(int id) {
+        return paymentRepository.findPaymentById(id);
+    }
+
+    @Override
+    public Payment savePayment(PaymentRequest paymentRequest) {
+        // find the associate User
+        User user = userRepository.findUserById(paymentRequest.getUserId());
+
+        // convert PaymentRequest to Payment object
+        Payment payment = new Payment(paymentRequest);
+
+        // assocaite User to Payment object
+        payment.setUserId(user);
+
+        // save
+        return paymentRepository.save(payment);
     }
 
 }

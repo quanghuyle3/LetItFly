@@ -1,8 +1,13 @@
 package com.project.LetItFly.model;
 
+import com.project.LetItFly.requestModel.PaymentRequest;
+import com.project.LetItFly.requestModel.UserRequest;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -11,7 +16,11 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "payment")
 public class Payment {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
     @Column(name = "card_number")
     private String cardNumber;
 
@@ -34,21 +43,54 @@ public class Payment {
     @Column(name = "billing_address")
     private String billingAddress;
 
+    @Column(name = "in_use")
+    private boolean inUse = true;
+
     @Column(name = "balance")
     private double balance;
 
     public Payment() {
     }
 
-    public Payment(String expiration, int cvv, String type, User userId, String name, String billingAddress,
-            double balance) {
+    public Payment(String cardNumber, String expiration, int cvv, String type, User userId, String name,
+            String billingAddress,
+            boolean inUse, double balance) {
+        this.cardNumber = cardNumber;
         this.expiration = expiration;
         this.cvv = cvv;
         this.type = type;
         this.userId = userId;
         this.name = name;
         this.billingAddress = billingAddress;
+        this.inUse = inUse;
         this.balance = balance;
+    }
+
+    public Payment(PaymentRequest payment) {
+        this.cardNumber = payment.getCardNumber();
+        this.expiration = payment.getExpiration();
+        this.cvv = payment.getCvv();
+        this.type = payment.getType();
+        this.name = payment.getName();
+        this.billingAddress = payment.getBillingAddress();
+        this.inUse = payment.isInUse();
+        this.balance = payment.getBalance();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
     }
 
     public String getExpiration() {
@@ -99,6 +141,14 @@ public class Payment {
         this.billingAddress = billingAddress;
     }
 
+    public boolean isInUse() {
+        return inUse;
+    }
+
+    public void setInUse(boolean inUse) {
+        this.inUse = inUse;
+    }
+
     public double getBalance() {
         return this.balance;
     }
@@ -109,14 +159,8 @@ public class Payment {
 
     @Override
     public String toString() {
-        return "{" +
-                " expiration='" + getExpiration() + "'" +
-                ", cvv='" + getCvv() + "'" +
-                ", type='" + getType() + "'" +
-                ", userId='" + getUserId() + "'" +
-                ", name='" + getName() + "'" +
-                ", billingAddress='" + getBillingAddress() + "'" +
-                ", balance='" + getBalance() + "'" +
-                "}";
+        return "Payment [id=" + id + ", cardNumber=" + cardNumber + ", expiration=" + expiration + ", cvv=" + cvv
+                + ", type=" + type + ", userId=" + userId + ", name=" + name + ", billingAddress=" + billingAddress
+                + ", inUse=" + inUse + ", balance=" + balance + "]";
     }
 }
