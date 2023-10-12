@@ -13,7 +13,7 @@ function Login() {
     setPassword(e.target.value);
   };
   return (
-    <div class="login-page">
+    <div className="login-page">
       <div>
         <img
           src={logo}
@@ -21,8 +21,8 @@ function Login() {
         ></img>
       </div>
       <h2>Login</h2>
-      <div class="">
-        <div class="input">
+      <div className="">
+        <div className="input">
           <p>Username:</p>
           <input
             type="email"
@@ -32,7 +32,7 @@ function Login() {
             required
           ></input>
         </div>
-        <div class="input">
+        <div className="input">
           <p>Password:</p>
           <input
             type="password"

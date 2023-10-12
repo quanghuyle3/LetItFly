@@ -1,7 +1,7 @@
 import React from "react";
 
-function DriverHome() {
+function DriverHistory() {
   return <div>Driver History Page</div>;
 }
 
-export default DriverHome;
+export default DriverHistory;
