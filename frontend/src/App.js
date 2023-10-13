@@ -18,51 +18,21 @@ import DriverHistory from "./pages/DriverHistory";
 function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
-      // Root route = login page
-      <Route>
-        <Route
-          path="/"
-          element={<Login />}
-        />
-        // {/* REGISTER PAGE */}
-        <Route
-          path="/register"
-          element={<Register />}
-        />
-        {/* CUSTOMER ROUTING */}
-        <Route
-          path="/customer/home"
-          element={<CustomerHome />}
-        />
-        <Route
-          path="/customer/settings"
-          element={<CustomerSettings />}
-        />
-        <Route
-          path="/customer/history"
-          element={<CustomerHistory />}
-        />
-        <Route
-          path="/customer/ride"
-          element={<CustomerRide />}
-        />
-        {/* DRIVER ROUTING */}
-        <Route
-          path="/driver/home"
-          element={<DriverHome />}
-        />
-        <Route
-          path="/driver/settings"
-          element={<DriverSettings />}
-        />
-        <Route
-          path="/driver/history"
-          element={<DriverHistory />}
-        />
-        <Route
-          path="/driver/ride"
-          element={<DriverRide />}
-        />
+      <Route path="/">
+        <Route index element={<Login />} />
+        <Route path="register" element={<Register />} />
+        <Route path="customer">
+          <Route index element={<CustomerHome />} />
+          <Route path="settings" element={<CustomerSettings />} />
+          <Route path="history" element={<CustomerHistory />} />
+          <Route path="ride" element={<CustomerRide />} />
+        </Route>
+        <Route path="driver">
+          <Route index element={<DriverHome />} />
+          <Route path="settings" element={<DriverSettings />} />
+          <Route path="history" element={<DriverHistory />} />
+          <Route path="ride" element={<DriverRide />} />
+        </Route>
       </Route>
     )
   );

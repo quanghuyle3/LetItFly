@@ -1,7 +1,7 @@
 import React from "react";
 
 function CustomerRide() {
-  return <div>Customer Ride Page</div>;
+  return <h1>Customer Ride Page</h1>;
 }
 
 export default CustomerRide;

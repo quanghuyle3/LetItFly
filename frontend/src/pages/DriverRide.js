@@ -1,5 +1,5 @@
 function Home() {
-  return <div>Driver Ride Page</div>;
+  return <h1>Driver Ride Page</h1>;
 }
 
 export default Home;

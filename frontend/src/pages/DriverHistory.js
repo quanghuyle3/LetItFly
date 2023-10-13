@@ -1,7 +1,7 @@
 import React from "react";
 
 function DriverHistory() {
-  return <div>Driver History Page</div>;
+  return <h1>Driver History Page</h1>;
 }
 
 export default DriverHistory;
