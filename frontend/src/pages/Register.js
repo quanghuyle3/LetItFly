@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useState } from "react";
 import "../css/Register.css";
-import logo from "./mock_logo.jpg";
+import logo from "../mock_logo.jpg";
 
 function Register() {
   const [name, setName] = useState("");
@@ -61,7 +61,10 @@ function Register() {
   return (
     <div class="reg-box">
       <div>
-        <img src={logo}></img>
+        <img
+          src={logo}
+          alt="Let It FLy Logo"
+        ></img>
       </div>
       <h2>Registration</h2>
       <form onSubmit={handleSubmit}>
@@ -97,14 +100,16 @@ function Register() {
           </div>
           <div class="input">
             <p>Role:</p>
-            <select name="roleName" onChange={handleRoleChange}>
+            <select
+              name="roleName"
+              onChange={handleRoleChange}
+            >
               <option value="ROLE_DRIVER">Driver</option>
               <option value="ROLE_PASSENGER">Passenger</option>
             </select>
           </div>
 
           <button type="submit">Create Account</button>
-
         </div>
       </form>
     </div>
