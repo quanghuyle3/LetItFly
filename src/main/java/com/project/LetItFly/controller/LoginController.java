@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -32,6 +33,7 @@ import com.project.LetItFly.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @CrossOrigin
@@ -86,7 +88,9 @@ public class LoginController {
 
         // // Set the authentication result to the SecurityContext
         // SecurityContextHolder.getContext().setAuthentication(authentication);
-
+        HttpSession session = request.getSession(true);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                context);
         return authentication.getPrincipal();
     }
 }
