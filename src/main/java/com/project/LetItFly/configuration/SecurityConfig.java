@@ -31,7 +31,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(configurer -> configurer
                 .requestMatchers("/login").permitAll()
                 .requestMatchers("/registration").permitAll()
-                .anyRequest().permitAll());
+                .anyRequest().authenticated());
 
         http.httpBasic(Customizer.withDefaults());
         http.csrf((csrf) -> csrf.disable());
