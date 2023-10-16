@@ -1,42 +1,43 @@
-import React, { useMemo, useCallback, useRef } from "react";
-import { GoogleMap, useLoadScript } from "@react-google-maps/api";
+import { Loader } from "@googlemaps/js-api-loader";
 import "../css/Home.css";
+import { useState, useRef } from "react";
 
 function Map() {
-  const mapRef = useRef();
-  const center = useMemo(() => ({ lat: 37.3352, lng: -121.8811 }), []);
-  const options = useMemo(
-    () => ({
-      disableDefaultUI: true,
-      clickableIcons: false,
-    }),
-    []
-  );
-  const onLoad = useCallback((map) => (mapRef.current = map), []);
-
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_KEY,
-    libraries: ["places"],
+  const [address, setAddress] = useState("");
+  const currentLocation = useRef();
+  const loader = new Loader({
+    apiKey: process.env.REACT_APP_GOOGLE_KEY,
   });
 
-  if (!isLoaded) return <div>Loading ...</div>;
+  navigator.geolocation.getCurrentPosition(
+    ({ coords: { latitude, longitude } }) => {
+      currentLocation.center = { lat: latitude, lng: longitude };
+      console.log(`lat: ${latitude}, lng: ${longitude}`);
+    }
+  );
+  loader.load().then(async () => {
+    const { Map } = await window.google.maps.importLibrary("maps");
+    let map = new Map(document.getElementsByClassName("map-container")[0], {
+      center: currentLocation.center,
+      zoom: 14,
+      disableDefaultUI: true,
+    });
+    currentLocation.map = map;
+  });
 
   return (
-    <GoogleMap
-      zoom={16}
-      center={center}
-      mapContainerClassName="map-container"
-      options={options}
-      onLoad={onLoad}
-    >
-      <form>
+    <>
+      <div className="search-bar-wrapper">
         <input
           className="search-bar"
-          placeholder="Search Address..."
           type="text"
-        ></input>
-      </form>
-    </GoogleMap>
+          placeholder="Enter address..."
+          onChange={(e) => setAddress(e.target.value)}
+          value={address}
+        />
+      </div>
+      <div className="map-container"></div>
+    </>
   );
 }
 

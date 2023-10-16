@@ -38,23 +38,27 @@ header img {
   z-index: 10;
   border-radius: 1rem;
   display: block;
-  margin: 40px auto;
+  margin: 20px auto;
   width: 49%;
   height: 50vh;
   border: 5px solid goldenrod;
+}
+
+.search-bar-wrapper {
+  max-width: 50%;
+  margin: 20px auto 0px auto;
 }
 
 .search-bar {
   font-family: "Titillium Web", sans-serif;
   padding: 10px;
   padding-left: 20px;
-  position: relative;
   margin-top: 20px;
   margin-left: 20px;
   font-weight: 700;
   font-size: 20px;
   z-index: 30;
-  width: 30%;
+  width: 50%;
   border-radius: 1.25rem;
   border: 2px solid rgb(113, 113, 113);
 }
