@@ -1,44 +1,38 @@
-import { Loader } from "@googlemaps/js-api-loader";
 import "../css/Home.css";
-import { useState, useRef } from "react";
+import { useRef, useEffect } from "react";
 
-function Map() {
-  const [address, setAddress] = useState("");
-  const currentLocation = useRef();
-  const loader = new Loader({
-    apiKey: process.env.REACT_APP_GOOGLE_KEY,
-  });
+function Map({ Loader }) {
+  const currentMap = useRef();
+  useEffect(() => {
+    initMap();
+  }, []);
 
-  navigator.geolocation.getCurrentPosition(
-    ({ coords: { latitude, longitude } }) => {
-      currentLocation.center = { lat: latitude, lng: longitude };
-      console.log(`lat: ${latitude}, lng: ${longitude}`);
-    }
-  );
-  loader.load().then(async () => {
-    const { Map } = await window.google.maps.importLibrary("maps");
-    let map = new Map(document.getElementsByClassName("map-container")[0], {
-      center: currentLocation.center,
-      zoom: 14,
-      disableDefaultUI: true,
+  function initMap() {
+    // Get user's current location
+    var user_location;
+    navigator.geolocation.getCurrentPosition(
+      ({ coords: { latitude, longitude } }) => {
+        user_location = { lat: latitude, lng: longitude };
+      }
+    );
+
+    // load the map onto the page
+    let map;
+    Loader.load().then(async () => {
+      const { Map } = await window.google.maps.importLibrary("maps");
+
+      map = new Map(document.getElementsByClassName("map-container")[0], {
+        center: user_location,
+        zoom: 15,
+        disableDefaultUI: true,
+        clickableIcons: false,
+      });
     });
-    currentLocation.map = map;
-  });
 
-  return (
-    <>
-      <div className="search-bar-wrapper">
-        <input
-          className="search-bar"
-          type="text"
-          placeholder="Enter address..."
-          onChange={(e) => setAddress(e.target.value)}
-          value={address}
-        />
-      </div>
-      <div className="map-container"></div>
-    </>
-  );
+    currentMap.current = map;
+  }
+
+  return <div className="map-container"></div>;
 }
 
 export default Map;
