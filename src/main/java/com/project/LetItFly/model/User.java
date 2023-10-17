@@ -57,6 +57,9 @@ public class User implements UserDetails {
     @Column(name = "date_join")
     private String dateJoin;
 
+    @Column(name = "driver_license")
+    private String driverLicense;
+
     @Column(name = "active")
     private boolean active = true;
 
@@ -71,7 +74,8 @@ public class User implements UserDetails {
     }
 
     public User(String email, String password, String firstName, String lastName, String birthdate,
-            String gender, String address, String phone, String dateJoin, boolean active, boolean verified) {
+            String gender, String address, String phone, String dateJoin, String driverLicense, boolean active,
+            boolean verified) {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
@@ -81,6 +85,7 @@ public class User implements UserDetails {
         this.address = address;
         this.phone = phone;
         this.dateJoin = dateJoin;
+        this.driverLicense = driverLicense;
         this.active = active;
         this.verified = verified;
     }
@@ -95,6 +100,7 @@ public class User implements UserDetails {
         this.address = user.getAddress();
         this.phone = user.getPhone();
         this.dateJoin = user.getDateJoin();
+        this.driverLicense = user.getDriverLicense();
         this.active = user.isActive();
         this.verified = user.isVerified();
     }
@@ -177,6 +183,14 @@ public class User implements UserDetails {
 
     public void setDateJoin(String dateJoin) {
         this.dateJoin = dateJoin;
+    }
+
+    public String getDriverLicense() {
+        return driverLicense;
+    }
+
+    public void setDriverLicense(String driverLicense) {
+        this.driverLicense = driverLicense;
     }
 
     public boolean isActive() {

@@ -79,12 +79,6 @@ public class UserServiceImpl implements UserService {
     // ASSUME THAT USERNAME HAS ALREADY BEEN THAT IS NOT EXISTED YET
     @Override
     public User saveUser(UserRequest userRequest) {
-        // User exist = userRepository.findUserByEmail(userRequest.getEmail());
-        // if (exist != null) {
-        // // return roleService.findByName("ROLE_DRIVER");
-        // return "EXIST";
-        // // return exist;
-        // }
 
         // convert to user
         User user = new User(userRequest);
@@ -99,9 +93,6 @@ public class UserServiceImpl implements UserService {
 
         // save to db
         return userRepository.save(user);
-
-        // return roleService.findByName(user.getRoleName());
-        // return "SUCCESS";
     }
 
     @Override

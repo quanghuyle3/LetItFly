@@ -6,28 +6,50 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.LetItFly.model.Payment;
 import com.project.LetItFly.configuration.JwtService;
 import com.project.LetItFly.model.User;
+import com.project.LetItFly.model.Vehicle;
+import com.project.LetItFly.requestModel.PaymentRequest;
 import com.project.LetItFly.requestModel.UserRequest;
+import com.project.LetItFly.requestModel.VehicleRequest;
+import com.project.LetItFly.service.PaymentService;
 import com.project.LetItFly.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+import com.project.LetItFly.service.VehicleService;
 
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
+@RequestMapping("/registration")
 public class RegistrationController {
 
     private final UserService userService;
     private final JwtService jwtService;
+    private final PaymentService paymentService;
+    private final VehicleService vehicleService;
 
-    @PostMapping("/registration")
+    @PostMapping("/user")
     public ResponseEntity<String> registration(@RequestBody UserRequest userRequest) {
         User user = userService.saveUser(userRequest);
         String jwt = jwtService.generateToken(user);
         return ResponseEntity.ok("CREATED");
         // return new ResponseEntity(HttpStatusCode.valueOf(200));
+    }
+
+    @PostMapping("/payment")
+    public Payment registerPayment(@RequestBody PaymentRequest paymentRequest) {
+        return paymentService.savePayment(paymentRequest);
+
+    }
+
+    @PostMapping("/vehicle")
+    public Vehicle registerVehicle(@RequestBody VehicleRequest vehicleRequest) {
+        return vehicleService.saveVehicle(vehicleRequest);
+
     }
 }
