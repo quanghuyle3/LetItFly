@@ -9,7 +9,8 @@ import com.project.LetItFly.model.Role;
 import com.project.LetItFly.model.User;
 import com.project.LetItFly.requestModel.UserRequest;
 
-public interface UserService extends UserDetailsService {
+// public interface UserService extends UserDetailsService {
+public interface UserService {
 
     public List<User> findAllUsers();
 
@@ -21,7 +22,7 @@ public interface UserService extends UserDetailsService {
 
     // public String saveUser(User user);
 
-    public String saveUser(UserRequest userRequest);
+    public User saveUser(UserRequest userRequest);
 
     public String updateUser(UserRequest userRequest);
 }

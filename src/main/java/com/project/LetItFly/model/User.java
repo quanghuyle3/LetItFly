@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.project.LetItFly.requestModel.UserRequest;
 
@@ -22,7 +24,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "user")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -208,7 +210,21 @@ public class User {
         getRoles().add(role);
     }
 
-    public Collection<SimpleGrantedAuthority> mapRolesToAuthorities(List<Role> roles) {
+    // public Collection<SimpleGrantedAuthority> mapRolesToAuthorities(List<Role>
+    // roles) {
+    // Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+    // for (Role role : roles) {
+    // SimpleGrantedAuthority tempAuthority = new
+    // SimpleGrantedAuthority(role.getName());
+    // authorities.add(tempAuthority);
+    // }
+
+    // return authorities;
+    // }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
         for (Role role : roles) {
@@ -217,6 +233,31 @@ public class User {
         }
 
         return authorities;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
 }

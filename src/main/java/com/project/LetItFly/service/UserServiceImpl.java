@@ -38,19 +38,20 @@ public class UserServiceImpl implements UserService {
     }
 
     // This method is used by Spring Security (Authentication provider)
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findUserByEmail(username);
+    // @Override
+    // public UserDetails loadUserByUsername(String username) throws
+    // UsernameNotFoundException {
+    // User user = userRepository.findUserByEmail(username);
 
-        if (user == null) {
-            throw new UsernameNotFoundException("Couldn't find user with email: " +
-                    username);
-        }
+    // if (user == null) {
+    // throw new UsernameNotFoundException("Couldn't find user with email: " +
+    // username);
+    // }
 
-        // Create a UserDetails object with custome properties
-        CustomUserDetails userDetails = new CustomUserDetails(user);
-        return userDetails;
-    }
+    // // Create a UserDetails object with custome properties
+    // CustomUserDetails userDetails = new CustomUserDetails(user);
+    // return userDetails;
+    // }
 
     @Override
     public List<User> findAllUsers() {
@@ -75,14 +76,15 @@ public class UserServiceImpl implements UserService {
     // // }
     // }
 
+    // ASSUME THAT USERNAME HAS ALREADY BEEN THAT IS NOT EXISTED YET
     @Override
-    public String saveUser(UserRequest userRequest) {
-        User exist = userRepository.findUserByEmail(userRequest.getEmail());
-        if (exist != null) {
-            // return roleService.findByName("ROLE_DRIVER");
-            return "EXIST";
-            // return exist;
-        }
+    public User saveUser(UserRequest userRequest) {
+        // User exist = userRepository.findUserByEmail(userRequest.getEmail());
+        // if (exist != null) {
+        // // return roleService.findByName("ROLE_DRIVER");
+        // return "EXIST";
+        // // return exist;
+        // }
 
         // convert to user
         User user = new User(userRequest);
@@ -96,10 +98,10 @@ public class UserServiceImpl implements UserService {
         }
 
         // save to db
-        userRepository.save(user);
+        return userRepository.save(user);
 
         // return roleService.findByName(user.getRoleName());
-        return "SUCCESS";
+        // return "SUCCESS";
     }
 
     @Override
