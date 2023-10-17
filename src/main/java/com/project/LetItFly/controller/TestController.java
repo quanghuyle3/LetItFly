@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,7 +61,7 @@ public class TestController {
     }
 
     @PostMapping("/saveUser")
-    public String saveUser(@RequestBody UserRequest userRequest) {
+    public User saveUser(@RequestBody UserRequest userRequest) {
         return userService.saveUser(userRequest);
     }
 
@@ -106,6 +107,12 @@ public class TestController {
     @GetMapping("/findHistoryLogsByPassengerId")
     public List<HistoryLog> findHistoryLogsByPassengerId(@RequestParam("id") int id) {
         return historyLogService.findHistoryLogsByPassengerId(id);
+    }
+
+    @GetMapping("/testjwt")
+    public ResponseEntity<String> sayHello() {
+        return ResponseEntity.ok("Hello from localhost:8080/api/testjwt");
+
     }
 
 }
