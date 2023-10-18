@@ -66,4 +66,33 @@ public class VehicleServiceImpl implements VehicleService {
         return vehicleRepository.save(vehicle);
     }
 
+    @Override
+    public String updateVehicle(VehicleRequest vehicleRequest) {
+        Vehicle exist = vehicleRepository.findVehicleByLicensePlate(vehicleRequest.getLicensePlate());
+        if (exist == null) {
+            return "NOT EXIST";
+        }
+
+        // update new infor (expiration, cvv, name, billing address, )
+        exist.setMake(vehicleRequest.getMake());
+        exist.setModel(vehicleRequest.getModel());
+        exist.setYear(vehicleRequest.getYear());
+        exist.setType(vehicleRequest.getType());
+
+        vehicleRepository.save(exist);
+        return "UPDATED";
+    }
+
+    @Override
+    public String setVehicleToNotUse(String licensePlate) {
+        Vehicle exist = vehicleRepository.findVehicleByLicensePlate(licensePlate);
+        if (exist == null) {
+            return "NOT EXIST";
+        }
+
+        exist.setInUse(false);
+        vehicleRepository.save(exist);
+        return "UPDATED";
+    }
+
 }
