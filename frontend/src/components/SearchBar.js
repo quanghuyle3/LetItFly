@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import "../css/Home.css";
 
-function SearchBar({ Loader }) {
+function SearchBar({ Loader, currentMap, userLocation }) {
   // const [address, setAddress] = useState("");
   useEffect(() => {
     initAutocomplete();
-  }, []);
+  });
 
   function initAutocomplete() {
     // autocomplete will return results within these bounds
@@ -35,10 +35,66 @@ function SearchBar({ Loader }) {
       autocomplete.addListener("place_changed", () => {
         console.log(input.value);
 
-        const place = autocomplete.getPlace();
-        console.log({ place });
-        console.log(place.geometry.location.lat());
-        console.log(place.geometry.location.lng());
+        var geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({ address: input.value }, (results, status) => {
+          if (status === "OK") {
+            var destinationLatitude = results[0].geometry.location.lat();
+            var destinationLongitude = (destinationLatitude =
+              results[0].geometry.location.lng());
+
+            console.log(destinationLatitude, destinationLongitude);
+
+            const marker = new window.google.maps.Marker({
+              position: {
+                lat: destinationLatitude,
+                lng: destinationLongitude,
+              },
+              map: currentMap.map,
+              title: input.value,
+            });
+
+            currentMap.current.panTo({
+              lat: destinationLatitude,
+              lng: destinationLongitude,
+            });
+            marker.setMap(currentMap.current);
+
+            // Directions
+            var directionsService = new window.google.maps.DirectionsService();
+            var directionsRenderer =
+              new window.google.maps.DirectionsRenderer();
+
+            var user_location;
+            navigator.geolocation.getCurrentPosition(
+              ({ coords: { latitude, longitude } }) => {
+                user_location = { lat: latitude, lng: longitude };
+              }
+            );
+
+            var start = new window.google.maps.LatLng(37.3352, -121.88111);
+            var end = new window.google.maps.LatLng(
+              destinationLatitude,
+              destinationLongitude
+            );
+
+            console.log(start, end);
+            var request = {
+              // origin: { lat: 37.3352, lng: -121.881 },
+              origin: "San José State University, Washington Sq, San Jose, CA",
+              destination: input.value,
+              travelMode: "DRIVING",
+            };
+            directionsRenderer.setMap(currentMap.current);
+            directionsService.route(request, (results, status) => {
+              if (status === "OK") {
+                directionsRenderer.set("directions", null);
+                directionsRenderer.setDirections(results);
+              } else {
+                console.log(status);
+              }
+            });
+          } else console.log(status);
+        });
       });
     });
   }
@@ -49,8 +105,6 @@ function SearchBar({ Loader }) {
         className="search-bar"
         type="text"
         placeholder="Enter address..."
-        // onChange={(e) => setAddress(e.target.value)}
-        // value={address}
       />
     </div>
   );
