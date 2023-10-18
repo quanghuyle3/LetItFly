@@ -40,17 +40,18 @@ public class LoginController {
             User user = userService.findUserByEmail(authRequest.getEmail());
 
             String jwt = jwtService.generateToken(user);
-            return ResponseEntity.ok(new AuthenticationResponse().builder().token(jwt).build());
+            return ResponseEntity.ok(
+                    new AuthenticationResponse().builder().id(user.getId()).email(user.getEmail()).token(jwt).build());
 
         } catch (BadCredentialsException m) {
-            return ResponseEntity.status(HttpStatusCode.valueOf(401))
-                    .body(new AuthenticationResponse("Invalid username or password"));
+            return ResponseEntity.status(HttpStatusCode.valueOf(401)) // unauthorized
+                    .body(new AuthenticationResponse());
         } catch (DisabledException m) {
-            return ResponseEntity.status(HttpStatusCode.valueOf(403))
-                    .body(new AuthenticationResponse("Account is disabled."));
+            return ResponseEntity.status(HttpStatusCode.valueOf(403)) // forbidden
+                    .body(new AuthenticationResponse());
         } catch (LockedException m) {
-            return ResponseEntity.status(HttpStatusCode.valueOf(423))
-                    .body(new AuthenticationResponse("Account is locked."));
+            return ResponseEntity.status(HttpStatusCode.valueOf(423)) // locked
+                    .body(new AuthenticationResponse());
         }
     }
 }
