@@ -1,48 +1,73 @@
 import React from "react";
 import logo from "../mock_logo.jpg";
 import { useState } from "react";
+import { TextField, Button, Container, Stack } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import Paper from "@mui/material/Paper";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  function handleSubmit(event) {
+    event.preventDefault();
+    navigate("/customer");
+    // fetch here and need role to figure out the page to navigate to
+  }
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
   return (
-    <div className="login-page">
-      <div>
-        <img
-          src={logo}
-          alt="Let It FLy Logo"
-        ></img>
-      </div>
-      <h2>Login</h2>
-      <div className="">
-        <div className="input">
-          <p>Username:</p>
-          <input
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        background: "goldenrod",
+        backdropFilter: "blur(8px)",
+       
+      }}
+    >
+      
+      <Paper
+        elevation={3}
+        style={{ padding: "20px", margin: "0 auto", maxWidth: "90vw" }}
+      >
+    
+        <h2 style={{ textAlign: "center" }}>Login</h2>
+        <form onSubmit={handleSubmit}>
+          <TextField
             type="email"
+            variant="outlined"
+            color="primary"
+            label="Email"
+            onChange={(e) => setEmail(e.target.value)}
             value={email}
-            placeholder="Enter Username"
-            onChange={handleEmailChange}
+            fullWidth
             required
-          ></input>
-        </div>
-        <div className="input">
-          <p>Password:</p>
-          <input
+            sx={{ marginBottom: 4 }}
+          />
+          <TextField
             type="password"
+            variant="outlined"
+            color="primary"
+            label="Password"
+            onChange={(e) => setPassword(e.target.value)}
             value={password}
-            placeholder="Enter Password"
-            onChange={handlePasswordChange}
+            fullWidth
             required
-          ></input>
-        </div>
-      </div>
+            sx={{ marginBottom: 4 }}
+          />
+
+          <Button
+            variant="outlined"
+            color="primary"
+            type="submit"
+            style={{ display: "block", margin: "0 auto", width: "200px" }}
+          >
+            Login
+          </Button>
+        </form>
+      </Paper>
     </div>
   );
 }
