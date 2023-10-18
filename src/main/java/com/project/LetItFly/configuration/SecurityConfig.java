@@ -26,52 +26,52 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private static final Long MAX_AGE = 3600L;
-    private static final int CORS_FILTER_ORDER = -102;
+        private static final Long MAX_AGE = 3600L;
+        private static final int CORS_FILTER_ORDER = -102;
 
-    private final JwtAuthenticationFilter jwtAuthFilter;
-    private final AuthenticationProvider authenticationProvider;
+        private final JwtAuthenticationFilter jwtAuthFilter;
+        private final AuthenticationProvider authenticationProvider;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(configurer -> configurer
-                .requestMatchers("/login").permitAll()
-                .requestMatchers("/registration").permitAll()
-                // .anyRequest().authenticated())
-                .anyRequest().permitAll())
-                .sessionManagement((sessionManagement) -> sessionManagement
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout(logout -> logout.permitAll());
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+                http.authorizeHttpRequests(configurer -> configurer
+                                .requestMatchers("/login").permitAll()
+                                .requestMatchers("/registration").permitAll()
+                                // .anyRequest().authenticated())
+                                .anyRequest().permitAll())
+                                .sessionManagement((sessionManagement) -> sessionManagement
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authenticationProvider(authenticationProvider)
+                                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                                .logout(logout -> logout.permitAll());
 
-        http.httpBasic(Customizer.withDefaults());
-        http.csrf((csrf) -> csrf.disable());
-        return http.build();
-    }
+                http.httpBasic(Customizer.withDefaults());
+                http.csrf((csrf) -> csrf.disable());
+                return http.build();
+        }
 
-    @Bean
-    public FilterRegistrationBean corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:3000");
-        config.setAllowedHeaders(Arrays.asList(
-                HttpHeaders.AUTHORIZATION,
-                HttpHeaders.CONTENT_TYPE,
-                HttpHeaders.ACCEPT));
-        config.setAllowedMethods(Arrays.asList(
-                HttpMethod.GET.name(),
-                HttpMethod.POST.name(),
-                HttpMethod.PUT.name(),
-                HttpMethod.DELETE.name()));
-        config.setMaxAge(MAX_AGE);
-        source.registerCorsConfiguration("/**", config);
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+        @Bean
+        public FilterRegistrationBean corsFilter() {
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                CorsConfiguration config = new CorsConfiguration();
+                config.setAllowCredentials(true);
+                config.addAllowedOrigin("http://localhost:3000");
+                config.setAllowedHeaders(Arrays.asList(
+                                HttpHeaders.AUTHORIZATION,
+                                HttpHeaders.CONTENT_TYPE,
+                                HttpHeaders.ACCEPT));
+                config.setAllowedMethods(Arrays.asList(
+                                HttpMethod.GET.name(),
+                                HttpMethod.POST.name(),
+                                HttpMethod.PUT.name(),
+                                HttpMethod.DELETE.name()));
+                config.setMaxAge(MAX_AGE);
+                source.registerCorsConfiguration("/**", config);
+                FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
 
-        // should be set order to -100 because we need to CorsFilter before
-        // SpringSecurityFilter
-        bean.setOrder(CORS_FILTER_ORDER);
-        return bean;
-    }
+                // should be set order to -100 because we need to CorsFilter before
+                // SpringSecurityFilter
+                bean.setOrder(CORS_FILTER_ORDER);
+                return bean;
+        }
 }
