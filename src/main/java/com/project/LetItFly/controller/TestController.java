@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -177,6 +178,12 @@ public class TestController {
     @GetMapping("/findDriverStatusByUserId")
     public DriverStatus findDriverStatusByUserId(@RequestParam("userId") int userId) {
         return driverStatusService.findDriverStatusByUserId(userId);
+    }
+
+    @GetMapping("/testjwt")
+    public ResponseEntity<String> sayHello() {
+        return ResponseEntity.ok("Hello from localhost:8080/api/testjwt");
+
     }
 
 }

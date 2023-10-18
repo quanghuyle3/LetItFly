@@ -27,5 +27,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT u FROM User u WHERE :role1 MEMBER OF u.roles AND :role2 MEMBER OF u.roles")
     List<User> findUsersByTwoRoles(@Param("role1") Role role1, @Param("role2") Role role2);
 
+    // works - Find a user that has the matching driver license
+    public User findUserByDriverLicense(String driverLicense);
+
     // not working
 }
