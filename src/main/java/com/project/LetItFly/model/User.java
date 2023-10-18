@@ -8,6 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.project.LetItFly.requestModel.RegistrationRequest;
 import com.project.LetItFly.requestModel.UserRequest;
 
 import jakarta.persistence.CascadeType;
@@ -103,6 +104,21 @@ public class User implements UserDetails {
         this.driverLicense = user.getDriverLicense();
         this.active = user.isActive();
         this.verified = user.isVerified();
+    }
+
+    public User(RegistrationRequest registrationRequest) {
+        this.email = registrationRequest.getEmail();
+        this.password = registrationRequest.getPassword();
+        this.firstName = registrationRequest.getFirstName();
+        this.lastName = registrationRequest.getLastName();
+        this.birthdate = registrationRequest.getBirthdate();
+        this.gender = registrationRequest.getGender();
+        this.address = registrationRequest.getAddress();
+        this.phone = registrationRequest.getPhone();
+        this.dateJoin = registrationRequest.getDateJoin();
+        this.driverLicense = registrationRequest.getDriverLicense();
+        this.active = registrationRequest.isActive();
+        this.verified = registrationRequest.isVerified();
     }
 
     public int getId() {

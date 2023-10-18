@@ -1,12 +1,9 @@
 package com.project.LetItFly.service;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.security.core.userdetails.UserDetailsService;
-
-import com.project.LetItFly.model.Role;
 import com.project.LetItFly.model.User;
+import com.project.LetItFly.requestModel.RegistrationRequest;
 import com.project.LetItFly.requestModel.UserRequest;
 
 // public interface UserService extends UserDetailsService {
@@ -25,4 +22,8 @@ public interface UserService {
     public User saveUser(UserRequest userRequest);
 
     public String updateUser(UserRequest userRequest);
+
+    public User findUserByDriverLicense(String driverLicense);
+
+    public User registration(RegistrationRequest registrationRequest);
 }
