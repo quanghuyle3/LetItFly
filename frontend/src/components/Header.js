@@ -16,7 +16,7 @@ function Header() {
           />
         </Link>
         <ul className="navbar-home">
-          <Link to={"/register"}>
+          <Link to={"/customer/settings"}>
             <li>Settings</li>
           </Link>
           <Link to={"/"}>

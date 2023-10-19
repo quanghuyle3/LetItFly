@@ -1,7 +1,14 @@
 import React from "react";
+import Settings from "../components/Settings";
+import Header from "../components/Header";
 
 function CustomerSettings() {
-  return <h1>Customer Settings Page</h1>;
+  return (
+    <>
+      <Header />
+      <Settings />
+    </>
+  );
 }
 
 export default CustomerSettings;
