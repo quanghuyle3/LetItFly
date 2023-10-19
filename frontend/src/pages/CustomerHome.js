@@ -15,15 +15,19 @@ import { useEffect, useRef } from "react";
 
 function CustomerHome() {
   const currentMap = useRef();
-  const userLocation = useRef();
 
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      ({ coords: { latitude, longitude } }) => {
-        userLocation.current = { lat: latitude, lng: longitude };
-      }
-    );
-  }, []);
+  // wrap user location in a promise
+  const userLocation = new Promise((resolve, reject) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        ({ coords: { latitude, longitude } }) => {
+          resolve({ lat: latitude, lng: longitude });
+        }
+      );
+    } else {
+      reject(null);
+    }
+  });
 
   // Initialize google map api loader
   const loader = new Loader({
