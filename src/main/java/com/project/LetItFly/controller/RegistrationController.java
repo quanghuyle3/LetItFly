@@ -43,7 +43,7 @@ public class RegistrationController {
 
         if (registrationRequest.getRoleName().equals("ROLE_DRIVER")
                 && userService.findUserByDriverLicense(registrationRequest.getDriverLicense()) != null) {
-            return new ResponseEntity<String>("EXISTED DRIVER LICENSE", HttpStatusCode.valueOf(302)); // STATUS: FOUND
+            return new ResponseEntity<String>("EXISTED DRIVER LICENSE", HttpStatusCode.valueOf(323)); // STATUS: FOUND
         }
 
         // save all objects to database
