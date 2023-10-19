@@ -1,6 +1,7 @@
 package com.project.LetItFly.model;
 
 import com.project.LetItFly.requestModel.PaymentRequest;
+import com.project.LetItFly.requestModel.RegistrationRequest;
 import com.project.LetItFly.requestModel.UserRequest;
 
 import jakarta.persistence.CascadeType;
@@ -75,6 +76,17 @@ public class Payment {
         this.billingAddress = payment.getBillingAddress();
         this.inUse = payment.isInUse();
         this.balance = payment.getBalance();
+    }
+
+    public Payment(RegistrationRequest registrationRequest) {
+        this.cardNumber = registrationRequest.getCardNumber();
+        this.expiration = registrationRequest.getExpiration();
+        this.cvv = registrationRequest.getCvv();
+        this.type = registrationRequest.getPaymentType();
+        this.name = registrationRequest.getName();
+        this.billingAddress = registrationRequest.getBillingAddress();
+        this.inUse = registrationRequest.isPaymentInUse();
+        this.balance = registrationRequest.getBalance();
     }
 
     public int getId() {

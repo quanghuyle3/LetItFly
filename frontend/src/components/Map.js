@@ -1,43 +1,33 @@
-import React, { useMemo, useCallback, useRef } from "react";
-import { GoogleMap, useLoadScript } from "@react-google-maps/api";
 import "../css/Home.css";
 
-function Map() {
-  const mapRef = useRef();
-  const center = useMemo(() => ({ lat: 37.3352, lng: -121.8811 }), []);
-  const options = useMemo(
-    () => ({
-      disableDefaultUI: true,
-      clickableIcons: false,
-    }),
-    []
-  );
-  const onLoad = useCallback((map) => (mapRef.current = map), []);
+function Map({ Loader, currentMap, userLocation }) {
+  function initMap() {
+    // Get user's current location, this can be memoized
+    // var user_location;
+    // navigator.geolocation.getCurrentPosition(
+    //   ({ coords: { latitude, longitude } }) => {
+    //     user_location = { lat: latitude, lng: longitude };
+    //   }
+    // );
 
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_KEY,
-    libraries: ["places"],
-  });
+    // load the map onto the page
 
-  if (!isLoaded) return <div>Loading ...</div>;
+    Loader.load().then(async () => {
+      const { Map } = await window.google.maps.importLibrary("maps");
 
-  return (
-    <GoogleMap
-      zoom={16}
-      center={center}
-      mapContainerClassName="map-container"
-      options={options}
-      onLoad={onLoad}
-    >
-      <form>
-        <input
-          className="search-bar"
-          placeholder="Search Address..."
-          type="text"
-        ></input>
-      </form>
-    </GoogleMap>
-  );
+      const map = new Map(document.getElementsByClassName("map-container")[0], {
+        center: userLocation.current,
+        zoom: 15,
+        disableDefaultUI: true,
+        clickableIcons: false,
+      });
+      currentMap.current = map;
+    });
+  }
+
+  initMap();
+
+  return <div className="map-container"></div>;
 }
 
 export default Map;

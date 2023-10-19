@@ -18,6 +18,9 @@ public interface VehicleService {
     public Vehicle saveVehicle(VehicleRequest vehicleRequest);
 
     // update
+    public String updateVehicle(VehicleRequest vehicleRequest);
+
+    public String setVehicleToNotUse(String licensePlate);
 
     // delete
 

@@ -1,5 +1,6 @@
 package com.project.LetItFly.model;
 
+import com.project.LetItFly.requestModel.RegistrationRequest;
 import com.project.LetItFly.requestModel.VehicleRequest;
 
 import jakarta.persistence.CascadeType;
@@ -62,6 +63,15 @@ public class Vehicle {
         this.year = vehicleRequest.getYear();
         this.type = vehicleRequest.getType();
         this.inUse = vehicleRequest.isInUse();
+    }
+
+    public Vehicle(RegistrationRequest registrationRequest) {
+        this.licensePlate = registrationRequest.getLicensePlate();
+        this.make = registrationRequest.getMake();
+        this.model = registrationRequest.getModel();
+        this.year = registrationRequest.getYear();
+        this.type = registrationRequest.getVehicleType();
+        this.inUse = registrationRequest.isVehicleInUse();
     }
 
     public int getId() {

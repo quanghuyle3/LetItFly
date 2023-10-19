@@ -18,6 +18,9 @@ public interface PaymentService {
     public Payment savePayment(PaymentRequest paymentRequest);
 
     // update
+    public String updatePayment(PaymentRequest paymentRequest);
+
+    public String setPaymentToNotUse(String cardNumber);
 
     // delete
 }

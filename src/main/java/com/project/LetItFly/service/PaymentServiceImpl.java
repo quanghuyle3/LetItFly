@@ -41,8 +41,8 @@ public class PaymentServiceImpl implements PaymentService {
             return null;
         }
 
-        // find payments based on the user object
-        return paymentRepository.findPaymentsByUserId(user);
+        // find payments (IN USE) and based on the user object
+        return paymentRepository.findPaymentsInUseByUserId(user);
     }
 
     @Override
@@ -63,6 +63,37 @@ public class PaymentServiceImpl implements PaymentService {
 
         // save
         return paymentRepository.save(payment);
+    }
+
+    @Override
+    public String updatePayment(PaymentRequest paymentRequest) {
+
+        Payment exist = paymentRepository.findPaymentByCardNumber(paymentRequest.getCardNumber());
+        if (exist == null) {
+            return "NOT EXIST";
+        }
+
+        // update new infor (expiration, cvv, name, billing address, )
+        exist.setExpiration(paymentRequest.getExpiration());
+        exist.setCvv(paymentRequest.getCvv());
+        exist.setName(paymentRequest.getName());
+        exist.setBillingAddress(paymentRequest.getBillingAddress());
+
+        paymentRepository.save(exist);
+        return "UPDATED";
+
+    }
+
+    @Override
+    public String setPaymentToNotUse(String cardNumber) {
+        Payment exist = paymentRepository.findPaymentByCardNumber(cardNumber);
+        if (exist == null) {
+            return "NOT EXIST";
+        }
+
+        exist.setInUse(false);
+        paymentRepository.save(exist);
+        return "UPDATED";
     }
 
 }
