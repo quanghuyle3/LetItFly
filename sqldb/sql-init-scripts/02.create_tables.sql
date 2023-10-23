@@ -77,3 +77,10 @@ CREATE TABLE history_log(
         cost DOUBLE,
         CONSTRAINT history_log_user_fk1 FOREIGN KEY (driver_id) REFERENCES user(id),
         CONSTRAINT history_log_user_fk2 FOREIGN KEY (passenger_id) REFERENCES user(id));
+        
+CREATE TABLE ride_request(
+		id INT PRIMARY KEY AUTO_INCREMENT,
+        cur_lat DECIMAL(10, 8),
+        cur_long DECIMAL(11, 8),
+        dest_lat DECIMAL(10, 8),
+        dest_long DECIMAL(11, 8));

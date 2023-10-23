@@ -36,3 +36,10 @@ INSERT INTO driver_status (user_id, dispatch, seat_available) VALUES
 INSERT INTO history_log (driver_id, passenger_id, date, pickup_location, destination, distance, time_duration, cost) VALUES
 		(10000, 10001, "2023-12-06", "9th Street, San Jose, CA 95100", "Airport Way, San Francisco, CA 95334", 23.8, "02:12", 36.50),
         (10000, 10001, "2023-12-15", "Airport Way, San Francisco, CA 95334", "9th Street, San Jose, CA 95100", 23.8, "02:20", 32.50);
+
+-- Insert initial data for ride_request
+INSERT INTO ride_request (cur_lat, cur_long, dest_lat, dest_long) VALUES
+		(37.335436, -121.909424, 37.615223, -122.389977),
+        (37.349372, -121.896864, 37.363949, -121.928940),
+        (37.535419, -121.986426, 37.715907, -122.213771);
+        
