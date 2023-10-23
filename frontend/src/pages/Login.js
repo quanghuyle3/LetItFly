@@ -21,15 +21,8 @@ function Login() {
       body: JSON.stringify(loginInfo),
     }).then((response) => {
       console.log(response);
-      response
-      .json();
-      .then((result) => {
-        console.log(result);
-        if (result.ok) {
-          response.json().then((tokenObject) => {
-            const authenticationObject = tokenObject;
-            console.log(authenticationObject.token);
-          });
+      if (response.ok) {
+        return response.json();
         }
         else if (response.status === 401) {
           console.log("Invalid username or password");
@@ -40,13 +33,18 @@ function Login() {
         else if (response.status === 423) {
           console.log("Account is locked");
         }
-        //navigate("/customer");
-    })
+      })
+      .then((tokenObject) => {
+        console.log(tokenObject);
+        const authenticationObject = tokenObject;
+        console.log(authenticationObject.token);
+        navigate("/customer", {state:{tokenObject}});
+        })
     .catch((error) => {
       console.error("Login failed:", error);
     });
-  });
-}
+  };
+
 
   return (
     <div
