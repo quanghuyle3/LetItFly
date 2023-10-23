@@ -4,6 +4,7 @@ import History from "../components/History";
 import SearchBar from "../components/SearchBar";
 import { Loader } from "@googlemaps/js-api-loader";
 import { useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 
 /**
  * ISSUES:
@@ -16,7 +17,8 @@ import { useEffect, useRef } from "react";
 function CustomerHome() {
   const currentMap = useRef();
   const userLocation = useRef();
-
+  const location = useLocation();
+  
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       ({ coords: { latitude, longitude } }) => {
@@ -24,7 +26,7 @@ function CustomerHome() {
       }
     );
   }, []);
-
+  console.log(location.state);
   // Initialize google map api loader
   const loader = new Loader({
     apiKey: process.env.REACT_APP_GOOGLE_KEY,
