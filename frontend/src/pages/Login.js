@@ -11,9 +11,40 @@ function Login() {
   const navigate = useNavigate();
   function handleSubmit(event) {
     event.preventDefault();
-    navigate("/customer");
     // fetch here and need role to figure out the page to navigate to
-  }
+    console.log("hello");
+    const loginInfo = { email, password };
+    console.log(loginInfo);
+    fetch("http://localhost:8080/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(loginInfo),
+    }).then((response) => {
+      console.log(response);
+      if (response.ok) {
+        return response.json();
+        }
+        else if (response.status === 401) {
+          console.log("Invalid username or password");
+        }
+        else if (response.status === 403) {
+          console.log("Account is disabled");
+        }
+        else if (response.status === 423) {
+          console.log("Account is locked");
+        }
+      })
+      .then((tokenObject) => {
+        console.log(tokenObject);
+        const authenticationObject = tokenObject;
+        console.log(authenticationObject.token);
+        navigate("/customer", {state:{tokenObject}});
+        })
+    .catch((error) => {
+      console.error("Login failed:", error);
+    });
+  };
+
 
   return (
     <div
