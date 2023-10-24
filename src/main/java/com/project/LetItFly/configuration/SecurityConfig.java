@@ -37,8 +37,10 @@ public class SecurityConfig {
                 http.authorizeHttpRequests(configurer -> configurer
                                 .requestMatchers("/login").permitAll()
                                 .requestMatchers("/registration").permitAll()
-                                // .anyRequest().authenticated())
-                                .anyRequest().permitAll())
+                                .requestMatchers("/api/check").permitAll()
+                                .requestMatchers("/api/test").permitAll()
+                                .anyRequest().authenticated())
+                                // .anyRequest().permitAll())
                                 .sessionManagement((sessionManagement) -> sessionManagement
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authenticationProvider(authenticationProvider)
