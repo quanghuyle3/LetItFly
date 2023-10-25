@@ -28,7 +28,7 @@ import com.project.LetItFly.service.UserService;
 import com.project.LetItFly.service.VehicleService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/test")
 @CrossOrigin
 public class TestController {
 
