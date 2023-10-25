@@ -9,22 +9,15 @@ const googleApiLoader = new Loader({
  * Given a destination string, return the lat and lng coords
  * @param {String} destinationString
  */
-function geocode(destinationString) {
+function geocode(destinationString, callbackFunction) {
   googleApiLoader.importLibrary("geocoding").then(({ Geocoder }) => {
     var geocoder = new Geocoder();
-    geocoder.geocode({ address: destinationString }, (results, status) => {
-      if (status === "OK") {
-        return {
-          destinationLat: results[0].geometry.location.lat(),
-          destinationLng: results[0].geometry.location.lng(),
-        };
-      } else return {};
-    });
+    geocoder.geocode({ address: destinationString }, callbackFunction);
   });
 }
 
 // Expectation: given an input element, return set of destination coords
-function autocompleteAndGeocode(inputElement) {
+function autocomplete(inputElement, callback) {
   // prioritize search results in these bounds
   const bayAreaBounds = {
     north: 37.96328887, //37.96328887243628
@@ -43,25 +36,59 @@ function autocompleteAndGeocode(inputElement) {
 
   googleApiLoader.importLibrary("places").then(({ Autocomplete }) => {
     var autocomplete = new Autocomplete(inputElement, options);
-    autocomplete.addListener("place_changed", () => {
-      console.log(inputElement.value);
-      return geocode(inputElement.value);
-    });
+    autocomplete.addListener("place_changed", callback);
   });
+}
+
+/**
+ *
+ * @param {lat: current_latitude, lng: current_longitude} currentLocation
+ * @param {lat: destination_latitude, lng: destination_longitude} destinationLocation
+ * @param {Promise} currentMap
+ * @returns
+ */
+var directionsRenderer;
+var directionsService;
+function getDirections(currentLocation, destinationLocation, currentMap) {
+  googleApiLoader
+    .importLibrary("routes")
+    .then(({ DirectionsService, DirectionsRenderer }) => {
+      if (!directionsService) {
+        directionsService = new DirectionsService();
+      }
+      if (!directionsRenderer) {
+        directionsRenderer = new DirectionsRenderer();
+        currentMap.then((map) => {
+          directionsRenderer.setMap(map);
+        });
+      }
+
+      var request = {
+        origin: currentLocation,
+        destination: destinationLocation,
+        travelMode: "DRIVING",
+      };
+
+      directionsService.route(request, (results, status) => {
+        if (status === "OK") {
+          directionsRenderer.setDirections(results);
+        } else console.log("Directions Failed: ", status);
+      });
+    });
 }
 
 function createMap(mapContainer, centerCoords) {
   const mapOptions = {
     center: centerCoords,
-    zoom: 15,
+    zoom: 17,
     disableDefaultUI: true,
     clickableIcons: false,
   };
 
-  googleApiLoader.importLibrary("maps").then(({ Map }) => {
+  return googleApiLoader.importLibrary("maps").then(({ Map }) => {
     var map = new Map(mapContainer, mapOptions);
     return map;
   });
 }
 
-export { googleApiLoader, autocompleteAndGeocode, geocode, createMap };
+export { googleApiLoader, autocomplete, geocode, createMap, getDirections };
