@@ -1,20 +1,28 @@
 import React from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../mock_logo.jpg";
 import "../css/Home.css";
 
 function Header() {
+  const location = useLocation();
+  // var username = location.state.username;
+
   return (
     <header>
-      <Nav>
-        <Link to={"/"}>
-          <img
-            src={logo}
-            alt="Let It Fly Logo"
-            height={100}
-          />
-        </Link>
+      <Link to={"/"}>
+        <img
+          className="header-left"
+          src={logo}
+          alt="Let It Fly Logo"
+          height={100}
+        />
+      </Link>
+      <div className="header-right">
+        <div className="header-right-top">
+          <p className="header-username">Hi Username!</p>
+        </div>
+
         <ul className="navbar-home">
           <Link to={"/register"}>
             <li>Settings</li>
@@ -23,15 +31,17 @@ function Header() {
             <li>Logout</li>
           </Link>
         </ul>
-      </Nav>
+      </div>
     </header>
   );
 }
 
 const Nav = styled.div`
+  background-color: violet;
   display: flex;
-  outline: 10px solid blue;
-  justify-content: center;
+  height: 100%;
+  border-bottom: 5px solid blue;
+  /* justify-content: center; */
 `;
 
 export default Header;
