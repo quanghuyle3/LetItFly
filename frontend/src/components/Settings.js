@@ -1,33 +1,85 @@
 import "../css/Settings.css";
 import { Fragment, useEffect } from "react";
+import React, { useState } from 'react';
 
 function Settings() {
-    /*useEffect(() => {
-        fetch("http://localhost:8080/api/findUserByEmail?email=driveraccount3@gmail.com", {
-        headers: { "Content-Type": "application/json" },
-        mode: 'no-cors'
-    }).then((response) => {response.json()})
-    }, [])*/
+    const [userInfo, setUserInfo] = useState(null);
 
-    fetch("http://localhost:8080/api/findUserByEmail?email=driveraccount3@gmail.com", {
+    useEffect(() => {
+        fetch("http://localhost:8080/api/user/findByEmail?email=passengeraccount@gmail.com", {
+        headers: { "Content-Type": "application/json" }
+        }).then((response) => {
+            response.json().then((jsonObject) => {
+                console.log(jsonObject);
+                setUserInfo(JSON.parse(JSON.stringify(jsonObject)));
+            })
+        })
+    }, []);
+
+    const handleAddress = () => {
+        const newAddress = prompt("Enter new Address: ");
+        var UserRequest = {
+            email: userInfo.email,
+            phone: userInfo.phone,
+            address: newAddress
+        };
+
+        fetch("http://localhost:8080/api/user/update", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        mode: 'no-cors'
-    }).then((response) => {response.json()})
+        body: JSON.stringify(UserRequest)
+        }).then((response) => {
+            window.location.reload();
+            alert("Update Successfull");
+        }).catch((error) => {
+            console.error("Update failed:", error);
+        });
+    };
+
+    const handlePhone = () => {
+        const newPhone = prompt("Enter new Phone: ");
+        var UserRequest = {
+            email: userInfo.email,
+            phone: newPhone,
+            address: userInfo.address
+        };
+
+        fetch("http://localhost:8080/api/user/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(UserRequest)
+        }).then((response) => {
+            window.location.reload();
+            alert("Update Successfull");
+        }).catch((error) => {
+            console.error("Update failed:", error);
+        });    
+    };
+
     return (
-        <Fragment>
-            <div class="row">
-                <h1>Settings:</h1>
-                <label for="fname">First name: </label>
-                <input type="text" placeholder="Fname"></input>
-                <button type="submit">Submit</button>
-                <label for="lname">Last name: </label>
-                <input type="text" id="lname" placeholder="Lname"></input>
-                <button type="submit">Submit</button>
-                <label for="email">E-mail: </label>
-                <input type="text" id="email" placeholder="Email"></input>
-                <button type="submit">Submit</button>
-            </div>
-        </Fragment>
+        <div className="row">
+            {userInfo !== null ? (
+                <Fragment>
+                    <h1>Account: </h1>
+                    <div>
+                        <p>First Name: {userInfo.firstName}</p>
+                        <p>Last Name: {userInfo.lastName}</p>
+                        <p>Email: {userInfo.email}</p>
+                        <p>Phone: {userInfo.phone}</p>
+                        <p>Adress: {userInfo.address}</p>
+                    </div>
+                    <div>
+                        <button onClick={handleAddress}>Change Address</button>
+                        <button onClick={handlePhone}>Change Phone</button>
+                    </div>
+                  
+
+                </Fragment>
+            ) : (
+                <p>Loading...</p>
+            )}  
+        </div>
+      
     );
     
 }
