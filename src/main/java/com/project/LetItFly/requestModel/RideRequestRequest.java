@@ -1,4 +1,4 @@
-package com.project.LetItFly.controller;
+package com.project.LetItFly.requestModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationResponse {
+public class RideRequestRequest {
 
     private int id;
-    private String email;
-    private String roleName;
-    private String token;
+    private double curLat;
+    private double curLong;
+    private double destLat;
+    private double destLong;
 }
