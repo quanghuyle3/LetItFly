@@ -112,18 +112,18 @@ header {
   font-family: "Titillium Web", sans-serif;
   /* height: 20px; */
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 900;
   border-radius: 1.25rem;
   width: 100px;
   color: black;
-  padding: 12px;
+  padding: 10px;
   margin-left: 20px;
-  background-color: rgb(255, 224, 187);
+  background-color: rgb(0, 248, 103);
   border: 2px solid black;
 
   &:hover {
     cursor: pointer;
-    background-color: rgb(247, 198, 138);
+    background-color: rgb(159, 253, 59);
   }
 }
 
