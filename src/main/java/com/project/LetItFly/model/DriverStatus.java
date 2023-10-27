@@ -1,5 +1,7 @@
 package com.project.LetItFly.model;
 
+import com.project.LetItFly.requestModel.DriverStatusRequest;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,9 +39,17 @@ public class DriverStatus {
     private int seatAvailable;
 
     @Column(name = "curLat")
-    private String curLat;
+    private double curLat;
 
     @Column(name = "curLong")
-    private String curLong;
+    private double curLong;
+
+    public DriverStatus(DriverStatusRequest dsRequest) {
+        this.id = dsRequest.getId();
+        this.dispatch = dsRequest.isDispatch();
+        this.seatAvailable = dsRequest.getSeatAvailable();
+        this.curLat = dsRequest.getCurLat();
+        this.curLong = dsRequest.getCurLong();
+    }
 
 }
