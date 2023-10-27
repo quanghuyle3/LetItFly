@@ -36,13 +36,40 @@ public class RideRequestController {
 
     }
 
+    // return the id of the ride request
+    // 0: if failed saving the ride request
     @PostMapping("/save")
-    public String save(@RequestBody RideRequestRequest rideRequestRequest) {
+    public int save(@RequestBody RideRequestRequest rideRequestRequest) {
         return rideRequestService.save(rideRequestRequest);
     }
 
+    // id of the ride request
     @GetMapping("/delete")
     public String delete(@RequestParam("id") int id) {
         return rideRequestService.delete(id);
     }
+
+    // find current ride request by passenger id
+    @GetMapping("/findByPassengerId")
+    public ResponseEntity<RideRequest> findByPassengerId(@RequestParam("id") int id) {
+        RideRequest rideRequest = rideRequestService.findRideRequestByPassengerId(id);
+        return ResponseEntity.ok(rideRequest);
+    }
+
+    // find current rides taken by driver id
+    @GetMapping("/findByDriverId")
+    public ResponseEntity<List<RideRequest>> findByDriverId(@RequestParam("id") int id) {
+        List<RideRequest> rideRequests = rideRequestService.findRideRequestByDriverId(id);
+        return ResponseEntity.ok(rideRequests);
+    }
+
+    // update current coordinates of passenger
+
+    // get current coordinates of passenger
+
+    // add the driver id to the ride (the one accepts the ride)
+    // this will also set the start attribute of the ride to TRUE
+
+    // get driver id of the ride request
+    // 0: if no driver accepts the ride yet
 }
