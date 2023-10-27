@@ -11,7 +11,11 @@ public interface RideRequestService {
 
     public List<RideRequest> findAllRideRequest();
 
-    public String save(RideRequestRequest rideRequestRequest);
+    public int save(RideRequestRequest rideRequestRequest);
 
     public String delete(int id);
+
+    public RideRequest findRideRequestByPassengerId(int passengerId);
+
+    public List<RideRequest> findRideRequestByDriverId(int driverId);
 }
