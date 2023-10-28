@@ -29,9 +29,6 @@ function CustomerHome() {
     }
   });
 
-  // const location = useLocation();
-  // console.log("logging cookie:", location.state);
-
   return (
     <>
       <Header />

@@ -6,7 +6,7 @@ import "../css/Home.css";
 
 function Header() {
   const location = useLocation();
-  // var username = location.state.username;
+  var username = location.state?.email;
 
   return (
     <header>
@@ -20,7 +20,9 @@ function Header() {
       </Link>
       <div className="header-right">
         <div className="header-right-top">
-          <p className="header-username">Hi Username!</p>
+          <p className="header-username">
+            {username ? `Hi ${username}!` : "Hi username!"}
+          </p>
         </div>
 
         <ul className="navbar-home">

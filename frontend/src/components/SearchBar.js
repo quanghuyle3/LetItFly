@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import "../css/Home.css";
 import { autocomplete, geocode, getDirections } from "./MapUtilities";
+import { useLocation } from "react-router-dom";
 
 function SearchBar({
   currentMap,
@@ -10,6 +11,7 @@ function SearchBar({
   setDuration,
   setCost,
 }) {
+  const location = useLocation();
   useEffect(() => {
     var inputElement = document.getElementsByClassName("search-bar")[0];
     autocomplete(inputElement, () => {
@@ -42,18 +44,33 @@ function SearchBar({
       return alert("Please choose a destination!");
     }
 
+    const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
+
     // send a POST request to backend
-    const url = "";
+    const url = `${proxy}/api/ride-request/save`;
+    console.log(currentRoute.current);
+    console.log(location.state.tokenObject.token);
     fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + location.state.tokenObject.token,
+      },
       body: JSON.stringify({
-        currentLat: currentRoute.current.startLat,
-        currentLat: currentRoute.current.startLng,
+        curLat: currentRoute.current.startLat,
+        curLong: currentRoute.current.startLng,
         destLat: currentRoute.current.endLat,
-        destLat: currentRoute.current.endLng,
+        destLong: currentRoute.current.endLng,
+        passengerId: location.state.tokenObject.id,
       }),
-    });
+    })
+      .then((response) => {
+        console.log(response);
+        return response.json();
+      })
+      .then((data) => {
+        console.log("returned data: ", data);
+      });
   }
 
   return (
