@@ -39,7 +39,9 @@ function Login() {
         console.log(tokenObject);
         const authenticationObject = tokenObject;
         console.log(authenticationObject.token);
-        navigate("/customer", { state: { tokenObject } });
+        tokenObject.roleName === "ROLE_DRIVER"
+          ? navigate("/driver", { state: { tokenObject } })
+          : navigate("/customer", { state: { tokenObject } });
       })
       .catch((error) => {
         console.error("Login failed:", error);

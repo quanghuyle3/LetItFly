@@ -7,6 +7,11 @@ import { useLocation } from "react-router-dom";
 function CustomerHome() {
   const currentMap = useRef();
   const currentRoute = useRef();
+  const {
+    state: {
+      tokenObject: { email: userEmail },
+    },
+  } = useLocation();
 
   const [distance, setDistance] = useState("0 mi");
   const [duration, setDuration] = useState("0 mins");
@@ -31,7 +36,7 @@ function CustomerHome() {
 
   return (
     <>
-      <Header />
+      <Header userEmail={userEmail} />
       <SearchBar
         currentMap={currentMap}
         userLocation={userLocation}

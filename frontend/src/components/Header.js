@@ -4,9 +4,8 @@ import { Link, useLocation } from "react-router-dom";
 import logo from "../mock_logo.jpg";
 import "../css/Home.css";
 
-function Header() {
+function Header({ userEmail }) {
   const location = useLocation();
-  var username = location.state?.email;
 
   return (
     <header>
@@ -21,7 +20,7 @@ function Header() {
       <div className="header-right">
         <div className="header-right-top">
           <p className="header-username">
-            {username ? `Hi ${username}!` : "Hi username!"}
+            {userEmail ? `Hi ${userEmail}!` : "Hi username!"}
           </p>
         </div>
 
