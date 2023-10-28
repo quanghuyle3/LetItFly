@@ -18,4 +18,12 @@ public interface RideRequestService {
     public RideRequest findRideRequestByPassengerId(int passengerId);
 
     public List<RideRequest> findRideRequestByDriverId(int driverId);
+
+    public String updateCoordinatesPassenger(int passengerId, double curLat, double curLong);
+
+    public String setDriverToRideRequest(int driverId, int rideId);
+
+    public int getDriverIdOfRideRequest(int passengerId);
+
+    public String deleteByPassengerId(int passengerId);
 }
