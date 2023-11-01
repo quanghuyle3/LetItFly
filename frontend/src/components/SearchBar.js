@@ -1,102 +1,76 @@
 import { useEffect } from "react";
 import "../css/Home.css";
+import { autocomplete, geocode, getDirections } from "./MapUtilities";
+import { useLocation, useNavigate } from "react-router-dom";
 
-function SearchBar({ Loader, currentMap, userLocation }) {
-  // const [address, setAddress] = useState("");
+function SearchBar({
+  currentMap,
+  userLocation,
+  currentRoute,
+  setDistance,
+  setDuration,
+  setCost,
+}) {
+  const location = useLocation();
+  const navigate = useNavigate();
   useEffect(() => {
-    initAutocomplete();
+    var inputElement = document.getElementsByClassName("search-bar")[0];
+    autocomplete(inputElement, () => {
+      geocode(inputElement.value, geocodeCallback);
+    });
   });
 
-  function initAutocomplete() {
-    // autocomplete will return results within these bounds
-    const bayAreaBounds = {
-      north: -122.6629018966861,
-      south: -121.61026004010768,
-      east: 37.235567063362325,
-      west: 37.96328887243628,
-    };
+  function geocodeCallback(results, status) {
+    if (status === "OK") {
+      var destinationLocation = {
+        lat: results[0].geometry.location.lat(),
+        lng: results[0].geometry.location.lng(),
+      };
+      userLocation.then((userLocation) => {
+        getDirections(
+          userLocation,
+          destinationLocation,
+          currentMap.current,
+          currentRoute,
+          setDistance,
+          setDuration,
+          setCost
+        );
+      });
+    }
+  }
 
-    // input element to use
-    const input = document.getElementsByClassName("search-bar")[0];
+  function goButtonClickHandler() {
+    if (!currentRoute.current) {
+      return alert("Please choose a destination!");
+    }
 
-    // map options
-    const options = {
-      bounds: bayAreaBounds,
-      componentRestrictions: { country: "us" },
-      fields: ["geometry"],
-      type: ["airport", "geocode", "street_address", "street_number"],
-    };
+    const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
 
-    let autocomplete;
-    Loader.load().then(async () => {
-      const { Autocomplete } = await window.google.maps.importLibrary("places");
-      autocomplete = new Autocomplete(input, options);
-
-      autocomplete.addListener("place_changed", () => {
-        console.log(input.value);
-
-        var geocoder = new window.google.maps.Geocoder();
-        geocoder.geocode({ address: input.value }, (results, status) => {
-          if (status === "OK") {
-            var destinationLatitude = results[0].geometry.location.lat();
-            var destinationLongitude = (destinationLatitude =
-              results[0].geometry.location.lng());
-
-            console.log(destinationLatitude, destinationLongitude);
-
-            const marker = new window.google.maps.Marker({
-              position: {
-                lat: destinationLatitude,
-                lng: destinationLongitude,
-              },
-              map: currentMap.map,
-              title: input.value,
-            });
-
-            currentMap.current.panTo({
-              lat: destinationLatitude,
-              lng: destinationLongitude,
-            });
-            marker.setMap(currentMap.current);
-
-            // Directions
-            var directionsService = new window.google.maps.DirectionsService();
-            var directionsRenderer =
-              new window.google.maps.DirectionsRenderer();
-
-            var user_location;
-            navigator.geolocation.getCurrentPosition(
-              ({ coords: { latitude, longitude } }) => {
-                user_location = { lat: latitude, lng: longitude };
-              }
-            );
-
-            var start = new window.google.maps.LatLng(37.3352, -121.88111);
-            var end = new window.google.maps.LatLng(
-              destinationLatitude,
-              destinationLongitude
-            );
-
-            console.log(start, end);
-            var request = {
-              // origin: { lat: 37.3352, lng: -121.881 },
-              origin: "San José State University, Washington Sq, San Jose, CA",
-              destination: input.value,
-              travelMode: "DRIVING",
-            };
-            directionsRenderer.setMap(currentMap.current);
-            directionsService.route(request, (results, status) => {
-              if (status === "OK") {
-                directionsRenderer.set("directions", null);
-                directionsRenderer.setDirections(results);
-              } else {
-                console.log(status);
-              }
-            });
-          } else console.log(status);
+    // send a POST request to backend
+    const url = `${proxy}/api/ride-request/save`;
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + location.state.tokenObject.token,
+      },
+      body: JSON.stringify({
+        curLat: currentRoute.current.startLat,
+        curLong: currentRoute.current.startLng,
+        destLat: currentRoute.current.endLat,
+        destLong: currentRoute.current.endLng,
+        passengerId: location.state.tokenObject.id,
+      }),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        navigate("/customer/ride", {
+          state: { rideRequestId: data, cookie: location.state.tokenObject },
         });
       });
-    });
   }
 
   return (
@@ -106,6 +80,9 @@ function SearchBar({ Loader, currentMap, userLocation }) {
         type="text"
         placeholder="Enter address..."
       />
+      <button id="go-button" onClick={() => goButtonClickHandler()}>
+        START
+      </button>
     </div>
   );
 }
