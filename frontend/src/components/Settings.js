@@ -1,87 +1,70 @@
-import "../css/Settings.css";
+import Account from "./Account";
+import Payment from "./Payment";
+import VehicleInformation from "./VehicleInformation";
 import { Fragment, useEffect } from "react";
 import React, { useState } from 'react';
+import "../css/Settings.css";
 
-function Settings() {
-    const [userInfo, setUserInfo] = useState(null);
+function Settings({cookie}) {
 
+    const [userData, setUserData] = useState([]);
+    const [activeTab, setActiveTab] = useState('tab1');
+  
+    var shouldShowTab = true; 
+    
     useEffect(() => {
-        fetch("http://localhost:8080/api/user/findByEmail?email=passengeraccount@gmail.com", {
-        headers: { "Content-Type": "application/json" }
+        fetch(`http://localhost:8080/api/user/findByEmail?email=${cookie.email}`, {
+        headers: { "Content-Type": "application/json" },
+        "Authorization": "Bearer " + cookie.token
         }).then((response) => {
-            response.json().then((jsonObject) => {
-                console.log(jsonObject);
-                setUserInfo(JSON.parse(JSON.stringify(jsonObject)));
+            response.json().then((jsonData) => {
+                const dataArray = jsonData.roles;
+                setUserData(dataArray);
             })
         })
     }, []);
+    
+    userData.map((item) => {
+        if(item.name == "ROLE_PASSENGER") {
+            shouldShowTab = false; 
+        }
+    })
 
-    const handleAddress = () => {
-        const newAddress = prompt("Enter new Address: ");
-        var UserRequest = {
-            email: userInfo.email,
-            phone: userInfo.phone,
-            address: newAddress
-        };
-
-        fetch("http://localhost:8080/api/user/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(UserRequest)
-        }).then((response) => {
-            window.location.reload();
-            alert("Update Successfull");
-        }).catch((error) => {
-            console.error("Update failed:", error);
-        });
-    };
-
-    const handlePhone = () => {
-        const newPhone = prompt("Enter new Phone: ");
-        var UserRequest = {
-            email: userInfo.email,
-            phone: newPhone,
-            address: userInfo.address
-        };
-
-        fetch("http://localhost:8080/api/user/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(UserRequest)
-        }).then((response) => {
-            window.location.reload();
-            alert("Update Successfull");
-        }).catch((error) => {
-            console.error("Update failed:", error);
-        });    
-    };
-
+    const handleTabClick = (tabName) => {
+        setActiveTab(tabName);
+    }
+    
     return (
         <div className="row">
-            {userInfo !== null ? (
-                <Fragment>
-                    <h1>Account: </h1>
-                    <div>
-                        <p>First Name: {userInfo.firstName}</p>
-                        <p>Last Name: {userInfo.lastName}</p>
-                        <p>Email: {userInfo.email}</p>
-                        <p>Phone: {userInfo.phone}</p>
-                        <p>Adress: {userInfo.address}</p>
-                    </div>
-                    <div>
-                        <button onClick={handleAddress}>Change Address</button>
-                        <button onClick={handlePhone}>Change Phone</button>
-                    </div>
-                  
+            <div className="tab-bar">
+                <button
+                className={activeTab === 'tab1' ? 'active' : ''}
+                onClick={() => handleTabClick('tab1')}
+                >
+                Account
+                </button>
+                <button
+                className={activeTab === 'tab2' ? 'active' : ''}
+                onClick={() => handleTabClick('tab2')}
+                >
+                Payment Information
+                </button>
+                {shouldShowTab && (
+                <button
+                    className={`tab-button ${activeTab === 'tab3' ? 'active' : ''}`}
+                    onClick={() => handleTabClick('tab3')}
+                >
+                    Vehicle Information 
+                </button>
+            )}
 
-                </Fragment>
-            ) : (
-                <p>Loading...</p>
-            )}  
-        </div>
-      
+            </div>
+            <div className="tab-content">
+                {activeTab === 'tab1' && <Account cookie={cookie}/>}
+                {activeTab === 'tab2' && <Payment cookie={cookie}/>}
+                {activeTab === 'tab3' && <VehicleInformation cookie={cookie}/>}
+            </div>
+     </div>
     );
-    
 }
-
 export default Settings;
