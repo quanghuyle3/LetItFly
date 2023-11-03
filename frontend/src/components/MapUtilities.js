@@ -135,6 +135,34 @@ function createMap(mapContainer, centerCoords) {
   });
 }
 
+function createMarker(map) {
+    return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
+        const image =
+            "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
+
+        map.then((actualMap) => {
+            const marker = new Marker({
+                position: { lat: 37.35646273790564, lng: -121.89294433357483 },
+                map: actualMap,
+                icon: image,
+            });
+            //click event
+            marker.addListener("click", function () {
+                // Place your custom code here
+                //alert('Marker was clicked!');
+
+                // For example, to center the map at the marker's location:
+                actualMap.setCenter(marker.getPosition());
+            });
+            //marker.setMap(map);
+            //console.log("Marker", marker);
+            //console.log("THIS IS THE MAP qweeqw: ", map);
+            return marker;
+        })
+
+    });
+}
+
 export {
   googleApiLoader,
   autocomplete,
@@ -142,4 +170,5 @@ export {
   createMap,
   getDirections,
   userLocation,
+  createMarker
 };
