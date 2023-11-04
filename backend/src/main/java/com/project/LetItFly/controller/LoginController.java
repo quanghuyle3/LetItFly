@@ -47,7 +47,8 @@ public class LoginController {
             String jwt = jwtService.generateToken(user);
             return ResponseEntity.ok(
                     new AuthenticationResponse().builder().id(user.getId()).email(user.getEmail())
-                            .roleName(roles.get(0).getName()).token(jwt).build());
+                            .roleName(roles.get(0).getName()).token(jwt).firstName(user.getFirstName())
+                            .lastName(user.getLastName()).build());
 
         } catch (BadCredentialsException m) {
             return ResponseEntity.status(HttpStatusCode.valueOf(401)) // unauthorized
