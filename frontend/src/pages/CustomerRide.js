@@ -59,10 +59,14 @@ function CustomerRide() {
     token: token,
     param1: rideRequestId,
   });
+  console.log("Just posted from main thread");
   customerRideWorker.onmessage = (e) => {
     console.log(e.data);
     if (e.data.driverId) {
-      setRideAccepted(true);
+      if (!rideAccepted) {
+        setRideAccepted(true);
+      }
+      console.log("driver id has been found");
     }
   };
 
