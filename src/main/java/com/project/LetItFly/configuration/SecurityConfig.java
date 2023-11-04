@@ -39,8 +39,8 @@ public class SecurityConfig {
                                 .requestMatchers("/registration").permitAll()
                                 .requestMatchers("/api/check").permitAll()
                                 .requestMatchers("/api/test").permitAll()
-                                // .anyRequest().authenticated())
-                                .anyRequest().permitAll())
+                                .anyRequest().authenticated())
+                                // .anyRequest().permitAll())
                                 .sessionManagement((sessionManagement) -> sessionManagement
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authenticationProvider(authenticationProvider)
