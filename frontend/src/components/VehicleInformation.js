@@ -10,8 +10,8 @@ function VehicleInformation({cookie}) {
 
     useEffect(() => {
         fetch(`http://localhost:8080/api/vehicle/findByUserId?userId=${cookie.id}`, {
-        headers: { "Content-Type": "application/json" },
-        "Authorization": "Bearer " + cookie.token
+        headers: { "Content-Type": "application/json",
+        "Authorization": "Bearer " + cookie.token}
         }).then((response) => {
             response.json().then((jsonObject) => {
                 setUserInfo(JSON.parse(JSON.stringify(jsonObject)));
