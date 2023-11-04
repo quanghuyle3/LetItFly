@@ -15,7 +15,7 @@ function Header({ cookie }) {
           src={logo}
           alt="Let It Fly Logo"
           height={100}
-        />
+        /> 
       </Link>
       <div className="header-right">
         <div className="header-right-top">
