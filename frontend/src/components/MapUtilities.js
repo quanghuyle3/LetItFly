@@ -135,14 +135,15 @@ function createMap(mapContainer, centerCoords) {
   });
 }
 
-function createMarker(map) {
+function createMarker(map, passLat, passedLng) {
     return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
         const image =
             "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
 
         map.then((actualMap) => {
+            //console.log("Passed", typeof passLat, typeof passedLng)
             const marker = new Marker({
-                position: { lat: 37.35646273790564, lng: -121.89294433357483 },
+                position: { lat: passLat, lng: passedLng },
                 map: actualMap,
                 icon: image,
             });
