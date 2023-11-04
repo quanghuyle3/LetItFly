@@ -8,7 +8,11 @@ import { createMarker } from "../components/MapUtilities";
 
 function DriverHome() {
     const currentMap = useRef();
-
+    const {
+        state: {
+          tokenObject: cookie
+        },
+      } = useLocation();
     // wrap user location in a promise
     const userLocation = new Promise((resolve, reject) => {
         if (navigator.geolocation) {
@@ -32,9 +36,8 @@ function DriverHome() {
 
     return (
         <>
-            <Header />
+            <Header cookie={cookie} />
             <DriverMap currentMap={currentMap} userLocation={userLocation} />
-            <History />
         </>
     );
 }
