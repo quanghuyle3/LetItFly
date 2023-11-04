@@ -10,7 +10,7 @@ function CustomerHome() {
   const currentMap = useRef();
   const {
     state: {
-      tokenObject: { email: userEmail },
+      tokenObject: cookie
     },
   } = useLocation();
 
@@ -20,7 +20,7 @@ function CustomerHome() {
 
   return (
     <>
-      <Header userEmail={userEmail} />
+      <Header cookie={cookie} />
       <SearchBar
         currentMap={currentMap}
         userLocation={userLocation}

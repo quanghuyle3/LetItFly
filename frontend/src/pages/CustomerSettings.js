@@ -1,7 +1,16 @@
 import React from "react";
+import Settings from "../components/Settings";
+import Header from "../components/Header";
+import { useLocation } from "react-router-dom";
 
 function CustomerSettings() {
-  return <h1>Customer Settings Page</h1>;
+  const location = useLocation(); 
+  return (
+    <>
+      <Header cookie={location.state.cookie}/>
+      <Settings cookie={location.state.cookie}/>
+    </>
+  );
 }
 
 export default CustomerSettings;
