@@ -37,7 +37,7 @@ function DriverHome() {
     return (
         <>
             <Header cookie={cookie} />
-            <DriverMap currentMap={currentMap} userLocation={userLocation} />
+            <DriverMap currentMap={currentMap} userLocation={userLocation} cookie={cookie} />
         </>
     );
 }
