@@ -1,5 +1,22 @@
 import { Loader } from "@googlemaps/js-api-loader";
 
+// wrap user location in a promise
+const userLocation = new Promise((resolve, reject) => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      ({ coords: { latitude, longitude } }) => {
+        resolve({ lat: latitude, lng: longitude });
+      },
+      (error) => {
+        console.log(error);
+      },
+      { enableHighAccuracy: true, maximumAge: 1, timeout: 15000 }
+    );
+  } else {
+    reject(null);
+  }
+});
+
 // reusable loader with api key
 const googleApiLoader = new Loader({
   apiKey: process.env.REACT_APP_GOOGLE_KEY,
@@ -58,6 +75,9 @@ function getDirections(
   setDuration,
   setCost
 ) {
+  setDistance = setDistance || 0;
+  setDuration = setDuration || 0;
+  setCost = setCost || 0;
   googleApiLoader
     .importLibrary("routes")
     .then(({ DirectionsService, DirectionsRenderer }) => {
@@ -115,4 +135,40 @@ function createMap(mapContainer, centerCoords) {
   });
 }
 
-export { googleApiLoader, autocomplete, geocode, createMap, getDirections };
+function createMarker(map) {
+    return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
+        const image =
+            "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
+
+        map.then((actualMap) => {
+            const marker = new Marker({
+                position: { lat: 37.35646273790564, lng: -121.89294433357483 },
+                map: actualMap,
+                icon: image,
+            });
+            //click event
+            marker.addListener("click", function () {
+                // Place your custom code here
+                //alert('Marker was clicked!');
+
+                // For example, to center the map at the marker's location:
+                actualMap.setCenter(marker.getPosition());
+            });
+            //marker.setMap(map);
+            //console.log("Marker", marker);
+            //console.log("THIS IS THE MAP qweeqw: ", map);
+            return marker;
+        })
+
+    });
+}
+
+export {
+  googleApiLoader,
+  autocomplete,
+  geocode,
+  createMap,
+  getDirections,
+  userLocation,
+  createMarker
+};
