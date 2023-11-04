@@ -1,19 +1,19 @@
 USE let_it_fly;
 
 INSERT INTO user (email, password, first_name, last_name, birthdate, gender, address, phone, driver_license) VALUES
-		("driveraccount2@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq", "George", "Billy", "2001-10-07", "male", "3rd Street, San Jose, CA 95121", "4095627864", "K6728892");
+		("driveraccount2@gmail.com", "$2a$10$3zpAqif8gyRiukDi84gonuJtUScU6eiSZS7C2gnbqbs0S4kOdFZX.", "George", "Billy", "2001-10-07", "male", "3rd Street, San Jose, CA 95121", "4095627864", "K6728892");
 INSERT INTO user (email, password, first_name, last_name, birthdate, gender, address, phone) VALUES
-		("passengeraccount2@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq", "Sally", "Jenny", "2003-06-07", "female", "4rd Street, San Jose, CA 95121", "4095627864");
+		("passengeraccount2@gmail.com", "$2a$10$3zpAqif8gyRiukDi84gonuJtUScU6eiSZS7C2gnbqbs0S4kOdFZX.", "Sally", "Jenny", "2003-06-07", "female", "4rd Street, San Jose, CA 95121", "4095627864");
         
 INSERT INTO user (email, password, first_name, last_name, birthdate, gender, address, phone, driver_license) VALUES
-		("driveraccount3@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq", "Bobby", "Henderson", "2001-10-07", "male", "3rd Street, San Jose, CA 95121", "4095627864", "K6728892");
+		("driveraccount3@gmail.com", "$2a$10$3zpAqif8gyRiukDi84gonuJtUScU6eiSZS7C2gnbqbs0S4kOdFZX.", "Bobby", "Henderson", "2001-10-07", "male", "3rd Street, San Jose, CA 95121", "4095627864", "K6728892");
 INSERT INTO user (email, password, first_name, last_name, birthdate, gender, address, phone) VALUES
-		("passengeraccount3@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq", "Hana", "Van", "2001-10-07", "female", "3rd Street, San Jose, CA 95121", "4095627864");
+		("passengeraccount3@gmail.com", "$2a$10$3zpAqif8gyRiukDi84gonuJtUScU6eiSZS7C2gnbqbs0S4kOdFZX.", "Hana", "Van", "2001-10-07", "female", "3rd Street, San Jose, CA 95121", "4095627864");
         
 INSERT INTO user (email, password, first_name, last_name, birthdate, gender, address, phone) VALUES
-		("dummypassenger1@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq", "Kimbel", "Sihk", "1995-11-07", "famale", "1st Street, San Jose, CA 95121", "4095627864"),
-        ("dummypassenger2@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq", "Josh", "Ken", "1993-08-07", "male", "2nd Street, San Jose, CA 95121", "4095627864"),
-        ("dummypassenger3@gmail.com", "$2a$10$591ppVsEmSnbkbTCZDapmuytr//Txp5I7Zm9dfuDKfiI7W9gHcdIq", "Thanh", "West", "1999-03-07", "female", "3rd Street, San Jose, CA 95121", "4095627864"); 
+		("dummypassenger1@gmail.com", "$2a$10$3zpAqif8gyRiukDi84gonuJtUScU6eiSZS7C2gnbqbs0S4kOdFZX.", "Kimbel", "Sihk", "1995-11-07", "famale", "1st Street, San Jose, CA 95121", "4095627864"),
+        ("dummypassenger2@gmail.com", "$2a$10$3zpAqif8gyRiukDi84gonuJtUScU6eiSZS7C2gnbqbs0S4kOdFZX.", "Josh", "Ken", "1993-08-07", "male", "2nd Street, San Jose, CA 95121", "4095627864"),
+        ("dummypassenger3@gmail.com", "$2a$10$3zpAqif8gyRiukDi84gonuJtUScU6eiSZS7C2gnbqbs0S4kOdFZX.", "Thanh", "West", "1999-03-07", "female", "3rd Street, San Jose, CA 95121", "4095627864"); 
         
 INSERT INTO payment (card_number, expiration, cvv, type, user_id, name, billing_address) VALUES
 		("1000000000000003", "10/2024", 123, "debit", 10002, "Kevin Star", "5rd Street, San Jose, CA 95121"),
