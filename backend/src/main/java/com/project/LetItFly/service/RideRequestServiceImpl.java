@@ -2,6 +2,7 @@ package com.project.LetItFly.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.project.LetItFly.model.DriverStatus;
@@ -61,7 +62,9 @@ public class RideRequestServiceImpl implements RideRequestService {
         // retrieve the passenger object first
         User passenger = userRepository.findUserById(passengerId);
 
-        return rideRequestRepository.findRideRequestByPassengerId(passenger);
+        List<RideRequest> rideRequests = rideRequestRepository.findRideRequestByPassengerId(passenger);
+
+        return rideRequests == null ? null : rideRequests.get(rideRequests.size() - 1);
     }
 
     @Override
@@ -79,7 +82,11 @@ public class RideRequestServiceImpl implements RideRequestService {
         User passenger = userRepository.findUserById(passengerId);
 
         // retrive the ride that the passenger currently requesting
-        RideRequest rideRequest = rideRequestRepository.findRideRequestByPassengerId(passenger);
+        List<RideRequest> rideRequests = rideRequestRepository.findRideRequestByPassengerId(passenger);
+
+        RideRequest rideRequest = null;
+        if (rideRequests != null)
+            rideRequest = rideRequests.get(rideRequests.size() - 1);
 
         // update coords
         if (rideRequest == null) {
@@ -127,7 +134,11 @@ public class RideRequestServiceImpl implements RideRequestService {
         User passenger = userRepository.findUserById(passengerId);
 
         // retrieve the ride request object
-        RideRequest rideRequest = rideRequestRepository.findRideRequestByPassengerId(passenger);
+        List<RideRequest> rideRequests = rideRequestRepository.findRideRequestByPassengerId(passenger);
+
+        RideRequest rideRequest = null;
+        if (rideRequests != null)
+            rideRequest = rideRequests.get(rideRequests.size() - 1);
 
         // check if there's a driver
         if (rideRequest.getDriverId() != null) {
@@ -143,12 +154,12 @@ public class RideRequestServiceImpl implements RideRequestService {
         User passenger = userRepository.findUserById(passengerId);
 
         // retrieve ride request
-        RideRequest rideRequest = rideRequestRepository.findRideRequestByPassengerId(passenger);
+        List<RideRequest> rideRequest = rideRequestRepository.findRideRequestByPassengerId(passenger);
 
         if (rideRequest == null) {
             return "NOT EXIST";
         } else {
-            rideRequestRepository.delete(rideRequest);
+            rideRequestRepository.deleteAll(rideRequest);
             return "SUCCESS";
         }
     }

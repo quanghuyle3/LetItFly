@@ -24,7 +24,7 @@ function DriverMap({ currentMap, userLocation, cookie}) {
                 Authorization: "Bearer " + cookie.token,
             }}).then(response => response.json()).then(data => {
                 for (let i = 0; i < data.length; i++) {
-                    //console.log('Latitude:', typeof data[i].curLat, 'Longitude:', typeof data[i].curLong);
+                    console.log('Latitude:', typeof data[i].curLat, 'Longitude:', typeof data[i].curLong);
                     const marker = createMarker(
                         map,
                         data[i].curLat,

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField, Button, Container, Stack } from "@mui/material";
+import { TextField, Button, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -7,6 +7,17 @@ import Checkbox from "@mui/material/Checkbox";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import Autocomplete from "@mui/material/Autocomplete";
+import Alert from "@mui/material/Alert";
+import { stateAcronyms } from "./Categories";
+import dayjs from "dayjs";
+import {
+  isValidZipCode,
+  isValidAddress,
+  isValidName,
+  isValidCVV,
+  isValidCard,
+} from "./Valdiation";
 
 const CardInfo = (props) => {
   const [firstName, setFirstName] = useState("");
@@ -19,12 +30,19 @@ const CardInfo = (props) => {
   const [exprDate, setExprDate] = useState();
   const [CVV, setCVV] = useState("");
   const [goPrev, setGoPrev] = useState(false);
+  const [firstNameError, setFirstNameError] = useState(false);
+  const [lastNameError, setLastNameError] = useState(false);
+  const [addressError, setAddressError] = useState(false);
+  const [zipCodeError, setZipCodeError] = useState(false);
+  const [cardNumberError, setCardNumberError] = useState(false);
+  const [cvvError, setCVVError] = useState(false);
+  const [failed, setFailed] = useState(0);
   const navigate = useNavigate();
   const basicInfo = props.basicInfo;
 
   const changeUserInfo = (e) => {
     setUseInfo(e.target.checked);
-    if (useInfo == false) {
+    if (useInfo === false) {
       setFirstName(basicInfo.firstName);
       setLastName(basicInfo.lastName);
       setAddress(basicInfo.address);
@@ -44,57 +62,120 @@ const CardInfo = (props) => {
     props.prev();
   }
 
+  function validation() {
+    let isfailed = false;
+    if (!isValidName(firstName)) {
+      setFirstNameError(true);
+      isfailed = true;
+    } else {
+      isfailed = false;
+      setFirstNameError(false);
+    }
+    if (!isValidName(lastName)) {
+      setLastNameError(true);
+      isfailed = true;
+    } else {
+      isfailed = false;
+      setLastNameError(false);
+    }
+    if (!isValidAddress(address)) {
+      isfailed = true;
+      setAddressError(true);
+    } else {
+      isfailed = false;
+      setAddressError(false);
+    }
+    if (!isValidZipCode(zipcode)) {
+      isfailed = true;
+      setZipCodeError(true);
+    } else {
+      isfailed = false;
+      setZipCodeError(false);
+    }
+    if (!isValidCard(cardNumber)) {
+      isfailed = true;
+      setCardNumberError(cardNumber);
+    } else {
+      isfailed = false;
+      setCardNumberError(false);
+    }
+    if (!isValidCVV(CVV)) {
+      isfailed = true;
+      setCVVError(CVV);
+    } else {
+      isfailed = false;
+      setCVVError(false);
+    }
+    return isfailed;
+  }
+
   function handleSubmit(event) {
-    // TO-DO: Validation
     event.preventDefault();
-    const basicInfo = props.basicInfo;
-    const newAccount = {
-      email: basicInfo.email,
-      password: basicInfo.password,
-      firstName: basicInfo.firstName,
-      lastName: basicInfo.lastName,
-      birthDate: basicInfo.birthDate,
-      gender: basicInfo.gender,
-      address: basicInfo.address + " " + basicInfo.state + " " + basicInfo.zipcode,
-      phone: basicInfo.phone,
-      dateJoin: null,
-      driverLicense: basicInfo.driverLicense,
-      roleName: basicInfo.roleName,
-      cardNumber: cardNumber,
-      expiration: exprDate,
-      cvv: CVV,
-      paymentType: "Credit",
-      name: firstName + " " + lastName,
-      billingAddress: address + state + zipcode,
-      licensePlate: basicInfo.licensePlate,
-      make: basicInfo.make,
-      model: basicInfo.model,
-      year: basicInfo.year,
-      vehicleType: basicInfo.vehicleType,
-    };
-    fetch("http://localhost:8080/registration/user", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newAccount),
-    }).then((response) => {
-      response
-        .text()
-        .then((newUser) => {
-          console.log(response);
-          if (response.status == 200) {
-            console.log("Registration successful", newUser);
-            if (basicInfo.roleName == "ROLE_DRIVER") {
-              navigate("/driver");
-            } else {
-              navigate("/customer");
+    let isfail = validation();
+    if (isfail) {
+      setFailed(3);
+      return;
+    } else {
+      const basicInfo = props.basicInfo;
+      const newAccount = {
+        email: basicInfo.email,
+        password: basicInfo.password,
+        firstName: basicInfo.firstName,
+        lastName: basicInfo.lastName,
+        birthDate: (basicInfo.birthDate).format("MM/DD/YYYY"),
+        gender: basicInfo.gender,
+        address:
+          basicInfo.address + " " + basicInfo.state + " " + basicInfo.zipcode,
+        phone: basicInfo.phone,
+        dateJoin: dayjs().format("MM/DD/YYYY"),
+        driverLicense: basicInfo.driverLicense,
+        roleName: basicInfo.roleName,
+        cardNumber: cardNumber,
+        expiration: exprDate,
+        cvv: CVV,
+        paymentType: "Credit",
+        name: firstName + " " + lastName,
+        billingAddress: address + state + zipcode,
+        licensePlate: basicInfo.licensePlate,
+        make: basicInfo.make,
+        model: basicInfo.model,
+        year: basicInfo.year,
+        vehicleType: basicInfo.vehicleType,
+      };
+      console.log(newAccount);
+      fetch("http://localhost:8080/registration/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newAccount),
+      }).then((response) => {
+        response
+          .text()
+          .then((newUser) => {
+            console.log(response);
+            if (response.status === 200) {
+              console.log("Registration successful", newUser);
+              basicInfo.roleName === "ROLE_DRIVER"
+                ? navigate("/driver")
+                : navigate("/customer");
+            } else if (response.status === 302) {
+              console.log(
+                "Registration failed: Email already exists.",
+                newUser
+              );
+              setFailed(1);
+            } else if (response.status === 323) {
+              console.log(
+                "Registration failed: Driver License already exist.",
+                newUser
+              );
+              setFailed(2);
             }
-           
-          } 
-        })
-        .catch((error) => {
-          console.error("Registration failed:", error);
-        });
-    });
+          })
+          .catch((error) => {
+            console.error("Registration failed: ", error);
+          });
+      });
+    }
   }
   return (
     <div
@@ -122,6 +203,7 @@ const CardInfo = (props) => {
               label="First Name"
               onChange={(e) => setFirstName(e.target.value)}
               value={firstName}
+              error={firstNameError}
               fullWidth
               required={!goPrev}
             />
@@ -132,6 +214,7 @@ const CardInfo = (props) => {
               label="Last Name"
               onChange={(e) => setLastName(e.target.value)}
               value={lastName}
+              error={lastNameError}
               fullWidth
               required={!goPrev}
             />
@@ -145,18 +228,20 @@ const CardInfo = (props) => {
               onChange={(e) => setAddress(e.target.value)}
               value={address}
               required={!goPrev}
+              error={addressError}
               fullWidth
               sx={{ mb: 4 }}
             />
-            <TextField
-              type="text"
-              variant="outlined"
-              color="primary"
-              label="State"
-              onChange={(e) => setState(e.target.value)}
+            <Autocomplete
+              disablePortal
+              required
               value={state}
-              required={!goPrev}
-              sx={{ mb: 4 }}
+              options={stateAcronyms}
+              sx={{ width: 200 }}
+              onChange={(event, newValue) => {
+                setState(newValue);
+              }}
+              renderInput={(params) => <TextField {...params} label="State" />}
             />
             <TextField
               type="zipcode"
@@ -165,6 +250,7 @@ const CardInfo = (props) => {
               label="Zipcode"
               onChange={(e) => setZipCode(e.target.value)}
               value={zipcode}
+              error={zipCodeError}
               required={!goPrev}
               sx={{ mb: 4 }}
             />
@@ -183,6 +269,7 @@ const CardInfo = (props) => {
               label="Card Number"
               onChange={(e) => setCardNumber(e.target.value)}
               value={cardNumber}
+              error={cardNumberError}
               required={!goPrev}
               sx={{ mb: 4 }}
             />
@@ -191,8 +278,8 @@ const CardInfo = (props) => {
                 format="MM / YY"
                 label="Expiration Date"
                 value={exprDate}
+                minDate={dayjs()}
                 views={["month", "year"]}
-                fullWidth
                 onChange={(newValue) => setExprDate(newValue)}
                 sx={{ mb: 4 }}
               />
@@ -202,6 +289,7 @@ const CardInfo = (props) => {
               variant="outlined"
               color="primary"
               label="CVV"
+              error={cvvError}
               onChange={(e) => setCVV(e.target.value)}
               value={CVV}
               required={!goPrev}
@@ -227,6 +315,32 @@ const CardInfo = (props) => {
               Submit
             </Button>
           </Stack>
+          {failed === 1 && (
+            <div>
+              <Alert variant="filled" severity="error">
+                Registration error - Email already exsits!
+              </Alert>
+            </div>
+          )}
+          {failed === 2 && (
+            <div>
+              <Alert variant="filled" severity="error">
+                Registration error - Driver Licenses already exsits!
+              </Alert>
+            </div>
+          )}
+          {failed === 3 && (
+            <div>
+              <Alert
+                onClose={() => {}}
+                variant="filled"
+                severity="error"
+                sx={{ mb: 2, mt: 2 }}
+              >
+                Registration error - Incorrect Field!
+              </Alert>
+            </div>
+          )}
         </form>
       </Paper>
     </div>

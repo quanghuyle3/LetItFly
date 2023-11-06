@@ -36,9 +36,9 @@ public class SecurityConfig {
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http.authorizeHttpRequests(configurer -> configurer
                                 .requestMatchers("/login").permitAll()
-                                .requestMatchers("/registration").permitAll()
-                                .requestMatchers("/api/check").permitAll()
-                                .requestMatchers("/api/test").permitAll()
+                                .requestMatchers("/registration/*").permitAll()
+                                .requestMatchers("/api/check/*").permitAll()
+                                .requestMatchers("/api/test/*").permitAll()
                                 .anyRequest().authenticated())
                                 // .anyRequest().permitAll())
                                 .sessionManagement((sessionManagement) -> sessionManagement
