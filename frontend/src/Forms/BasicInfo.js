@@ -1,15 +1,17 @@
-import React, { useState } from "react";
-import { TextField, Button, Stack } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { TextField, Button, Stack, collapseClasses } from "@mui/material";
 import { Link } from "react-router-dom";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DateValidationError } from "@mui/x-date-pickers";
 import Autocomplete from "@mui/material/Autocomplete";
 import Paper from "@mui/material/Paper";
 import Alert from "@mui/material/Alert";
 import dayjs from "dayjs";
 import {
   isValidMake,
+  isValidBirthday,
   isValidPassword,
   isValidZipCode,
   isValidAddress,
@@ -28,9 +30,10 @@ const BasicInfo = (props) => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhoneNumber] = useState("");
-  const [gender, setGender] = useState(genders[0]);
+  const [gender, setGender] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState(null);
   const [role, setRole] = useState(roles[0]);
+  const [roleInDB, setRoleInDB] = useState(roleDB[0]);
   const [address, setAddress] = useState("");
   const [state, setState] = useState("");
   const [zipcode, setZipCode] = useState("");
@@ -56,16 +59,26 @@ const BasicInfo = (props) => {
   const [modelError, setModelError] = useState(false);
   const [yearError, setYearError] = useState(false);
 
-  /*
-  const oldData = props.oldData;
-  console.log(oldData)
-  if (Object.keys(oldData).length !== 0){
-    setFirstName(oldData.firstName);
-    setLastName(oldData.lastName);
-    setEmail(oldData.email);
-    //setPhoneNumber(oldData.phone);
-  
-  */
+  useEffect(() => {
+    if (localStorage.getItem("oldData") != null) {
+      const oldData = JSON.parse(localStorage.getItem("oldData"));
+      setFirstName(oldData.firstName);
+      setLastName(oldData.lastName);
+      setEmail(oldData.email);
+      setPhoneNumber(oldData.phone);
+      setGender(oldData.gender);
+      if (oldData.roleName == roles[0]) {
+        handleRoleChange(roles[0]);
+      } else if (oldData.roleName == roles[1]) {
+        handleRoleChange(roles[1]);
+      }
+      setDateOfBirth(oldData.birthDate);
+      setAddress(oldData.address);
+      setState(oldData.state);
+      setZipCode(oldData.zipcode);
+      setPassword(oldData.password);
+    }
+  }, []);
 
   function validation() {
     let isfailed = false;
@@ -79,7 +92,7 @@ const BasicInfo = (props) => {
     if (!isValidName(lastName)) {
       setLastNameError(true);
       isfailed = true;
-    }else {
+    } else {
       isfailed = false;
       setLastNameError(false);
     }
@@ -90,7 +103,7 @@ const BasicInfo = (props) => {
       isfailed = false;
       setEmailError(false);
     }
-    if(!dateOfBirth) {
+    if (!dateOfBirth) {
       isfailed = true;
       setDateError(true);
     } else {
@@ -125,7 +138,7 @@ const BasicInfo = (props) => {
       isfailed = false;
       setPasswordError(false);
     }
-    if (role == roleDB[1]) {
+    if (roleInDB == roleDB[1]) {
       if (!isValidDriverLicense(driverL)) {
         isfailed = true;
         setDriverLicenseError(true);
@@ -165,16 +178,32 @@ const BasicInfo = (props) => {
     return isfailed;
   }
 
+  function handleRoleChange(event, newValue) {
+    if (newValue === null) {
+      setRole(roles[0]);
+      setRoleInDB(roleDB[0]);
+    } else if (newValue === roles[0]) {
+      setRole(roles[0]);
+      setRoleInDB(roleDB[0]);
+    } else {
+      setRole(roles[1]);
+      setRoleInDB(roleDB[1]);
+    }
+  }
+
   function handleNext(event) {
     event.preventDefault();
-    /*
     if (email != "") {
       fetch(`http://localhost:8080/api/check/email?email=${email}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       }).then((response) => {
         response.text().then((message) => {
-          setFailed(1);
+          if (message == "EXIST") {
+            console.log("here email check");
+            setFailed(1);
+            return;
+          }
         });
       });
     }
@@ -187,11 +216,13 @@ const BasicInfo = (props) => {
         }
       ).then((response) => {
         response.text().then((message) => {
-          setFailed(2);
+          if (message == "EXIST") {
+            setFailed(2);
+            return;
+          }
         });
       });
     }
-    */
     if (failed == 3 || failed == 0) {
       let isfail = validation();
       if (isfail) {
@@ -210,7 +241,7 @@ const BasicInfo = (props) => {
           state: state,
           zipcode: zipcode,
           phone: phone,
-          roleName: role,
+          roleName: roleInDB,
           dateJoin: null,
           driverLicense: driverL,
           licensePlate: licensePlate,
@@ -276,6 +307,9 @@ const BasicInfo = (props) => {
               label="Email"
               onChange={(e) => setEmail(e.target.value)}
               value={email}
+              helperText={
+                emailError ? "Invalid Email (ex. john.smith@gmail.com)" : ""
+              }             
               error={emailError}
               fullWidth
               required
@@ -298,6 +332,7 @@ const BasicInfo = (props) => {
           <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
             <Autocomplete
               disablePortal
+              value={gender}
               options={genders}
               sx={{ width: 300 }}
               onChange={(event, newValue) => {
@@ -321,17 +356,10 @@ const BasicInfo = (props) => {
             <Autocomplete
               disablePortal
               required
+              value={role}
               options={roles}
               sx={{ width: 300 }}
-              onChange={(event, newValue) => {
-                if (newValue === null) {
-                  setRole(roles[0]);
-                } else if (newValue === roles[0]) {
-                  setRole(roleDB[0]);
-                } else {
-                  setRole(roleDB[1]);
-                }
-              }}
+              onChange={handleRoleChange}
               renderInput={(params) => (
                 <TextField {...params} label="I'm a.." required />
               )}
@@ -366,6 +394,7 @@ const BasicInfo = (props) => {
               variant="outlined"
               color="primary"
               label="Zipcode"
+              helperText={ zipCodeError ? "Invalid Zipcode" : ""}
               onChange={(e) => setZipCode(e.target.value)}
               value={zipcode}
               error={zipCodeError}
@@ -373,8 +402,23 @@ const BasicInfo = (props) => {
               required
             />
           </Stack>
+           <TextField
+            type="password"
+            variant="outlined"
+            color="primary"
+            label="Password"
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+            error={passwordError}
+            helperText={
+              "Password must: Be a minimum of 8 characters, contain at least one uppercase letter (A-Z), contain at least one lowercase letter (a-z), and at least one digit (0-9)."
+            }
+            required
+            fullWidth
+            sx={{ mb: 4 }}
+          />
 
-          {role === roleDB[1] && (
+          {roleInDB === roleDB[1] && (
             <div>
               <h3>Driver and Vechile Information:</h3>
               <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
@@ -385,6 +429,7 @@ const BasicInfo = (props) => {
                   label="Driver's License"
                   onChange={(e) => setDriverL(e.target.value)}
                   value={driverL}
+                  helperText={ driverLicenseError ? "Invalid Driver License" : ""}
                   required
                   fullWidth
                   error={driverLicenseError}
@@ -394,9 +439,10 @@ const BasicInfo = (props) => {
                   type="text"
                   variant="outlined"
                   color="primary"
-                  label="License's Plate"
+                  label="License Plate"
                   onChange={(e) => setLicensePlate(e.target.value)}
                   value={licensePlate}
+                  helperText={ licensePlateError ? "Invalid License Plate" : ""}
                   error={licensePlateError}
                   required
                   fullWidth
@@ -409,6 +455,7 @@ const BasicInfo = (props) => {
                   label="Make"
                   onChange={(e) => setMake(e.target.value)}
                   value={make}
+                  helperText={ makeError ? "Invalid Make of Car (ex. Nissan)" : ""}
                   error={makeError}
                   required
                   fullWidth
@@ -422,6 +469,7 @@ const BasicInfo = (props) => {
                   color="primary"
                   label="Model"
                   onChange={(e) => setModel(e.target.value)}
+                  helperText={ modelError ? "Invalid Model of Car" : ""}
                   value={model}
                   error={modelError}
                   required
@@ -455,19 +503,6 @@ const BasicInfo = (props) => {
               </Stack>
             </div>
           )}
-
-          <TextField
-            type="password"
-            variant="outlined"
-            color="primary"
-            label="Password"
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-            error={passwordError}
-            required
-            fullWidth
-            sx={{ mb: 4 }}
-          />
           <Button
             variant="outlined"
             color="primary"
