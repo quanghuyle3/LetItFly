@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import "../css/Home.css";
-import { createMap } from "./MapUtilities";
+import { createInfowindow, createMap } from "./MapUtilities";
 import { createMarker } from "../components/MapUtilities";
 
 function DriverMap({ currentMap, userLocation, cookie}) {
@@ -19,6 +19,7 @@ function DriverMap({ currentMap, userLocation, cookie}) {
             //fetch ride requests
             const proxy = process.env.REACT_APP_BACKEND_BASE_URL
             const url = `${proxy}/api/ride-request/findAll`
+            const infoWindow = createInfowindow();
             fetch(url, {headers: {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + cookie.token,
@@ -27,6 +28,7 @@ function DriverMap({ currentMap, userLocation, cookie}) {
                     console.log('Latitude:', typeof data[i].curLat, 'Longitude:', typeof data[i].curLong);
                     const marker = createMarker(
                         map,
+                        infoWindow,
                         data[i].curLat,
                         data[i].curLong
                     )

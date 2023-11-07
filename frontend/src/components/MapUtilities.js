@@ -135,20 +135,7 @@ function createMap(mapContainer, centerCoords) {
   });
 }
 
-function closeInfoBox() {
-  document.getElementById('customInfoBox').style.display = 'none';
-}
-
-<div id="customInfoBox" class="custom-info-box">
-  <div class="content">
-    <h1>Title</h1>
-    <p>Description goes here.</p>
-    <button onclick="closeInfoBox()">Close</button>
-  </div>
-</div>
-
-
-function createMarker(map, passLat, passedLng) {
+function createMarker(map, infoWindow, passLat, passedLng) {
     return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
         const image =
             "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
@@ -162,15 +149,24 @@ function createMarker(map, passLat, passedLng) {
             });
             //click event
             marker.addListener("click", function () {
-              actualMap.setCenter(marker.getPosition());
+                actualMap.setCenter(marker.getPosition());
+                infoWindow.then((actualWindow) => {
+                  actualWindow.open(actualMap, marker);
+                });
             });
-            //marker.setMap(map);
-            //console.log("Marker", marker);
-            //console.log("THIS IS THE MAP qweeqw: ", map);
             return marker;
         })
 
     });
+}
+
+function createInfowindow() {
+  return googleApiLoader.importLibrary('maps').then(({ InfoWindow }) => {
+    const infoWindow = new InfoWindow({
+      content: 'Hello' // Your InfoWindow content here
+    });
+    return infoWindow;
+  });
 }
 
 export {
@@ -180,5 +176,7 @@ export {
   createMap,
   getDirections,
   userLocation,
-  createMarker
+  createMarker,
+  createInfowindow
 };
+ 
