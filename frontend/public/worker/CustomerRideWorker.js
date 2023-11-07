@@ -1,4 +1,4 @@
-import { userLocation } from "../../src/components/MapUtilities";
+//import { userLocation } from "../../src/components/MapUtilities";
 /**
  * AFTER RIDE ACCEPTED, BEFORE PICKUP
  * make sure i update passenger coords with:
@@ -50,39 +50,41 @@ function driverIdPoll(proxy, token, rideRequestId) {
     });
 }
 
-function locationPoll(proxy, token, rideRequestId, driverId) {
-  const driverUrl = `${proxy}/api/driver-status/findByDriverId(driverId)?id=${driverId}`;
-  const updatePassengerCoords = userLocation
-    .then((passengerCoords) => {
-      const passengerUrl = `${proxy}/api/ride-request/updateCoordinatesPassenger?id=${rideRequestId}&curLat=${passengerCoords.lat}&curLong=${passengerCoords.lng}`;
-      fetch(passengerUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + token,
-        },
+function locationPoll(proxy, token, rideRequestId, driverId, passengerCoords) {
+  const passengerUrl = `${proxy}/api/ride-request/updateCoordinatesPassenger?rideRequestId=${rideRequestId}&curLat=${passengerCoords.lat}&curLong=${passengerCoords.lng}`;
+  const updatePassengerCoords = fetch(passengerUrl, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+  })
+  .then((response) => {
+    console.log(response);
+    return response.json();
+  })
+  .then((data) => {
+    return data;
+  });
+  
+  const driverUrl = `${proxy}/api/driver-status/findByDriverId?driverId=${driverId}`;
+    const getDriverCoords = fetch(driverUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((response) => {
+        console.log(response);
+        return response.json();
+      })
+      .then((data) => {
+        return data;
       });
-    })
-
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      if (!data.driverId) {
-        if (driverIdPollCount > 5) {
-          console.log("ending poll: ", data);
-        } else {
-          driverIdPollCount += 1;
-          console.log(driverIdPollCount);
-          setTimeout(() => {
-            driverIdPoll(proxy, token, rideRequestId);
-          }, 5000);
-        }
-      } else {
-        console.log("posting message: ", data);
-        postMessage(data);
-      }
-    });
+      Promise.all([updatePassengerCoords, getDriverCoords]).then((values) => {
+        console.log(values);
+      });
 }
 
 /*
@@ -90,7 +92,6 @@ event.data format:
 typeString, token, url, param1, param2, ...
 */
 onmessage = (event) => {
-  console.log(event);
 
   if (event.data.typeString === "BEFORE RIDE ACCEPTED") {
     driverIdPoll(event.data.proxy, event.data.token, event.data.param1);
@@ -101,5 +102,6 @@ onmessage = (event) => {
     // update passenger coords and read driver coords until some sort of trigger
     // figure out how to stop the poll, what will be the trigger?
     console.log(event.data);
+    locationPoll(event.data.proxy, event.data.token, event.data.param1, event.data.param2, event.data.param3);
   }
 };

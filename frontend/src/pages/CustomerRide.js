@@ -45,6 +45,8 @@ function CustomerRide() {
   } = useLocation();
 
   const driverId = useRef(null);
+  const afterRideAcceptedInterval = useRef(null);
+
 
   const beforeRideAccepted = "BEFORE RIDE ACCEPTED";
   const rideAcceptedBeforePickup = "RIDE ACCEPTED, BEFORE PICKUP";
@@ -52,7 +54,7 @@ function CustomerRide() {
 
   const [rideAccepted, setRideAccepted] = useState(false);
   const [passengerPickedUp, setPassengerPickedUp] = useState(false);
-  const customerRideWorker = new Worker("/worker/CustomerRideWorker.js");
+  const customerRideWorker = new Worker("/worker/CustomerRideWorker.js", { type: "module" });
 
   const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
 
@@ -66,12 +68,18 @@ function CustomerRide() {
 }
 else if (!passengerPickedUp) {
   //phase 2
-  customerRideWorker.postMessage({
-    proxy: proxy,
-    typeString: rideAcceptedBeforePickup,
-    token: token,
-    param1: rideRequestId,
-    param2: driverId.current,
+  //afterRideAcceptedInterval.current = setInterval(() => {
+    userLocation.then(coords => {
+      customerRideWorker.postMessage({
+        proxy: proxy,
+        typeString: rideAcceptedBeforePickup,
+        token: token,
+        param1: rideRequestId,
+        param2: driverId.current,
+        param3: coords,
+    })
+  //}, 5000);
+    
   });
 }
 else {
@@ -85,6 +93,7 @@ else {
     }
     else if (e.data.responseString === "DRIVER LOCATION RECEIVED") {
       console.log(e.data);
+      //clearInterval(afterRideAcceptedInterval.current);
       //call function to update marker
     }
   };
