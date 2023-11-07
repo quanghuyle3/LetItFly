@@ -13,9 +13,43 @@
  */
 
 var driverIdPollCount = 0;
+  const afterRideAccepted = "AFTER RIDE ACCEPTED";
+  const driverLocationReceieved = "DRIVER LOCATION RECEIVED";
 
 function driverIdPoll(proxy, token, rideRequestId) {
   const url = `${proxy}/api/ride-request/findById?id=${rideRequestId}`;
+  return fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      if (!data.driverId) {
+        if (driverIdPollCount > 5) {
+          console.log("ending poll: ", data);
+        } else {
+          driverIdPollCount += 1;
+          console.log(driverIdPollCount);
+          setTimeout(() => {
+            driverIdPoll(proxy, token, rideRequestId);
+          }, 5000);
+        }
+      } else {
+        console.log("posting message: ", data);
+        postMessage({responseString : afterRideAccepted, driverId : data.driverId});
+      }
+    });
+}
+
+
+function locationPoll(proxy, token, rideRequestId) {
+  const url = `${proxy}/api/ride-request/updateCoordinatesPassenger?id=${rideRequestId}`;
+  const url2 = `${proxy}/api/driver-status/findByDriverId(driverId)?id=${rideRequestId}`;
   return fetch(url, {
     method: "GET",
     headers: {
@@ -59,5 +93,6 @@ onmessage = (event) => {
     // create this function
     // update passenger coords and read driver coords until some sort of trigger
     // figure out how to stop the poll, what will be the trigger?
+    console.log(event.data);
   }
 };
