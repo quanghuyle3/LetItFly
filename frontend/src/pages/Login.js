@@ -4,18 +4,42 @@ import { useState } from "react";
 import { TextField, Button, Container, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
+import {isValidEmail, isValidPassword} from "../Forms/Valdiation";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+
   const navigate = useNavigate();
+  function validation() {
+    let isfailed = false;
+    if (!isValidEmail(email)) {
+      setEmailError(true);
+      isfailed = true;
+    } else {
+      isfailed = false;
+      setEmailError(false);
+    }
+    if (!isValidPassword(password)) {
+      isfailed = true;
+      setPasswordError(true);
+    } else {
+      isfailed = false;
+      setPasswordError(false);
+    }
+    return isfailed;
+  }
   function handleSubmit(event) {
     event.preventDefault();
     // fetch here and need role to figure out the page to navigate to
     console.log("hello");
+    if (validation()) {
+      return;
+    }
     const loginInfo = { email, password };
     console.log(loginInfo);
-
     const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
 
     fetch(`${proxy}/login`, {
@@ -73,6 +97,7 @@ function Login() {
             onChange={(e) => setEmail(e.target.value)}
             value={email}
             fullWidth
+            error={emailError}
             required
             sx={{ marginBottom: 4 }}
           />
@@ -83,6 +108,7 @@ function Login() {
             label="Password"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
+            error={passwordError}
             fullWidth
             required
             sx={{ marginBottom: 4 }}

@@ -135,6 +135,38 @@ function createMap(mapContainer, centerCoords) {
   });
 }
 
+<<<<<<< HEAD
+=======
+function createMarker(map, passLat, passedLng) {
+    return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
+        const image =
+            "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
+
+        map.then((actualMap) => {
+            //console.log("Passed", typeof passLat, typeof passedLng)
+            const marker = new Marker({
+                position: { lat: passLat, lng: passedLng },
+                map: actualMap,
+                icon: image,
+            });
+            //click event
+            marker.addListener("click", function () {
+                // Place your custom code here
+                //alert('Marker was clicked!');
+
+                // For example, to center the map at the marker's location:
+                actualMap.setCenter(marker.getPosition());
+            });
+            //marker.setMap(map);
+            //console.log("Marker", marker);
+            //console.log("THIS IS THE MAP qweeqw: ", map);
+            return marker;
+        })
+
+    });
+}
+
+>>>>>>> bba44d92c459586c494b43ccd2423600118c250c
 export {
   googleApiLoader,
   autocomplete,
@@ -142,4 +174,8 @@ export {
   createMap,
   getDirections,
   userLocation,
+<<<<<<< HEAD
+=======
+  createMarker
+>>>>>>> bba44d92c459586c494b43ccd2423600118c250c
 };

@@ -41,7 +41,7 @@ public class RideRequest {
     @Column(name = "dest_long")
     private double destLong;
 
-    @OneToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH })
+    @ManyToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH })
     @JoinColumn(name = "passenger_id")
     private User passengerId;
 

@@ -4,8 +4,8 @@ import { Link, useLocation } from "react-router-dom";
 import logo from "../mock_logo.jpg";
 import "../css/Home.css";
 
-function Header({ userEmail }) {
-  const location = useLocation();
+function Header({ cookie }) {
+  //const location = useLocation();
 
   return (
     <header>
@@ -15,17 +15,19 @@ function Header({ userEmail }) {
           src={logo}
           alt="Let It Fly Logo"
           height={100}
-        />
+        /> 
       </Link>
       <div className="header-right">
         <div className="header-right-top">
           <p className="header-username">
-            {userEmail ? `Hi ${userEmail}!` : "Hi username!"}
+            {cookie.email ? `Hi ${cookie.email}!` : "Hi username!"}
           </p>
         </div>
 
         <ul className="navbar-home">
-          <Link to={"/register"}>
+          <Link to={{
+            pathname: "/customer/settings",
+            }}state={{cookie: cookie}}>
             <li>Settings</li>
           </Link>
           <Link to={"/"}>
