@@ -135,8 +135,6 @@ function createMap(mapContainer, centerCoords) {
   });
 }
 
-<<<<<<< HEAD
-=======
 function createMarker(map, passLat, passedLng) {
     return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
         const image =
@@ -166,7 +164,6 @@ function createMarker(map, passLat, passedLng) {
     });
 }
 
->>>>>>> bba44d92c459586c494b43ccd2423600118c250c
 export {
   googleApiLoader,
   autocomplete,
@@ -174,8 +171,5 @@ export {
   createMap,
   getDirections,
   userLocation,
-<<<<<<< HEAD
-=======
   createMarker
->>>>>>> bba44d92c459586c494b43ccd2423600118c250c
 };
