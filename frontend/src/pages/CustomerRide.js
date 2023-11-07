@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { createMap, userLocation } from "../components/MapUtilities";
-import { useState } from "react";
+import { useState, useRef } from "react";
+
 
 /*
     BEFORE RIDE ACCEPTED
@@ -43,7 +44,7 @@ function CustomerRide() {
     },
   } = useLocation();
 
-  var driverId = null;
+  const driverId = useRef(null);
 
   const beforeRideAccepted = "BEFORE RIDE ACCEPTED";
   const rideAcceptedBeforePickup = "RIDE ACCEPTED, BEFORE PICKUP";
@@ -56,7 +57,7 @@ function CustomerRide() {
   const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
 
   if (!rideAccepted) {
-  customerRideWorker.postMessage({
+    customerRideWorker.postMessage({
     proxy: proxy,
     typeString: beforeRideAccepted,
     token: token,
@@ -70,7 +71,7 @@ else if (!passengerPickedUp) {
     typeString: rideAcceptedBeforePickup,
     token: token,
     param1: rideRequestId,
-    param2: driverId,
+    param2: driverId.current,
   });
 }
 else {
@@ -79,8 +80,8 @@ else {
   customerRideWorker.onmessage = (e) => {
     if (e.data.responseString === "AFTER RIDE ACCEPTED") {
       console.log(e.data);
+      driverId.current = e.data.driverId.id;
       setRideAccepted(true);
-      driverId = e.data.driverId;
     }
     else if (e.data.responseString === "DRIVER LOCATION RECEIVED") {
       console.log(e.data);

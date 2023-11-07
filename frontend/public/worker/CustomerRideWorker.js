@@ -1,3 +1,4 @@
+import { userLocation } from "../../src/components/MapUtilities";
 /**
  * AFTER RIDE ACCEPTED, BEFORE PICKUP
  * make sure i update passenger coords with:
@@ -13,8 +14,8 @@
  */
 
 var driverIdPollCount = 0;
-  const afterRideAccepted = "AFTER RIDE ACCEPTED";
-  const driverLocationReceieved = "DRIVER LOCATION RECEIVED";
+const afterRideAccepted = "AFTER RIDE ACCEPTED";
+const driverLocationReceieved = "DRIVER LOCATION RECEIVED";
 
 function driverIdPoll(proxy, token, rideRequestId) {
   const url = `${proxy}/api/ride-request/findById?id=${rideRequestId}`;
@@ -41,22 +42,28 @@ function driverIdPoll(proxy, token, rideRequestId) {
         }
       } else {
         console.log("posting message: ", data);
-        postMessage({responseString : afterRideAccepted, driverId : data.driverId});
+        postMessage({
+          responseString: afterRideAccepted,
+          driverId: data.driverId,
+        });
       }
     });
 }
 
+function locationPoll(proxy, token, rideRequestId, driverId) {
+  const driverUrl = `${proxy}/api/driver-status/findByDriverId(driverId)?id=${driverId}`;
+  const updatePassengerCoords = userLocation
+    .then((passengerCoords) => {
+      const passengerUrl = `${proxy}/api/ride-request/updateCoordinatesPassenger?id=${rideRequestId}&curLat=${passengerCoords.lat}&curLong=${passengerCoords.lng}`;
+      fetch(passengerUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      });
+    })
 
-function locationPoll(proxy, token, rideRequestId) {
-  const url = `${proxy}/api/ride-request/updateCoordinatesPassenger?id=${rideRequestId}`;
-  const url2 = `${proxy}/api/driver-status/findByDriverId(driverId)?id=${rideRequestId}`;
-  return fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + token,
-    },
-  })
     .then((response) => {
       return response.json();
     })
