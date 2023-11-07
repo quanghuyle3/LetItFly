@@ -135,6 +135,19 @@ function createMap(mapContainer, centerCoords) {
   });
 }
 
+function closeInfoBox() {
+  document.getElementById('customInfoBox').style.display = 'none';
+}
+
+<div id="customInfoBox" class="custom-info-box">
+  <div class="content">
+    <h1>Title</h1>
+    <p>Description goes here.</p>
+    <button onclick="closeInfoBox()">Close</button>
+  </div>
+</div>
+
+
 function createMarker(map, passLat, passedLng) {
     return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
         const image =
@@ -149,11 +162,7 @@ function createMarker(map, passLat, passedLng) {
             });
             //click event
             marker.addListener("click", function () {
-                // Place your custom code here
-                //alert('Marker was clicked!');
-
-                // For example, to center the map at the marker's location:
-                actualMap.setCenter(marker.getPosition());
+              actualMap.setCenter(marker.getPosition());
             });
             //marker.setMap(map);
             //console.log("Marker", marker);
