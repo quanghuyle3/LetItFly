@@ -49,4 +49,10 @@ public class VehicleController {
         return vehicleService.setVehicleToNotUse(licensePlate);
     }
 
+    @PostMapping("/save")
+    public ResponseEntity<Vehicle> save(@RequestBody VehicleRequest vehicleRequest) {
+        Vehicle vehicle = vehicleService.saveVehicle(vehicleRequest);
+        return ResponseEntity.ok(vehicle);
+    }
+
 }

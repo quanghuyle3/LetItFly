@@ -47,4 +47,10 @@ public class PaymentController {
         return paymentService.setPaymentToNotUse(cardNumber);
     }
 
+    @PostMapping("/save")
+    public ResponseEntity<Payment> savePayment(@RequestBody PaymentRequest paymentRequest) {
+        Payment payment = paymentService.savePayment(paymentRequest);
+        return ResponseEntity.ok(payment);
+    }
+
 }
