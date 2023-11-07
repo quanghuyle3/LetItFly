@@ -2,6 +2,7 @@ package com.project.LetItFly.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,7 +51,13 @@ public class PaymentController {
     @PostMapping("/save")
     public ResponseEntity<Payment> savePayment(@RequestBody PaymentRequest paymentRequest) {
         Payment payment = paymentService.savePayment(paymentRequest);
-        return ResponseEntity.ok(payment);
+
+        if (payment == null) {
+            return ResponseEntity.status(HttpStatusCode.valueOf(409)) // duplicated record
+                    .body(null);
+        }
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)) // unauthorized
+                .body(payment);
     }
 
 }
