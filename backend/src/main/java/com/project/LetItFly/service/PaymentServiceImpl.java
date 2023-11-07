@@ -55,6 +55,15 @@ public class PaymentServiceImpl implements PaymentService {
         // find the associate User
         User user = userRepository.findUserById(paymentRequest.getUserId());
 
+        // check if there's already an in-used payment in sys
+        // that associated with the user
+        List<Payment> payments = paymentRepository.findPaymentsInUseByUserId(user);
+        for (Payment p : payments) {
+            if (p.getCardNumber().equals(paymentRequest.getCardNumber())) {
+                return null;
+            }
+        }
+
         // convert PaymentRequest to Payment object
         Payment payment = new Payment(paymentRequest);
 
