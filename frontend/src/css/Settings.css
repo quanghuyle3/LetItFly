@@ -4,17 +4,8 @@ label {
     font-weight: bold;
 }
 
-
-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-}
-
-button:hover {
-    background-color: #0056b3;
+input {
+    width: 300px;
 }
 
 .row{

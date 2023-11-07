@@ -26,11 +26,17 @@ function Card(param) {
         <div className="row">
             {userInfo !== null ? ( 
                 <div>
-                    <h3>Card: {num+1} </h3>  
-                    <p>Card Number: {"************" + userInfo[num].cardNumber.substring(12,16)}</p>
-                    <p>Card Name: {userInfo[num].name}</p>
-                    <p>type: {userInfo[num].type}</p>
-                    <p>BillingAddress: {userInfo[num].billingAddress}</p>
+                    <h3>Card: {num+1} </h3> 
+                    <label for="name">Name:</label> 
+                    <p id="name">{userInfo[num].name}</p>
+                    <label for="number">Number:</label> 
+                    <p id="number">{"************" + userInfo[num].cardNumber.substring(12,16)}</p>
+                    <label for="type">Type:</label> 
+                    <p id="type">{userInfo[num].type}</p>
+                    <label for="exp">Expiration:</label> 
+                    <p id="exp">{userInfo[num].expiration}</p>
+                    <label for="address">Billing Address:</label> 
+                    <p id="address">{userInfo[num].billingAddress}</p>
                     <button onClick={handleDel}>Delete Card</button>
                 </div>
             ) : (
