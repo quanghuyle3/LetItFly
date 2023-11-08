@@ -1,12 +1,14 @@
 import React from "react";
 import logo from "../mock_logo.jpg";
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { TextField, Button, Container, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
-import {isValidEmail, isValidPassword} from "../Forms/Valdiation";
+import { isValidEmail, isValidPassword } from "../Forms/Valdiation";
 import Alert from "@mui/material/Alert";
-
+import { Link } from "react-router-dom";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -16,16 +18,16 @@ function Login() {
   const [failed, setFailed] = useState(0);
   const [regSuccess, setRegSuccess] = useState(false);
 
-
-
   useEffect(() => {
-    if(localStorage.getItem('regSuccess') !== null){
-      let reg = JSON.parse(localStorage.getItem('regSuccess'));
+    if (localStorage.getItem("regSuccess") !== null) {
+      let reg = JSON.parse(localStorage.getItem("regSuccess"));
       reg = reg.success;
-      setRegSuccess(reg)
+      setRegSuccess(reg);
       localStorage.removeItem("regSuccess");
     }
-    const timer = setTimeout(() => { setRegSuccess(false); }, 5000);
+    const timer = setTimeout(() => {
+      setRegSuccess(false);
+    }, 5000);
     return () => {
       clearTimeout(timer);
     };
@@ -38,14 +40,12 @@ function Login() {
       setEmailError(true);
       isfailed = true;
     } else {
-      isfailed = false;
       setEmailError(false);
     }
     if (!isValidPassword(password)) {
       isfailed = true;
       setPasswordError(true);
     } else {
-      isfailed = false;
       setPasswordError(false);
     }
     return isfailed;
@@ -58,14 +58,14 @@ function Login() {
     const loginInfo = { email, password };
     console.log(loginInfo);
     const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
-  
+
     try {
       const response = await fetch(`${proxy}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginInfo),
       });
-  
+
       if (response.ok) {
         setFailed(0);
         const tokenObject = await response.json();
@@ -78,7 +78,6 @@ function Login() {
           navigate("/customer", { state: { tokenObject } });
         }
       } else if (response.status === 401) {
-        
         setFailed(1);
       } else if (response.status === 403) {
         setFailed(2);
@@ -103,19 +102,26 @@ function Login() {
     >
       <Paper
         elevation={3}
-        style={{ padding: "20px", margin: "0 auto", maxWidth: "90vw" }}
+        style={{
+          padding: "20px",
+          margin: "0 auto",
+          maxWidth: "50vw",
+          minWidth: "30vw",
+        }}
       >
-         {regSuccess === true && (
-            <div>
-              <Alert
-                variant="filled"
-                severity="success"
-                sx={{ mb: 2, mt: 2 }}
-              >
-                Login Successful - Please Login Here!
-              </Alert>
-            </div>
-          )}
+        <Grid container justifyContent="center" alignItems="center">
+          <Grid item>
+            <img src={logo} style={{ height: "100px" }} />
+          </Grid>
+        </Grid>
+
+        {regSuccess === true && (
+          <div>
+            <Alert variant="filled" severity="success" sx={{ mb: 2, mt: 2 }}>
+              Login Successful - Please Login Here!
+            </Alert>
+          </div>
+        )}
         <h2 style={{ textAlign: "center" }}>Login</h2>
         <form onSubmit={handleSubmit}>
           <TextField
@@ -126,7 +132,10 @@ function Login() {
             onChange={(e) => setEmail(e.target.value)}
             value={email}
             fullWidth
-            helperText={emailError ? "Invalid Email (ex. john.smith@gmail.com)" : ""}
+            error={emailError}
+            helperText={
+              emailError ? "Invalid Email (ex. john.smith@gmail.com)" : ""
+            }
             required
             sx={{ marginBottom: 4 }}
           />
@@ -139,7 +148,11 @@ function Login() {
             value={password}
             error={passwordError}
             fullWidth
-            helperText={passwordError ? "Password must: Be a minimum of 8 characters, contain at least one uppercase letter (A-Z), contain at least one lowercase letter (a-z), and at least one digit (0-9)." : ""}
+            helperText={
+              passwordError
+                ? "Password must: Be a minimum of 8 characters, contain at least one uppercase letter (A-Z), contain at least one lowercase letter (a-z), and at least one digit (0-9)."
+                : ""
+            }
             required
             sx={{ marginBottom: 4 }}
           />
@@ -154,39 +167,31 @@ function Login() {
           </Button>
           {failed === 1 && (
             <div>
-              <Alert
-                variant="filled"
-                severity="error"
-                sx={{ mb: 2, mt: 2 }}
-              >
+              <Alert variant="filled" severity="error" sx={{ mb: 2, mt: 2 }}>
                 Login Failed - Incorrect Email or Password!
               </Alert>
             </div>
           )}
           {failed === 2 && (
             <div>
-              <Alert
-                variant="filled"
-                severity="error"
-                sx={{ mb: 2, mt: 2 }}
-              >
+              <Alert variant="filled" severity="error" sx={{ mb: 2, mt: 2 }}>
                 Login Failed - Account is disabled!
               </Alert>
             </div>
           )}
           {failed === 3 && (
             <div>
-              <Alert
-                variant="filled"
-                severity="error"
-                sx={{ mb: 2, mt: 2 }}
-              >
+              <Alert variant="filled" severity="error" sx={{ mb: 2, mt: 2 }}>
                 Login Failed - Account is locked!
               </Alert>
             </div>
           )}
-         
         </form>
+        <div style={{ marginTop: "20px" }}>
+          <small>
+            Don't have an account? <Link to="/register"> Sign Up! </Link>
+          </small>
+        </div>
       </Paper>
     </div>
   );

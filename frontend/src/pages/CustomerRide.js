@@ -49,7 +49,7 @@ function CustomerRide() {
 
   const [rideAccepted, setRideAccepted] = useState(false);
   const [passengerPickedUp, setPassengerPickedUp] = useState(false);
-  const customerRideWorker = new Worker("/worker/CustomerRideWorker.js");
+  const customerRideWorker = new Worker("/worker/CustomerRideWorker.js"); //child process
 
   const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
 
