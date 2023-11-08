@@ -46,6 +46,15 @@ import { useState, useRef, useEffect } from "react";
  *  - wrap the above marker position change and distance checking in a handler function
  */
 
+/**
+ * PHASE 3 TODO:
+ * - render new route between passenger and destination
+ * - create marker for passenger
+ * - update passenger marker position every 3 seconds
+ * - check distance between passenger and destination, if distance < 0.05 ? display ride completion message
+ * - on ride completion, display ride cost, duration, and distance, then navigate user to home page on completion
+ */
+
 function CustomerRide() {
   const {
     state: {
@@ -89,6 +98,18 @@ function CustomerRide() {
     });
   }
 
+  function initMap() {
+    userLocation.then((location) => {
+      currentMap.current = createMap(
+        document.getElementById("ride-accepted-map"),
+        location
+      );
+    });
+  }
+
+  /*
+          --------- POST MESSAGE ---------
+   */
   // PHASE 1 POST MESSAGE
   if (!rideAccepted) {
     customerRideWorker.postMessage({
@@ -107,8 +128,14 @@ function CustomerRide() {
   }
   // PHASE 3
   else {
-    //phase 3 code
+    // ...
+    // phase 3 code
+    // ...
   }
+
+  /*
+          --------- ONMESSAGE ---------
+   */
   customerRideWorker.onmessage = (e) => {
     // PHASE 1 ON MESSAGE
     if (e.data.responseString === "AFTER RIDE ACCEPTED") {
@@ -146,15 +173,6 @@ function CustomerRide() {
       //call function to update marker
     }
   };
-
-  function initMap() {
-    userLocation.then((location) => {
-      currentMap.current = createMap(
-        document.getElementById("ride-accepted-map"),
-        location
-      );
-    });
-  }
 
   return (
     <>
