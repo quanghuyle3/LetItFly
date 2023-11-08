@@ -41,7 +41,6 @@ function driverIdPoll(proxy, token, rideRequestId) {
           }, 5000);
         }
       } else {
-        console.log("posting message: ", data);
         postMessage({
           responseString: afterRideAccepted,
           driverId: data.driverId,
@@ -59,32 +58,30 @@ function locationPoll(proxy, token, rideRequestId, driverId, passengerCoords) {
       Authorization: "Bearer " + token,
     },
   })
-  .then((response) => {
-    console.log(response);
-    return response.json();
-  })
-  .then((data) => {
-    return data;
-  });
-  
+    .then((response) => response.text())
+    .then((data) => data);
+
   const driverUrl = `${proxy}/api/driver-status/findByDriverId?driverId=${driverId}`;
-    const getDriverCoords = fetch(driverUrl, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-    })
-      .then((response) => {
-        console.log(response);
-        return response.json();
-      })
-      .then((data) => {
-        return data;
+  const getDriverCoords = fetch(driverUrl, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => data);
+  Promise.all([updatePassengerCoords, getDriverCoords]).then(
+    ([passengerCoordsResponse, DriverCoordsResponse]) => {
+      postMessage({
+        responseString: driverLocationReceieved,
+        driverCoords: {
+          lat: DriverCoordsResponse.curLat,
+          lng: DriverCoordsResponse.curLong,
+        },
       });
-      Promise.all([updatePassengerCoords, getDriverCoords]).then((values) => {
-        console.log(values);
-      });
+    }
+  );
 }
 
 /*
@@ -92,7 +89,6 @@ event.data format:
 typeString, token, url, param1, param2, ...
 */
 onmessage = (event) => {
-
   if (event.data.typeString === "BEFORE RIDE ACCEPTED") {
     driverIdPoll(event.data.proxy, event.data.token, event.data.param1);
   }
@@ -101,7 +97,12 @@ onmessage = (event) => {
     // create this function
     // update passenger coords and read driver coords until some sort of trigger
     // figure out how to stop the poll, what will be the trigger?
-    console.log(event.data);
-    locationPoll(event.data.proxy, event.data.token, event.data.param1, event.data.param2, event.data.param3);
+    locationPoll(
+      event.data.proxy,
+      event.data.token,
+      event.data.param1,
+      event.data.param2,
+      event.data.param3
+    );
   }
 };
