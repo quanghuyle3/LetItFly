@@ -38,11 +38,6 @@ import { useState, useRef, useEffect } from "react";
 */
 
 /**
- * ISSUES:
- *  - customerRideWorker sends multiple messages when driverId has been assigned, could be problematic
- */
-
-/**
  * PHASE 2 TODO:
  *  - create marker for passenger with person picture
  *  - create marker for driver with car picture
@@ -94,6 +89,7 @@ function CustomerRide() {
     });
   }
 
+  // PHASE 1 POST MESSAGE
   if (!rideAccepted) {
     customerRideWorker.postMessage({
       proxy: proxy,
@@ -101,32 +97,41 @@ function CustomerRide() {
       token: token,
       param1: rideRequestId,
     });
-  } else if (!passengerPickedUp) {
-    //phase 2
+  }
+  // PHASE 2 POST MESSAGE
+  else if (!passengerPickedUp) {
     workerPhaseTwoPostMessage();
     afterRideAcceptedInterval.current = setInterval(() => {
       workerPhaseTwoPostMessage();
     }, 3000);
-  } else {
-    //phase 3
+  }
+  // PHASE 3
+  else {
+    //phase 3 code
   }
   customerRideWorker.onmessage = (e) => {
+    // PHASE 1 ON MESSAGE
     if (e.data.responseString === "AFTER RIDE ACCEPTED") {
       driverId.current = e.data.driverId.id;
       setRideAccepted(true);
-    } else if (e.data.responseString === "DRIVER LOCATION RECEIVED") {
+    }
+    // PHASE 2 ON MESSAGE
+    else if (e.data.responseString === "DRIVER LOCATION RECEIVED") {
       driverLocation.current = e.data.driverCoords;
-      console.log("driver coords: ", e.data.driverCoords);
+      console.log("driver coords: ", e.data.driverCoords); // DELETE LATER <----------------
+      // check distance between driver and passenger
       if (currentRoute.current) {
-        let d = getDistanceFromLatLngInKm(
+        let distance = getDistanceFromLatLngInKm(
           passengerLocation.current.lat,
           passengerLocation.current.lng,
           driverLocation.current.lat,
           driverLocation.current.lng
         );
-        console.log("driver distance: ", d, "km");
-      } else {
-        console.log("yes routing");
+        console.log("driver distance: ", distance, "km");
+      }
+
+      // Render route between driver and passenger
+      else {
         getDirections(
           passengerLocation.current,
           driverLocation.current,

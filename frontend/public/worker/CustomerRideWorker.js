@@ -1,18 +1,3 @@
-//import { userLocation } from "../../src/components/MapUtilities";
-/**
- * AFTER RIDE ACCEPTED, BEFORE PICKUP
- * make sure i update passenger coords with:
- * /updateCoordinatesPassenger
- *
- * /api/driver-status
- * findByDriverId(driverId) -> returns whole record -> look at "curLat", "curLong"
- */
-
-/**
- * ISSUES:
- *  - customerRideWorker sends multiple messages when driverId has been assigned, could be problematic
- */
-
 var driverIdPollCount = 0;
 const afterRideAccepted = "AFTER RIDE ACCEPTED";
 const driverLocationReceieved = "DRIVER LOCATION RECEIVED";
@@ -94,9 +79,6 @@ onmessage = (event) => {
   }
 
   if (event.data.typeString === "RIDE ACCEPTED, BEFORE PICKUP") {
-    // create this function
-    // update passenger coords and read driver coords until some sort of trigger
-    // figure out how to stop the poll, what will be the trigger?
     locationPoll(
       event.data.proxy,
       event.data.token,
