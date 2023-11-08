@@ -1,6 +1,7 @@
-var driverIdPollCount = 0;
+var driverIdPollCount = 0; // DELETE LATER <------------------------------
 const afterRideAccepted = "AFTER RIDE ACCEPTED";
 const driverLocationReceieved = "DRIVER LOCATION RECEIVED";
+const finalDestinationRetrieved = "FINAL DESTINATION RETRIEVED";
 
 function driverIdPoll(proxy, token, rideRequestId) {
   const url = `${proxy}/api/ride-request/findById?id=${rideRequestId}`;
@@ -16,6 +17,7 @@ function driverIdPoll(proxy, token, rideRequestId) {
     })
     .then((data) => {
       if (!data.driverId) {
+        // DELETE LATER <------------------------------
         if (driverIdPollCount > 5) {
           console.log("ending poll: ", data);
         } else {
@@ -69,6 +71,25 @@ function locationPoll(proxy, token, rideRequestId, driverId, passengerCoords) {
   );
 }
 
+function retrieveFinalDestination(proxy, token, rideRequestId) {
+  const url = `${proxy}/api/ride-request/findById?id=${rideRequestId}`;
+  return fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+  })
+    .then((response) => response.json())
+    .then((data) =>
+      postMessage({
+        responseString: finalDestinationRetrieved,
+        destination: { lat: data.destLat, lng: data.destLong },
+        record: data,
+      })
+    );
+}
+
 /*
 event.data format:
 typeString, token, url, param1, param2, ...
@@ -85,6 +106,14 @@ onmessage = (event) => {
       event.data.param1,
       event.data.param2,
       event.data.param3
+    );
+  }
+
+  if (event.data.typeString === "AFTER PICKUP") {
+    retrieveFinalDestination(
+      event.data.proxy,
+      event.data.token,
+      event.data.param1
     );
   }
 };

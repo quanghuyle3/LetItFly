@@ -111,6 +111,9 @@ function getDirections(
           directionsRenderer.setMap(map);
         });
       }
+      currentMap.then((map) => {
+        if (directionsRenderer.getMap() != map) directionsRenderer.setMap(map);
+      });
 
       var request = {
         origin: currentLocation,
@@ -168,6 +171,41 @@ function closeInfoBox() {
   </div>
 </div>;
 
+/**
+ * Returns a google map marker
+ * @param {Object} paramObj with 4 fields
+ *  - currentMap: map object to display marker on [REQUIRED]
+ *  - imageUrl: image to be used as marker icon [optional]
+ *  - lat: latitude [REQUIRED]
+ *  - lng: longitude [REQUIRED]
+ */
+function createRideMarker(paramObj) {
+  const {
+    currentMap: currentMap,
+    imageUrl: imageUrl,
+    lat: latitude,
+    lng: longitude,
+  } = paramObj;
+  return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
+    return currentMap.then((map) => {
+      if (imageUrl) {
+        const marker = new Marker({
+          position: { lat: latitude, lng: longitude },
+          map: map,
+          icon: imageUrl,
+        });
+        return marker;
+      } else {
+        const marker = new Marker({
+          position: { lat: latitude, lng: longitude },
+          map: map,
+        });
+        return marker;
+      }
+    });
+  });
+}
+
 function createMarker(map, passLat, passedLng) {
   return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
     const image =
@@ -201,4 +239,5 @@ export {
   userLocation,
   createMarker,
   getDistanceFromLatLngInKm,
+  createRideMarker,
 };
