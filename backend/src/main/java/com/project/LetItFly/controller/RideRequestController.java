@@ -74,10 +74,10 @@ public class RideRequestController {
     // update current coordinates of passenger
     // return: "SUCCESS" or "NOT EXIST" (passenger doesn't have ride request)
     @GetMapping("/updateCoordinatesPassenger")
-    public String updateCoordinatesPassenger(@RequestParam("passengerId") int passengerId,
+    public String updateCoordinatesPassenger(@RequestParam("rideRequestId") int rideRequestId,
             @RequestParam("curLat") double curLat,
             @RequestParam("curLong") double curLong) {
-        return rideRequestService.updateCoordinatesPassenger(passengerId, curLat, curLong);
+        return rideRequestService.updateCoordinatesPassenger(rideRequestId, curLat, curLong);
     }
 
     // get current coordinates of passenger

@@ -1,5 +1,25 @@
 import { Loader } from "@googlemaps/js-api-loader";
 
+// Haversine formula
+function getDistanceFromLatLngInKm(lat1, lon1, lat2, lon2) {
+  function deg2rad(deg) {
+    return deg * (Math.PI / 180);
+  }
+
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(lat2 - lat1); // deg2rad below
+  var dLon = deg2rad(lon2 - lon1);
+  var a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) *
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  var d = R * c; // Distance in km
+  return d;
+}
+
 // wrap user location in a promise
 const userLocation = new Promise((resolve, reject) => {
   if (navigator.geolocation) {
@@ -62,6 +82,7 @@ function autocomplete(inputElement, callback) {
  * @param {lat: current_latitude, lng: current_longitude} currentLocation
  * @param {lat: destination_latitude, lng: destination_longitude} destinationLocation
  * @param {Promise} currentMap
+ * @param {useRef} currentRoute
  * @returns
  */
 var directionsRenderer;
@@ -90,6 +111,9 @@ function getDirections(
           directionsRenderer.setMap(map);
         });
       }
+      currentMap.then((map) => {
+        if (directionsRenderer.getMap() != map) directionsRenderer.setMap(map);
+      });
 
       var request = {
         origin: currentLocation,
@@ -114,9 +138,9 @@ function getDirections(
           endLat: results.routes[0].legs[0].end_location.lat(),
           endLng: results.routes[0].legs[0].end_location.lng(),
         };
-        setDistance(currentRoute.current.distance);
-        setDuration(currentRoute.current.duration);
-        setCost(currentRoute.current.cost);
+        if (setDistance) setDistance(currentRoute.current.distance);
+        if (setDuration) setDuration(currentRoute.current.duration);
+        if (setCost) setCost(currentRoute.current.cost);
       });
     });
 }
@@ -206,8 +230,66 @@ function createMarker(map, infoWindow, data, passLat, passedLng) {
             });
             return marker;
         })
+      })
+    }
 
+/**
+ * Returns a google map marker
+ * @param {Object} paramObj with 4 fields
+ *  - currentMap: map object to display marker on [REQUIRED]
+ *  - imageUrl: image to be used as marker icon [optional]
+ *  - lat: latitude [REQUIRED]
+ *  - lng: longitude [REQUIRED]
+ */
+function createRideMarker(paramObj) {
+  const {
+    currentMap: currentMap,
+    imageUrl: imageUrl,
+    lat: latitude,
+    lng: longitude,
+  } = paramObj;
+  return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
+    return currentMap.then((map) => {
+      if (imageUrl) {
+        const marker = new Marker({
+          position: { lat: latitude, lng: longitude },
+          map: map,
+          icon: imageUrl,
+        });
+        return marker;
+      } else {
+        const marker = new Marker({
+          position: { lat: latitude, lng: longitude },
+          map: map,
+        });
+        return marker;
+      }
     });
+  });
+}
+
+function createMarker(map, passLat, passedLng) {
+  return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
+    const image =
+      "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
+
+    map.then((actualMap) => {
+      //console.log("Passed", typeof passLat, typeof passedLng)
+      const marker = new Marker({
+        position: { lat: passLat, lng: passedLng },
+        map: actualMap,
+        icon: image,
+      });
+      //click event
+      marker.addListener("click", function () {
+        actualMap.setCenter(marker.getPosition());
+      });
+      //marker.setMap(map);
+      //console.log("Marker", marker);
+      //console.log("THIS IS THE MAP qweeqw: ", map);
+      return marker;
+    });
+  });
 }
 
 function createInfowindow(infoWindowContent) {
@@ -227,6 +309,8 @@ export {
   getDirections,
   userLocation,
   createMarker,
-  createInfowindow
+  createInfowindow,
+  getDistanceFromLatLngInKm,
+  createRideMarker,
 };
  
