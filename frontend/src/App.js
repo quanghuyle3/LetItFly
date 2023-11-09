@@ -21,6 +21,13 @@ import DriverHistory from "./pages/DriverHistory";
  */
 
 function App() {
+
+  const pathname = window.location.pathname;
+  console.log(pathname)
+  if (!pathname.includes("register")){
+    localStorage.removeItem("oldData");
+  }
+
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/">
