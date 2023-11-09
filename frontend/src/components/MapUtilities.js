@@ -123,6 +123,7 @@ function getDirections(
 
       directionsService.route(request, (results, status) => {
         if (status === "OK") {
+          console.log(results);
           directionsRenderer.setDirections(results);
         } else console.log("Directions Failed: ", status);
         currentRoute.current = {
