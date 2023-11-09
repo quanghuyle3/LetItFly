@@ -247,33 +247,48 @@ function convertTo12Hour(timeString) {
 }
 
 function createMarker(map, infoWindow, data, passLat, passedLng) {
-    return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
-        const image =
-            "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
+  return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
+      const image =
+          "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
 
-        map.then((actualMap) => {
-            //console.log("Passed", typeof passLat, typeof passedLng)
-            const marker = new Marker({
-                position: { lat: passLat, lng: passedLng },
-                map: actualMap,
-                icon: image,
-            });
-            //click event
-            marker.addListener("click", function () {
-                // Place your custom code here
-                //alert('Marker was clicked!');
-
-                // For example, to center the map at the marker's location:
-                actualMap.setCenter(marker.getPosition());
-            });
-            //marker.setMap(map);
-            //console.log("Marker", marker);
-            //console.log("THIS IS THE MAP qweeqw: ", map);
-            return marker;
-        })
+      map.then((actualMap) => {
+          //console.log("Passed", typeof passLat, typeof passedLng)
+          const marker = new Marker({
+              position: { lat: passLat, lng: passedLng },
+              map: actualMap
+             // icon: image,
+          });
+          //click event
+          marker.addListener("click", function () {
+              actualMap.setCenter(marker.getPosition());
+              infoWindow.then((actualWindow) => {
+                //update
+                console.log(typeof(data.timeRequest));
+                const windowData = {
+                    date: data.date,
+                    time: convertTo12Hour(data.timeRequest),
+                    rider: data.passengerId.firstName + " " + data.passengerId.lastName,
+                    duration: data.duration,
+                    profit: "$" + data.cost
+                };
+                updateInfoWindow(actualWindow, windowData)
+                actualWindow.open(actualMap, marker);
+              });
+          });
+          return marker;
       })
-    }
-    
+
+  });
+}
+function createInfowindow(infoWindowContent) {
+  return googleApiLoader.importLibrary('maps').then(({ InfoWindow }) => {
+    const infoWindow = new InfoWindow({
+      content: infoWindowContent
+    });
+    return infoWindow;
+  });
+}
+        
 export {
   googleApiLoader,
   autocomplete,
@@ -282,8 +297,8 @@ export {
   getDirections,
   userLocation,
   createMarker,
-  createInfowindow,
   getDistanceFromLatLngInKm,
   createRideMarker,
+  createInfowindow
 };
  
