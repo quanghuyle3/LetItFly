@@ -5,29 +5,33 @@ import logo from "../mock_logo.jpg";
 import "../css/Home.css";
 
 function Header({ cookie }) {
-  //const location = useLocation();
-
   return (
     <header>
-      <Link to={"/"}>
+      <Link
+        to={cookie.roleName === "ROLE_DRIVER" ? "/driver" : "/customer"}
+        state={{ tokenObject: cookie }}
+      >
         <img
           className="header-left"
           src={logo}
           alt="Let It Fly Logo"
           height={100}
-        /> 
+        />
       </Link>
       <div className="header-right">
         <div className="header-right-top">
           <p className="header-username">
-            {cookie.email ? `Hi ${cookie.email}!` : "Hi username!"}
+            {cookie.email ? `Hi ${cookie.firstName}!` : "Hi username!"}
           </p>
         </div>
 
         <ul className="navbar-home">
-          <Link to={{
-            pathname: "/customer/settings",
-            }}state={{cookie: cookie}}>
+          <Link
+            to={{
+              pathname: "/customer/settings",
+            }}
+            state={{ cookie: cookie }}
+          >
             <li>Settings</li>
           </Link>
           <Link to={"/"}>
