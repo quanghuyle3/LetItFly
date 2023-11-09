@@ -19,16 +19,19 @@ function DriverMap({ currentMap, userLocation, cookie}) {
             //fetch ride requests
             const proxy = process.env.REACT_APP_BACKEND_BASE_URL
             const url = `${proxy}/api/ride-request/findAll`
+
             const infoWindow = createInfowindow();
+           // updateInfoWindow(infoWindow, data);
             fetch(url, {headers: {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + cookie.token,
             }}).then(response => response.json()).then(data => {
                 for (let i = 0; i < data.length; i++) {
-                    console.log('Latitude:', typeof data[i].curLat, 'Longitude:', typeof data[i].curLong);
+                    console.log(data[i]);
                     const marker = createMarker(
                         map,
                         infoWindow,
+                        data[i],
                         data[i].curLat,
                         data[i].curLong
                     )

@@ -135,7 +135,26 @@ function createMap(mapContainer, centerCoords) {
   });
 }
 
-function createMarker(map, infoWindow, passLat, passedLng) {
+
+function createInfoWindowContent(data) {
+  return `
+    <div id="infoContent" style="padding: 0; margin: 0;">
+      <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">Ride Request</h1>
+      <p><strong>Date:</strong> ${data.date}</p>
+      <p><strong>Time:</strong> ${data.time}</p>
+      <p><strong>Rider:</strong> ${data.rider}</p>
+      <!-- Repeat the pattern for more lines of information -->
+      <button id="infoButton" style="width: 100%; background-color: rgb(242, 201, 98); border: none; padding: 10px 0; box-sizing: border-box;">Accept</button>
+    </div>
+  `;
+}
+
+function updateInfoWindow(infoWindow, data) {
+  const newContent = createInfoWindowContent(data);
+  infoWindow.setContent(newContent);
+}
+
+function createMarker(map, infoWindow, data, passLat, passedLng) {
     return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
         const image =
             "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
@@ -151,6 +170,14 @@ function createMarker(map, infoWindow, passLat, passedLng) {
             marker.addListener("click", function () {
                 actualMap.setCenter(marker.getPosition());
                 infoWindow.then((actualWindow) => {
+                  //update
+                  console.log(typeof(data.timeRequest));
+                  const windowData = {
+                      date: data.date,
+                      time: data.timeRequest,
+                      rider: data.passengerId.firstName + " " + data.passengerId.lastName
+                  };
+                  updateInfoWindow(actualWindow, windowData)
                   actualWindow.open(actualMap, marker);
                 });
             });
@@ -160,10 +187,10 @@ function createMarker(map, infoWindow, passLat, passedLng) {
     });
 }
 
-function createInfowindow() {
+function createInfowindow(infoWindowContent) {
   return googleApiLoader.importLibrary('maps').then(({ InfoWindow }) => {
     const infoWindow = new InfoWindow({
-      content: 'Hello' // Your InfoWindow content here
+      content: infoWindowContent
     });
     return infoWindow;
   });
