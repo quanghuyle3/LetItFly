@@ -123,7 +123,6 @@ function getDirections(
 
       directionsService.route(request, (results, status) => {
         if (status === "OK") {
-          console.log(results);
           directionsRenderer.setDirections(results);
         } else console.log("Directions Failed: ", status);
         currentRoute.current = {
@@ -216,13 +215,13 @@ function createInfoWindowContent(data) {
       <p><strong>Rider:</strong> ${data.rider}</p>
       <p><strong>Distance:</strong> ${data.distance}</p>
       <p><strong>Duration:</strong> ${data.duration}</p>
-      <p><strong>Profit:</strong> <span style="color: green;">${data.profit}</span></p>
+      <p><strong>Profit:</strong> <span style="color: green;">${
+        data.profit
+      }</span></p>
       <button id="infoButton" style="width: 100%; background-color: rgb(242, 201, 98); color: rgb(255, 255, 255); border: none; padding: 15px 0; box-sizing: border-box; font-size: 18px; font-weight: bold;">Accept</button>
     </div>
   `;
 }
-
-
 
 function updateInfoWindow(infoWindow, data) {
   const newContent = createInfoWindowContent(data);
@@ -230,13 +229,13 @@ function updateInfoWindow(infoWindow, data) {
 }
 
 function convertTo12Hour(timeString) {
-  const [hours, minutes, seconds] = timeString.split(':');
+  const [hours, minutes, seconds] = timeString.split(":");
 
   let hrs = parseInt(hours, 10);
   let mins = parseInt(minutes, 10);
   let secs = parseInt(seconds, 10);
 
-  const suffix = hrs >= 12 ? 'PM' : 'AM';
+  const suffix = hrs >= 12 ? "PM" : "AM";
 
   // Convert hours to 12-hour format
   hrs = hrs % 12;
@@ -250,48 +249,47 @@ function convertTo12Hour(timeString) {
 
 function createMarker(map, infoWindow, data, passLat, passedLng) {
   return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
-      const image =
-          "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
+    const image =
+      "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
 
-      map.then((actualMap) => {
-          //console.log("Passed", typeof passLat, typeof passedLng)
-          const marker = new Marker({
-              position: { lat: passLat, lng: passedLng },
-              map: actualMap
-             // icon: image,
-          });
-          //click event
-          marker.addListener("click", function () {
-              actualMap.setCenter(marker.getPosition());
-              infoWindow.then((actualWindow) => {
-                //update
-                console.log(data);
-                const windowData = {
-                    date: data.date,
-                    time: convertTo12Hour(data.timeRequest),
-                    rider: data.passengerId.firstName + " " + data.passengerId.lastName,
-                    distance: data.distance,
-                    duration: data.duration,
-                    profit: "$" + data.cost
-                };
-                updateInfoWindow(actualWindow, windowData)
-                actualWindow.open(actualMap, marker);
-              });
-          });
-          return marker;
-      })
-
+    map.then((actualMap) => {
+      //console.log("Passed", typeof passLat, typeof passedLng)
+      const marker = new Marker({
+        position: { lat: passLat, lng: passedLng },
+        map: actualMap,
+        // icon: image,
+      });
+      //click event
+      marker.addListener("click", function () {
+        actualMap.setCenter(marker.getPosition());
+        infoWindow.then((actualWindow) => {
+          //update
+          console.log(data);
+          const windowData = {
+            date: data.date,
+            time: convertTo12Hour(data.timeRequest),
+            rider: data.passengerId.firstName + " " + data.passengerId.lastName,
+            distance: data.distance,
+            duration: data.duration,
+            profit: "$" + data.cost,
+          };
+          updateInfoWindow(actualWindow, windowData);
+          actualWindow.open(actualMap, marker);
+        });
+      });
+      return marker;
+    });
   });
 }
 function createInfowindow(infoWindowContent) {
-  return googleApiLoader.importLibrary('maps').then(({ InfoWindow }) => {
+  return googleApiLoader.importLibrary("maps").then(({ InfoWindow }) => {
     const infoWindow = new InfoWindow({
-      content: infoWindowContent
+      content: infoWindowContent,
     });
     return infoWindow;
   });
 }
-        
+
 export {
   googleApiLoader,
   autocomplete,
@@ -302,6 +300,5 @@ export {
   createMarker,
   getDistanceFromLatLngInKm,
   createRideMarker,
-  createInfowindow
+  createInfowindow,
 };
- 
