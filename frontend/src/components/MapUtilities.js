@@ -154,6 +154,25 @@ function updateInfoWindow(infoWindow, data) {
   infoWindow.setContent(newContent);
 }
 
+function convertTo12Hour(timeString) {
+  const [hours, minutes, seconds] = timeString.split(':');
+
+  let hrs = parseInt(hours, 10);
+  let mins = parseInt(minutes, 10);
+  let secs = parseInt(seconds, 10);
+
+  const suffix = hrs >= 12 ? 'PM' : 'AM';
+
+  // Convert hours to 12-hour format
+  hrs = hrs % 12;
+  hrs = hrs ? hrs : 12; // the hour '0' should be '12'
+
+  const paddedMins = mins < 10 ? `0${mins}` : mins;
+  const paddedSecs = secs < 10 ? `0${secs}` : secs;
+
+  return `${hrs}:${paddedMins}:${paddedSecs} ${suffix}`;
+}
+
 function createMarker(map, infoWindow, data, passLat, passedLng) {
     return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
         const image =
@@ -174,7 +193,7 @@ function createMarker(map, infoWindow, data, passLat, passedLng) {
                   console.log(typeof(data.timeRequest));
                   const windowData = {
                       date: data.date,
-                      time: data.timeRequest,
+                      time: convertTo12Hour(data.timeRequest),
                       rider: data.passengerId.firstName + " " + data.passengerId.lastName
                   };
                   updateInfoWindow(actualWindow, windowData)
