@@ -206,7 +206,6 @@ function createRideMarker(paramObj) {
   });
 }
 
-
 function createInfoWindowContent(data) {
   return `
     <div id="infoContent" style="padding: 0; margin: 0;">
@@ -214,12 +213,14 @@ function createInfoWindowContent(data) {
       <p><strong>Date:</strong> ${data.date}</p>
       <p><strong>Time:</strong> ${convertTo12Hour(data.time)}</p>
       <p><strong>Rider:</strong> ${data.rider}</p>
+      <p><strong>Distance:</strong> ${data.distance}</p>
       <p><strong>Duration:</strong> ${data.duration}</p>
       <p><strong>Profit:</strong> <span style="color: green;">${data.profit}</span></p>
-      <button id="infoButton" style="width: 100%; background-color: rgb(242, 201, 98); border: none; padding: 10px 0; box-sizing: border-box;">Accept</button>
+      <button id="infoButton" style="width: 100%; background-color: rgb(242, 201, 98); color: rgb(255, 255, 255); border: none; padding: 15px 0; box-sizing: border-box; font-size: 18px; font-weight: bold;">Accept</button>
     </div>
   `;
 }
+
 
 
 function updateInfoWindow(infoWindow, data) {
@@ -263,11 +264,12 @@ function createMarker(map, infoWindow, data, passLat, passedLng) {
               actualMap.setCenter(marker.getPosition());
               infoWindow.then((actualWindow) => {
                 //update
-                console.log(typeof(data.timeRequest));
+                console.log(data);
                 const windowData = {
                     date: data.date,
                     time: convertTo12Hour(data.timeRequest),
                     rider: data.passengerId.firstName + " " + data.passengerId.lastName,
+                    distance: data.distance,
                     duration: data.duration,
                     profit: "$" + data.cost
                 };
