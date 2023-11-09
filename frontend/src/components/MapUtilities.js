@@ -141,13 +141,15 @@ function createInfoWindowContent(data) {
     <div id="infoContent" style="padding: 0; margin: 0;">
       <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">Ride Request</h1>
       <p><strong>Date:</strong> ${data.date}</p>
-      <p><strong>Time:</strong> ${data.time}</p>
+      <p><strong>Time:</strong> ${convertTo12Hour(data.time)}</p>
       <p><strong>Rider:</strong> ${data.rider}</p>
-      <!-- Repeat the pattern for more lines of information -->
+      <p><strong>Duration:</strong> ${data.duration}</p>
+      <p><strong>Profit:</strong> <span style="color: green;">${data.profit}</span></p>
       <button id="infoButton" style="width: 100%; background-color: rgb(242, 201, 98); border: none; padding: 10px 0; box-sizing: border-box;">Accept</button>
     </div>
   `;
 }
+
 
 function updateInfoWindow(infoWindow, data) {
   const newContent = createInfoWindowContent(data);
@@ -182,8 +184,8 @@ function createMarker(map, infoWindow, data, passLat, passedLng) {
             //console.log("Passed", typeof passLat, typeof passedLng)
             const marker = new Marker({
                 position: { lat: passLat, lng: passedLng },
-                map: actualMap,
-                icon: image,
+                map: actualMap
+               // icon: image,
             });
             //click event
             marker.addListener("click", function () {
@@ -194,7 +196,9 @@ function createMarker(map, infoWindow, data, passLat, passedLng) {
                   const windowData = {
                       date: data.date,
                       time: convertTo12Hour(data.timeRequest),
-                      rider: data.passengerId.firstName + " " + data.passengerId.lastName
+                      rider: data.passengerId.firstName + " " + data.passengerId.lastName,
+                      duration: data.duration,
+                      profit: "$" + data.cost
                   };
                   updateInfoWindow(actualWindow, windowData)
                   actualWindow.open(actualMap, marker);
