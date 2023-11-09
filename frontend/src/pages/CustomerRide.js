@@ -10,36 +10,6 @@ import { useState, useRef, useEffect } from "react";
 import pickupIcon from "../person.png";
 import carIcon from "../car.png";
 
-/*
-    BEFORE RIDE ACCEPTED
-    ::Display::
-    "Loading ..."
-
-    ::Background::
-    /api/ride-request
-    getDriverIdOfRideRequest(ride request id) -> returns driverId
-      -1 ? keep polling : driver found = driver id 
-
-    AFTER RIDE ACCEPTED, BEFORE PICKUP
-    ::Display::
-    display map with route between current location and driver location
-    update driver and customer markers
-
-    ::Background::
-    make sure i update passenger coords with: 
-    /updateCoordinatesPassenger
-
-    /api/driver-status
-    findByDriverId(driverId) -> returns whole record -> look at "curLat", "curLong"
-
-    move to next phase after distance between driver & passenger < 0.05 km using haversine formula
-
-    AFTER PASSENGER PICKUP
-    ::Display::
-    display map with current location and destination location
-    -- no need to interact with database anymore
-*/
-
 function CustomerRide() {
   const {
     state: {
@@ -133,7 +103,6 @@ function CustomerRide() {
   /*
           --------- ONMESSAGE ---------
    */
-  var c = 1;
   customerRideWorker.onmessage = (e) => {
     // PHASE 1 ON MESSAGE
     if (e.data.responseString === "AFTER RIDE ACCEPTED") {
@@ -142,7 +111,7 @@ function CustomerRide() {
     }
     // PHASE 2 ON MESSAGE
     else if (e.data.responseString === "DRIVER LOCATION RECEIVED") {
-      if (c < 2) driverLocation.current = e.data.driverCoords;
+      driverLocation.current = e.data.driverCoords;
       // Route already rendered
       if (currentRoute.current) {
         // update marker positions
@@ -150,20 +119,6 @@ function CustomerRide() {
           lat: passengerLocation.current.lat,
           lng: passengerLocation.current.lng,
         });
-
-        // 37.32981760103271, -121.89016722367852
-
-        if (c >= 2 && c < 3) {
-          driverLocation.current = {
-            lat: 37.33839581,
-            lng: -121.89426123,
-          };
-        }
-
-        if (c > 3) {
-          driverLocation.current.lat = 37.329682;
-          driverLocation.current.lng = -121.89051473;
-        }
         driverMarker.current.setPosition({
           lat: driverLocation.current.lat,
           lng: driverLocation.current.lng,
@@ -176,10 +131,9 @@ function CustomerRide() {
           driverLocation.current.lng
         );
         console.log("driver distance: ", distance, "km");
-        c++;
 
         // criteria to check if passenger has been picked up
-        const FiftyMetersInKm = 1; // FIX VALUE LATER TO 0.05
+        const FiftyMetersInKm = 0.05;
         if (distance < FiftyMetersInKm) {
           console.log("picked up passenger!!");
           clearInterval(afterRideAcceptedInterval.current);
@@ -224,7 +178,6 @@ function CustomerRide() {
     // PHASE 3 ON MESSAGE
     else if (e.data.responseString === "FINAL DESTINATION RETRIEVED") {
       rideRecord.current = e.data.record;
-      console.log(rideRecord.current);
       destinationLocation.current = e.data.destination;
       getDirections(
         passengerLocation.current,
@@ -251,25 +204,12 @@ function CustomerRide() {
             clearInterval(afterPassengerPickupInterval.current);
           }, 20000);
         });
-      var c2 = 1;
+
       function updateMarkerLocation() {
         userLocation
           .then((location) => {
-            if (c2 < 2) {
-              c2++;
-              passengerMarker.current.setPosition(location);
-              passengerLocation.current = location;
-            } else if (c2 < 4) {
-              c2++;
-              const pos = { lat: 37.33109791490554, lng: -121.88377082875157 };
-              passengerMarker.current.setPosition(pos);
-              passengerLocation.current = pos;
-            } else {
-              c2++;
-              const pos = { lat: 37.334171276018736, lng: -121.88046319744207 };
-              passengerMarker.current.setPosition(pos);
-              passengerLocation.current = pos;
-            }
+            passengerMarker.current.setPosition(location);
+            passengerLocation.current = location;
           })
           .then(() => {
             let distance = getDistanceFromLatLngInKm(
