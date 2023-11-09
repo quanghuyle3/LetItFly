@@ -159,6 +159,53 @@ function createMap(mapContainer, centerCoords) {
   });
 }
 
+function closeInfoBox() {
+  document.getElementById("customInfoBox").style.display = "none";
+}
+
+<div id="customInfoBox" class="custom-info-box">
+  <div class="content">
+    <h1>Title</h1>
+    <p>Description goes here.</p>
+    <button onclick="closeInfoBox()">Close</button>
+  </div>
+</div>;
+
+/**
+ * Returns a google map marker
+ * @param {Object} paramObj with 4 fields
+ *  - currentMap: map object to display marker on [REQUIRED]
+ *  - imageUrl: image to be used as marker icon [optional]
+ *  - lat: latitude [REQUIRED]
+ *  - lng: longitude [REQUIRED]
+ */
+function createRideMarker(paramObj) {
+  const {
+    currentMap: currentMap,
+    imageUrl: imageUrl,
+    lat: latitude,
+    lng: longitude,
+  } = paramObj;
+  return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
+    return currentMap.then((map) => {
+      if (imageUrl) {
+        const marker = new Marker({
+          position: { lat: latitude, lng: longitude },
+          map: map,
+          icon: imageUrl,
+        });
+        return marker;
+      } else {
+        const marker = new Marker({
+          position: { lat: latitude, lng: longitude },
+          map: map,
+        });
+        return marker;
+      }
+    });
+  });
+}
+
 
 function createInfoWindowContent(data) {
   return `
@@ -208,99 +255,25 @@ function createMarker(map, infoWindow, data, passLat, passedLng) {
             //console.log("Passed", typeof passLat, typeof passedLng)
             const marker = new Marker({
                 position: { lat: passLat, lng: passedLng },
-                map: actualMap
-               // icon: image,
+                map: actualMap,
+                icon: image,
             });
             //click event
             marker.addListener("click", function () {
+                // Place your custom code here
+                //alert('Marker was clicked!');
+
+                // For example, to center the map at the marker's location:
                 actualMap.setCenter(marker.getPosition());
-                infoWindow.then((actualWindow) => {
-                  //update
-                  console.log(typeof(data.timeRequest));
-                  const windowData = {
-                      date: data.date,
-                      time: convertTo12Hour(data.timeRequest),
-                      rider: data.passengerId.firstName + " " + data.passengerId.lastName,
-                      duration: data.duration,
-                      profit: "$" + data.cost
-                  };
-                  updateInfoWindow(actualWindow, windowData)
-                  actualWindow.open(actualMap, marker);
-                });
             });
+            //marker.setMap(map);
+            //console.log("Marker", marker);
+            //console.log("THIS IS THE MAP qweeqw: ", map);
             return marker;
         })
       })
     }
-
-/**
- * Returns a google map marker
- * @param {Object} paramObj with 4 fields
- *  - currentMap: map object to display marker on [REQUIRED]
- *  - imageUrl: image to be used as marker icon [optional]
- *  - lat: latitude [REQUIRED]
- *  - lng: longitude [REQUIRED]
- */
-function createRideMarker(paramObj) {
-  const {
-    currentMap: currentMap,
-    imageUrl: imageUrl,
-    lat: latitude,
-    lng: longitude,
-  } = paramObj;
-  return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
-    return currentMap.then((map) => {
-      if (imageUrl) {
-        const marker = new Marker({
-          position: { lat: latitude, lng: longitude },
-          map: map,
-          icon: imageUrl,
-        });
-        return marker;
-      } else {
-        const marker = new Marker({
-          position: { lat: latitude, lng: longitude },
-          map: map,
-        });
-        return marker;
-      }
-    });
-  });
-}
-
-function createMarker(map, passLat, passedLng) {
-  return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
-    const image =
-      "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
-
-    map.then((actualMap) => {
-      //console.log("Passed", typeof passLat, typeof passedLng)
-      const marker = new Marker({
-        position: { lat: passLat, lng: passedLng },
-        map: actualMap,
-        icon: image,
-      });
-      //click event
-      marker.addListener("click", function () {
-        actualMap.setCenter(marker.getPosition());
-      });
-      //marker.setMap(map);
-      //console.log("Marker", marker);
-      //console.log("THIS IS THE MAP qweeqw: ", map);
-      return marker;
-    });
-  });
-}
-
-function createInfowindow(infoWindowContent) {
-  return googleApiLoader.importLibrary('maps').then(({ InfoWindow }) => {
-    const infoWindow = new InfoWindow({
-      content: infoWindowContent
-    });
-    return infoWindow;
-  });
-}
-
+    
 export {
   googleApiLoader,
   autocomplete,
