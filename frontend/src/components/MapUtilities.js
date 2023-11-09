@@ -206,7 +206,48 @@ function createRideMarker(paramObj) {
   });
 }
 
-function createMarker(map, passLat, passedLng) {
+function createInfoWindowContent(data) {
+  return `
+    <div id="infoContent" style="padding: 0; margin: 0;">
+      <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">Ride Request</h1>
+      <p><strong>Date:</strong> ${data.date}</p>
+      <p><strong>Time:</strong> ${convertTo12Hour(data.time)}</p>
+      <p><strong>Rider:</strong> ${data.rider}</p>
+      <p><strong>Distance:</strong> ${data.distance}</p>
+      <p><strong>Duration:</strong> ${data.duration}</p>
+      <p><strong>Profit:</strong> <span style="color: green;">${
+        data.profit
+      }</span></p>
+      <button id="infoButton" style="width: 100%; background-color: rgb(242, 201, 98); color: rgb(255, 255, 255); border: none; padding: 15px 0; box-sizing: border-box; font-size: 18px; font-weight: bold;">Accept</button>
+    </div>
+  `;
+}
+
+function updateInfoWindow(infoWindow, data) {
+  const newContent = createInfoWindowContent(data);
+  infoWindow.setContent(newContent);
+}
+
+function convertTo12Hour(timeString) {
+  const [hours, minutes, seconds] = timeString.split(":");
+
+  let hrs = parseInt(hours, 10);
+  let mins = parseInt(minutes, 10);
+  let secs = parseInt(seconds, 10);
+
+  const suffix = hrs >= 12 ? "PM" : "AM";
+
+  // Convert hours to 12-hour format
+  hrs = hrs % 12;
+  hrs = hrs ? hrs : 12; // the hour '0' should be '12'
+
+  const paddedMins = mins < 10 ? `0${mins}` : mins;
+  const paddedSecs = secs < 10 ? `0${secs}` : secs;
+
+  return `${hrs}:${paddedMins}:${paddedSecs} ${suffix}`;
+}
+
+function createMarker(map, infoWindow, data, passLat, passedLng) {
   return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
     const image =
       "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
@@ -216,17 +257,36 @@ function createMarker(map, passLat, passedLng) {
       const marker = new Marker({
         position: { lat: passLat, lng: passedLng },
         map: actualMap,
-        icon: image,
+        // icon: image,
       });
       //click event
       marker.addListener("click", function () {
         actualMap.setCenter(marker.getPosition());
+        infoWindow.then((actualWindow) => {
+          //update
+          console.log(data);
+          const windowData = {
+            date: data.date,
+            time: convertTo12Hour(data.timeRequest),
+            rider: data.passengerId.firstName + " " + data.passengerId.lastName,
+            distance: data.distance,
+            duration: data.duration,
+            profit: "$" + data.cost,
+          };
+          updateInfoWindow(actualWindow, windowData);
+          actualWindow.open(actualMap, marker);
+        });
       });
-      //marker.setMap(map);
-      //console.log("Marker", marker);
-      //console.log("THIS IS THE MAP qweeqw: ", map);
       return marker;
     });
+  });
+}
+function createInfowindow(infoWindowContent) {
+  return googleApiLoader.importLibrary("maps").then(({ InfoWindow }) => {
+    const infoWindow = new InfoWindow({
+      content: infoWindowContent,
+    });
+    return infoWindow;
   });
 }
 
@@ -240,4 +300,5 @@ export {
   createMarker,
   getDistanceFromLatLngInKm,
   createRideMarker,
+  createInfowindow,
 };
