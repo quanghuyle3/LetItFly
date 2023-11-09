@@ -10,6 +10,8 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Autocomplete from "@mui/material/Autocomplete";
 import Alert from "@mui/material/Alert";
 import { stateAcronyms } from "./Categories";
+import Grid from "@mui/material/Grid";
+import logo from "../mock_logo.jpg";
 import dayjs from "dayjs";
 import {
   isValidZipCode,
@@ -35,9 +37,12 @@ const CardInfo = (props) => {
   const [addressError, setAddressError] = useState(false);
   const [zipCodeError, setZipCodeError] = useState(false);
   const [cardNumberError, setCardNumberError] = useState(false);
+  const [expDateError, setExpDateError] = useState(false);
   const [cvvError, setCVVError] = useState(false);
+  const [regSuccess, setRegSuccess] = useState(true);
   const [failed, setFailed] = useState(0);
   const navigate = useNavigate();
+
   const basicInfo = props.basicInfo;
 
   const changeUserInfo = (e) => {
@@ -68,42 +73,42 @@ const CardInfo = (props) => {
       setFirstNameError(true);
       isfailed = true;
     } else {
-      isfailed = false;
       setFirstNameError(false);
     }
     if (!isValidName(lastName)) {
       setLastNameError(true);
       isfailed = true;
     } else {
-      isfailed = false;
       setLastNameError(false);
     }
     if (!isValidAddress(address)) {
       isfailed = true;
       setAddressError(true);
     } else {
-      isfailed = false;
       setAddressError(false);
     }
     if (!isValidZipCode(zipcode)) {
       isfailed = true;
       setZipCodeError(true);
     } else {
-      isfailed = false;
       setZipCodeError(false);
     }
     if (!isValidCard(cardNumber)) {
       isfailed = true;
       setCardNumberError(cardNumber);
     } else {
-      isfailed = false;
       setCardNumberError(false);
+    }
+    if (!exprDate) {
+      isfailed = true;
+      setExpDateError(true);
+    } else {
+      setExpDateError(false);
     }
     if (!isValidCVV(CVV)) {
       isfailed = true;
       setCVVError(CVV);
     } else {
-      isfailed = false;
       setCVVError(false);
     }
     return isfailed;
@@ -111,6 +116,8 @@ const CardInfo = (props) => {
 
   function handleSubmit(event) {
     event.preventDefault();
+    setRegSuccess(false);
+    localStorage.setItem("regSuccess", JSON.stringify({ success: false }));
     let isfail = validation();
     if (isfail) {
       setFailed(3);
@@ -122,12 +129,12 @@ const CardInfo = (props) => {
         password: basicInfo.password,
         firstName: basicInfo.firstName,
         lastName: basicInfo.lastName,
-        birthDate: (basicInfo.birthDate).format("MM/DD/YYYY"),
+        birthDate: null, //basicInfo.birthDate ? basicInfo.birthDate.format("YYYY-MM-DD") : null,
         gender: basicInfo.gender,
         address:
           basicInfo.address + " " + basicInfo.state + " " + basicInfo.zipcode,
         phone: basicInfo.phone,
-        dateJoin: dayjs().format("MM/DD/YYYY"),
+        dateJoin: null, //dayjs().format("YYYY-MM-DD"),
         driverLicense: basicInfo.driverLicense,
         roleName: basicInfo.roleName,
         cardNumber: cardNumber,
@@ -154,9 +161,12 @@ const CardInfo = (props) => {
             console.log(response);
             if (response.status === 200) {
               console.log("Registration successful", newUser);
-              basicInfo.roleName === "ROLE_DRIVER"
-                ? navigate("/driver")
-                : navigate("/customer");
+              setRegSuccess(true);
+              navigate("/");
+              localStorage.setItem(
+                "regSuccess",
+                JSON.stringify({ success: true })
+              );
             } else if (response.status === 302) {
               console.log(
                 "Registration failed: Email already exists.",
@@ -192,9 +202,51 @@ const CardInfo = (props) => {
         elevation={3}
         style={{ padding: "20px", margin: "0 auto", maxWidth: "90vw" }}
       >
+        <Grid container justifyContent="center" alignItems="center">
+          <Grid item>
+            <img src={logo} style={{ height: "100px" }} />
+          </Grid>
+        </Grid>
         <h2 style={{ textAlign: "center" }}>Sign Up</h2>
         <h3>Payment Information: </h3>
         <form onSubmit={handleSubmit}>
+          <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
+            <TextField
+              type="text"
+              variant="outlined"
+              color="primary"
+              label="Card Number"
+              onChange={(e) => setCardNumber(e.target.value)}
+              value={cardNumber}
+              error={cardNumberError}
+              helperText={cardNumberError ? "Invalid Card Number" : ""}
+              required={!goPrev}
+              sx={{ mb: 4 }}
+            />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                format="MM / YY"
+                label="Expiration Date"
+                value={exprDate}
+                minDate={dayjs()}
+                views={["month", "year"]}
+                onChange={(newValue) => setExprDate(newValue)}
+                sx={{ mb: 4 }}
+              />
+            </LocalizationProvider>
+            <TextField
+              type="text"
+              variant="outlined"
+              color="primary"
+              label="CVV"
+              error={cvvError}
+              helperText={cvvError ? "Invalid CVV" : ""}
+              onChange={(e) => setCVV(e.target.value)}
+              value={CVV}
+              required={!goPrev}
+              sx={{ mb: 4 }}
+            />
+          </Stack>
           <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
             <TextField
               type="text"
@@ -204,6 +256,7 @@ const CardInfo = (props) => {
               onChange={(e) => setFirstName(e.target.value)}
               value={firstName}
               error={firstNameError}
+              helperText={firstNameError ? "Invalid First Name (ex. John)" : ""}
               fullWidth
               required={!goPrev}
             />
@@ -215,6 +268,7 @@ const CardInfo = (props) => {
               onChange={(e) => setLastName(e.target.value)}
               value={lastName}
               error={lastNameError}
+              helperText={lastNameError ? "Invalid Last Name (ex. Smith)" : ""}
               fullWidth
               required={!goPrev}
             />
@@ -227,6 +281,7 @@ const CardInfo = (props) => {
               label="Address"
               onChange={(e) => setAddress(e.target.value)}
               value={address}
+              helperText={addressError ? "Invalid Address" : ""}
               required={!goPrev}
               error={addressError}
               fullWidth
@@ -249,6 +304,7 @@ const CardInfo = (props) => {
               color="primary"
               label="Zipcode"
               onChange={(e) => setZipCode(e.target.value)}
+              helperText={zipCodeError ? "Invalid Zipcode" : ""}
               value={zipcode}
               error={zipCodeError}
               required={!goPrev}
@@ -261,41 +317,6 @@ const CardInfo = (props) => {
             label="Use the same name and address information for card details."
             onChange={changeUserInfo}
           />
-          <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
-            <TextField
-              type="text"
-              variant="outlined"
-              color="primary"
-              label="Card Number"
-              onChange={(e) => setCardNumber(e.target.value)}
-              value={cardNumber}
-              error={cardNumberError}
-              required={!goPrev}
-              sx={{ mb: 4 }}
-            />
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                format="MM / YY"
-                label="Expiration Date"
-                value={exprDate}
-                minDate={dayjs()}
-                views={["month", "year"]}
-                onChange={(newValue) => setExprDate(newValue)}
-                sx={{ mb: 4 }}
-              />
-            </LocalizationProvider>
-            <TextField
-              type="text"
-              variant="outlined"
-              color="primary"
-              label="CVV"
-              error={cvvError}
-              onChange={(e) => setCVV(e.target.value)}
-              value={CVV}
-              required={!goPrev}
-              sx={{ mb: 4 }}
-            />
-          </Stack>
           <Stack direction="row" sx={{ marginBottom: 2 }}>
             <Button
               variant="outlined"
@@ -310,7 +331,12 @@ const CardInfo = (props) => {
               variant="outlined"
               color="primary"
               type="submit"
-              style={{ display: "block", margin: "0 auto", width: "200px" }}
+              style={{
+                display: "block",
+                margin: "0 auto",
+                width: "200px",
+                mb: "2px",
+              }}
             >
               Submit
             </Button>
