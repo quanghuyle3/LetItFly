@@ -130,6 +130,18 @@ header {
   }
 }
 
+#infoButton {
+  width: 100%;
+  background-color: rgb(242, 201, 98);
+  /* color: rgb(0, 0, 0); */
+  color: #351851;
+  border: none;
+  padding: 15px 0;
+  box-sizing: border-box;
+  font-size: 18px;
+  font-weight: bold;
+}
+
 .route-details {
   font-family: "Titillium Web", sans-serif;
 

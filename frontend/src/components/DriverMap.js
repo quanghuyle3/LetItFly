@@ -1,13 +1,18 @@
 import { useRef } from "react";
 import "../css/Home.css";
 import {
+  clearDirections,
   createInfowindow,
   createMap,
   createMarker,
+  getDirections,
   userLocation,
 } from "./MapUtilities";
+import carIcon from "../car.png";
+import { useNavigate } from "react-router-dom";
 
 function DriverMap({ cookie }) {
+  const navigate = useNavigate();
   const currentMap = useRef();
   const infoWindowRef = useRef();
 
@@ -23,9 +28,21 @@ function DriverMap({ cookie }) {
         zoomLevel
       );
     });
+    userLocation.then(({ lat, lng }) => {
+      createMarker({
+        currentMap: currentMap.current,
+        imageUrl: carIcon,
+        lat: lat,
+        lng: lng,
+      });
+    });
     currentMap.current.then((map) => {
       map.addListener("click", () => {
-        if (infoWindowRef.current) infoWindowRef.current.close();
+        clearDirections();
+        if (infoWindowRef.current) {
+          infoWindowRef.current.close();
+          infoWindowRef.current = null;
+        }
       });
     });
   }
@@ -56,7 +73,12 @@ function DriverMap({ cookie }) {
 
   function markerCallback(marker, data) {
     const map = marker.getMap();
-    map.setCenter(marker.getPosition());
+    map.panTo(marker.getPosition());
+    getDirections(
+      { lat: data.curLat, lng: data.curLong },
+      { lat: data.destLat, lng: data.destLong },
+      currentMap.current
+    );
     const windowData = {
       date: data.date,
       time: convertTo12Hour(data.timeRequest),
@@ -66,14 +88,22 @@ function DriverMap({ cookie }) {
       profit: "$" + data.cost,
     };
     createInfowindow(createInfoWindowContent(windowData)).then((infoWindow) => {
+      if (infoWindowRef.current) infoWindowRef.current.close();
       infoWindowRef.current = infoWindow;
       infoWindow.open(map, marker);
+      infoWindow.addListener("domready", () => {
+        document.getElementById("infoButton").addEventListener("click", () => {
+          navigate("/driver/ride", {
+            state: { cookie: cookie, rideRequest: data },
+          });
+        });
+      });
     });
   }
 
   function createInfoWindowContent(data) {
     return `
-      <div id="infoContent" style="padding: 0; margin: 0;">
+      <div id="infoContent" style="padding: 0; margin: 0; font-size: 18px;">
         <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">Ride Request</h1>
         <p><strong>Date:</strong> ${data.date}</p>
         <p><strong>Time:</strong> ${convertTo12Hour(data.time)}</p>
@@ -83,7 +113,7 @@ function DriverMap({ cookie }) {
         <p><strong>Profit:</strong> <span style="color: green;">${
           data.profit
         }</span></p>
-        <button id="infoButton" style="width: 100%; background-color: rgb(242, 201, 98); color: rgb(255, 255, 255); border: none; padding: 15px 0; box-sizing: border-box; font-size: 18px; font-weight: bold;">Accept</button>
+        <button id="infoButton" style="cursor: pointer;">Accept</button>
       </div>
     `;
   }

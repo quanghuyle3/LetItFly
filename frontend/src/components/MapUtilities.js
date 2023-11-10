@@ -125,24 +125,30 @@ function getDirections(
         if (status === "OK") {
           directionsRenderer.setDirections(results);
         } else console.log("Directions Failed: ", status);
-        currentRoute.current = {
-          distance: results.routes[0].legs[0].distance.text,
-          duration: results.routes[0].legs[0].duration.text,
-          cost: (
-            (Number(results.routes[0].legs[0].distance.value) / 1609.34 - 2) /
-              5 +
-            15
-          ).toFixed(2),
-          startLat: results.routes[0].legs[0].start_location.lat(),
-          startLng: results.routes[0].legs[0].start_location.lng(),
-          endLat: results.routes[0].legs[0].end_location.lat(),
-          endLng: results.routes[0].legs[0].end_location.lng(),
-        };
+        if (currentRoute) {
+          currentRoute.current = {
+            distance: results.routes[0].legs[0].distance.text,
+            duration: results.routes[0].legs[0].duration.text,
+            cost: (
+              (Number(results.routes[0].legs[0].distance.value) / 1609.34 - 2) /
+                5 +
+              15
+            ).toFixed(2),
+            startLat: results.routes[0].legs[0].start_location.lat(),
+            startLng: results.routes[0].legs[0].start_location.lng(),
+            endLat: results.routes[0].legs[0].end_location.lat(),
+            endLng: results.routes[0].legs[0].end_location.lng(),
+          };
+        }
         if (setDistance) setDistance(currentRoute.current.distance);
         if (setDuration) setDuration(currentRoute.current.duration);
         if (setCost) setCost(currentRoute.current.cost);
       });
     });
+}
+
+function clearDirections() {
+  if (directionsRenderer) directionsRenderer.set("directions", null);
 }
 
 function createMap(mapContainer, centerCoords, zoomLevel) {
@@ -208,4 +214,5 @@ export {
   getDistanceFromLatLngInKm,
   createMarker,
   createInfowindow,
+  clearDirections,
 };
