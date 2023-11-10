@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   createMap,
-  createRideMarker,
+  createMarker,
   getDirections,
   getDistanceFromLatLngInKm,
   userLocation,
@@ -13,9 +13,9 @@ import carIcon from "../car.png";
 function CustomerRide() {
   const {
     state: {
-      rideRequestId: rideRequestId,
-      cookie: cookie,
-      cookie: { token: token },
+      rideRequestId,
+      cookie,
+      cookie: { token },
     },
   } = useLocation();
   const navigate = useNavigate();
@@ -155,7 +155,7 @@ function CustomerRide() {
         );
 
         // Create passenger marker
-        createRideMarker({
+        createMarker({
           currentMap: currentMap.current,
           lat: passengerLocation.current.lat,
           lng: passengerLocation.current.lng,
@@ -165,7 +165,7 @@ function CustomerRide() {
         });
 
         // Create driver marker
-        createRideMarker({
+        createMarker({
           currentMap: currentMap.current,
           lat: driverLocation.current.lat,
           lng: driverLocation.current.lng,
@@ -186,7 +186,7 @@ function CustomerRide() {
         currentRoute
       );
       // update passenger marker
-      createRideMarker({
+      createMarker({
         currentMap: currentMap.current,
         imageUrl: carIcon,
         lat: passengerLocation.current.lat,
