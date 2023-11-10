@@ -65,3 +65,13 @@ export function isValidCVV(CVV) {
   return cvvRegex.test(CVV);
 }
 
+export function isValidCardType(CardType) {
+  const cardTypeRegex = /^[A-Za-z]{1,10}$/;
+  return cardTypeRegex.test(CardType);
+}
+
+export function isValidExpiration(exp) {
+  const expRegex = /^\d{1,2}\/\d{1,2}$/
+  return expRegex.test(exp);
+}
+

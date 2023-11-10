@@ -2,13 +2,17 @@ import "../css/Settings.css";
 import Card from "./Card";
 import { Fragment, useEffect } from "react";
 import React, { useState } from 'react';
+import { isValidPhoneNumber, isValidAddress } from "../Forms/Valdiation"
 
 function Account({cookie}) {
 
     const [userInfo, setUserInfo] = useState(null);
     const [editPhone, setEditPhone] = useState(false);
     const [editAddress, setEditAddress] = useState(false);
-    const [inputValue, setInputValue] = useState('');
+    const [inputValueAddress, setInputValueAddress] = useState('');
+    const [inputValuePhone, setInputValuePhone] = useState('');
+    const [phoneError, setPhoneError] = useState(false);
+    const [addressError, setAddressError] = useState(false);
     
     useEffect(() => {
         fetch(`http://localhost:8080/api/user/findByEmail?email=${cookie.email}`, {
@@ -21,48 +25,64 @@ function Account({cookie}) {
         })
     }, []);
 
-    const handleChange = (event) => {
-        setInputValue(event.target.value); 
+    const handleChangePhone = (event) => {
+        setInputValuePhone(event.target.value); 
+    }
+
+    const handleChangeAddress = (event) => {
+        setInputValueAddress(event.target.value); 
     }
 
     const handlePhone = () => {
-        var UserRequest = {
-            email: userInfo.email,
-            phone: inputValue,
-            address: userInfo.address
-        };
-
-        fetch("http://localhost:8080/api/user/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", 
-        "Authorization": "Bearer " + cookie.token},
-        body: JSON.stringify(UserRequest)
-        }).then((response) => {
-            alert("Update Successful");
-            window.location.reload(); 
-        }).catch((error) => {
-            console.error("Update failed:", error);
-        });  
+        if(isValidPhoneNumber(inputValuePhone)) {
+            var UserRequest = {
+                email: userInfo.email,
+                phone: inputValuePhone,
+                address: userInfo.address
+            };
+    
+            fetch("http://localhost:8080/api/user/update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", 
+            "Authorization": "Bearer " + cookie.token},
+            body: JSON.stringify(UserRequest)
+            }).then((response) => {
+                alert("Update Successful");
+                window.location.reload(); 
+            }).catch((error) => {
+                console.error("Update failed:", error);
+            });  
+        }
+        else
+        {
+            setPhoneError(true);
+        }
     };
 
     const handleAddress = () => {
-        var UserRequest = {
-            email: userInfo.email,
-            phone: userInfo.phone,
-            address: inputValue
-        };
+        if(isValidAddress(inputValueAddress)) { 
+            var UserRequest = {
+                email: userInfo.email,
+                phone: userInfo.phone,
+                address: inputValueAddress
+            };
 
-        fetch("http://localhost:8080/api/user/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", 
-        "Authorization": "Bearer " + cookie.token},
-        body: JSON.stringify(UserRequest)
-        }).then((response) => {
-            window.location.reload();
-            alert("Update Successfull");
-        }).catch((error) => {
-            console.error("Update failed:", error);
-        }); 
+            fetch("http://localhost:8080/api/user/update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", 
+            "Authorization": "Bearer " + cookie.token},
+            body: JSON.stringify(UserRequest)
+            }).then((response) => {
+                window.location.reload();
+                alert("Update Successfull");
+            }).catch((error) => {
+                console.error("Update failed:", error);
+            }); 
+        }
+        else
+        {
+            setAddressError(true);
+        }
     };
 
     return (
@@ -80,9 +100,10 @@ function Account({cookie}) {
                     <label for="phone">Phone:</label>
                     {editPhone ? (
                         <div>
-                            <input type="text" onChange={handleChange} placeHolder={userInfo.phone}></input>
-                            <button onClick={() => setEditPhone(!editPhone)}>Cancel</button>
+                            <input type="text" onChange={handleChangePhone} placeHolder={userInfo.phone}></input>
+                            <button onClick={() => {setEditPhone(!editPhone); setPhoneError(false); setInputValuePhone('')}}>Cancel</button>
                             <button onClick={() => handlePhone()}>Submit</button>
+                            {phoneError && <small>Invalid Phone</small>}
                         </div>): (
                         <div>
                             <p id="phone">{userInfo.phone}</p>
@@ -93,9 +114,10 @@ function Account({cookie}) {
                     <label for="address">Address:</label>
                     {editAddress ? (
                         <div>
-                            <input type="text" onChange={handleChange} placeHolder={userInfo.address}></input>
-                            <button onClick={() => setEditAddress(!editAddress)}>Cancel</button>
+                            <input type="text" onChange={handleChangeAddress} placeHolder={userInfo.address}></input>
+                            <button onClick={() => {setEditAddress(!editAddress); setAddressError(false); setInputValueAddress('')}}>Cancel</button>
                             <button onClick={() => handleAddress()}>Submit</button>
+                            {addressError && <small>Invalid Address</small>}
                         </div>): (
                         <div>
                             <p id="address">{userInfo.address}</p>

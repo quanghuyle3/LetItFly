@@ -18,13 +18,32 @@ function Card(param) {
         })
     }, []);
 
+    console.log(userInfo);
+
     const handleDel = () => {
-        alert("delete");
+        fetch(`http://localhost:8080/api/payment/setToNotUse?cardNumber=${userInfo[num].cardNumber}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json", 
+        "Authorization": "Bearer " + cookie.token}
+        }).then((response) => {
+            return response.text();
+        }).then((result) => {
+            console.log(result);
+            if(result == "UPDATED") {
+                window.location.reload();
+                alert("Delete Successfull");
+            }
+            else{
+                alert("Delete Unsucessfull");
+            }
+        }).catch((error) => {
+            console.error("Delete failed:", error);
+        }); 
     };
 
     return (
         <div className="row">
-            {userInfo !== null ? ( 
+            {userInfo !== null && userInfo[num].inUse == true ? ( 
                 <div>
                     <h3>Card: {num+1} </h3> 
                     <label for="name">Name:</label> 
