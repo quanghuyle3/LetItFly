@@ -41,8 +41,8 @@ public class VehicleServiceImpl implements VehicleService {
             return null;
         }
 
-        // find all vehicles based on user object
-        return vehicleRepository.findVehicleByUserId(user);
+        // find all in-used vehicles based on user object
+        return vehicleRepository.findVehiclesInUseByUserId(user);
 
     }
 
@@ -55,6 +55,15 @@ public class VehicleServiceImpl implements VehicleService {
     public Vehicle saveVehicle(VehicleRequest vehicleRequest) {
         // find associated User object
         User user = userRepository.findUserById(vehicleRequest.getUserId());
+
+        // check if there's already an in-used vehicle in sys
+        // that associated with the user
+        List<Vehicle> vehicles = vehicleRepository.findVehiclesInUseByUserId(user);
+        for (Vehicle v : vehicles) {
+            if (v.getLicensePlate().equals(vehicleRequest.getLicensePlate())) {
+                return null;
+            }
+        }
 
         // convert vehicleRequest to vehicle object
         Vehicle vehicle = new Vehicle(vehicleRequest);
