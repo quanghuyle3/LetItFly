@@ -21,7 +21,7 @@ function Vehicle(param) {
 
 
     const handleDel = () => {
-        fetch(`http://localhost:8080/api/vehicle/setToNotUse?licensePlate=${userInfo[num].licensePlate}`, {
+        fetch(`http://localhost:8080/api/vehicle/setToNotUse?id=${userInfo[num].id}`, {
         method: "GET",
         headers: { "Content-Type": "application/json", 
         "Authorization": "Bearer " + cookie.token}

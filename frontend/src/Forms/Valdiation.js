@@ -93,7 +93,7 @@ export function isValidCardType(CardType) {
 }
 
 export function isValidExpiration(exp) {
-  const expRegex = /^\d{1,2}\/\d{1,2}$/
+  const expRegex = /^\d{2}\/\d{4}$/
   return expRegex.test(exp);
 }
 

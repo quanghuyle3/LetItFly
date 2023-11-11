@@ -104,7 +104,7 @@ function Payment({cookie}) {
                 }
                 else{
                     window.location.reload();
-                    alert("Duplicate Card!");
+                    alert("Duplicate Card! Unsuccessfull");
                 }
             }).catch((error) => {
                 console.error("Update failed:", error);
@@ -170,7 +170,7 @@ function Payment({cookie}) {
                             <input type="text" onChange={changeType} placeholder="type"></input>
                             {typeError && <small>Invalid Type: Only letters!</small>}
                             <input type="text" onChange={changeExp} placeholder="expiration"></input>
-                            {expError && <small>Invalid Expiration: month/year: **/**</small>}
+                            {expError && <small>Invalid Expiration: month/year: **/****</small>}
                             <input type="text" onChange={changeCvv} placeholder="cvv"></input>
                             {cvvError && <small>Invalid CVV: 3 or 4 digits!</small>}
                             <input type="text" onChange={changeBilling} placeholder="billing address"></input>

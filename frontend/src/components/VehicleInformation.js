@@ -71,69 +71,77 @@ function VehicleInformation({cookie}) {
         setModel('');
         setYear('');
         setType('');
-        }
+    }
 
-        const handleAdd = () => {
-            if(isValidLicensePlate(plate) && isValidMake(make) && isValidModel(model) && isValidCarYear(year) && isValidMake(type)) {
-                var VehicleRequest = {
-                    licensePlate: plate,
-                    make: make,
-                    model: model,
-                    year: year,
-                    type: type,
-                    userId: cookie.id
-                };
-    
-                fetch("http://localhost:8080/api/vehicle/save", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", 
-                "Authorization": "Bearer " + cookie.token},
-                body: JSON.stringify(VehicleRequest)
-                }).then((response) => {
+    const handleAdd = () => {
+        if(isValidLicensePlate(plate) && isValidMake(make) && isValidModel(model) && isValidCarYear(year) && isValidMake(type)) {
+            var VehicleRequest = {
+                licensePlate: plate,
+                make: make,
+                model: model,
+                year: year,
+                type: type,
+                userId: cookie.id
+            };
+
+            fetch("http://localhost:8080/api/vehicle/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", 
+            "Authorization": "Bearer " + cookie.token},
+            body: JSON.stringify(VehicleRequest)
+            }).then((response) => {
+                return response.status;
+            }).then((result) => {
+                if(result == 200) {
                     window.location.reload();
                     alert("Update Successfull");
-                }).catch((error) => {
-                    console.error("Update failed:", error);
-                }); 
+                }
+                else{
+                    window.location.reload();
+                    alert("Duplicate Vehicle! Unsuccessfull");
+                }
+            }).catch((error) => {
+                console.error("Update failed:", error);
+            }); 
+        }
+        else
+        {
+            if(!isValidLicensePlate(plate)) {
+                setPlateError(true);
             }
             else
             {
-                if(!isValidLicensePlate(plate)) {
-                    setPlateError(true);
-                }
-                else
-                {
-                    setPlateError(false);
-                }
-                if(!isValidMake(make)) {
-                    setMakeError(true);
-                }
-                else{
-                    setMakeError(false);
-                }
-                if(!isValidModel(model)) {
-                    setModelError(true);
-                }
-                else
-                {
-                    setModelError(false);
-                }
-                if(!isValidCarYear(year)) {
-                    setYearError(true);
-                }
-                else
-                {
-                    setYearError(false);
-                }
-                if(!isValidMake(type)) {
-                    setTypeError(true);
-                }
-                else
-                {
-                    setTypeError(false);
-                }
+                setPlateError(false);
             }
-        };
+            if(!isValidMake(make)) {
+                setMakeError(true);
+            }
+            else{
+                setMakeError(false);
+            }
+            if(!isValidModel(model)) {
+                setModelError(true);
+            }
+            else
+            {
+                setModelError(false);
+            }
+            if(!isValidCarYear(year)) {
+                setYearError(true);
+            }
+            else
+            {
+                setYearError(false);
+            }
+            if(!isValidMake(type)) {
+                setTypeError(true);
+            }
+            else
+            {
+                setTypeError(false);
+            }
+        }
+    };
 
     return (
         <div className="row">

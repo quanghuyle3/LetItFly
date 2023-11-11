@@ -44,8 +44,8 @@ public class VehicleController {
     }
 
     @GetMapping("/setToNotUse")
-    public String setToNotUse(@RequestParam("licensePlate") String licensePlate) {
-        return vehicleService.setVehicleToNotUse(licensePlate);
+    public String setToNotUse(@RequestParam("id") int id) {
+        return vehicleService.setVehicleToNotUse(id);
     }
 
     @PostMapping("/save")

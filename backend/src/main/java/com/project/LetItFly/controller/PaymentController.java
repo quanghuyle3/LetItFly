@@ -44,8 +44,8 @@ public class PaymentController {
     }
 
     @GetMapping("/setToNotUse")
-    public String setToNotUse(@RequestParam("cardNumber") String cardNumber) {
-        return paymentService.setPaymentToNotUse(cardNumber);
+    public String setToNotUse(@RequestParam("id") int id) {
+        return paymentService.setPaymentToNotUse(id);
     }
 
     @PostMapping("/save")

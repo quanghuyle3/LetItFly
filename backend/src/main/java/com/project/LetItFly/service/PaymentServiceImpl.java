@@ -94,8 +94,8 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public String setPaymentToNotUse(String cardNumber) {
-        Payment exist = paymentRepository.findPaymentByCardNumber(cardNumber);
+    public String setPaymentToNotUse(int id) {
+        Payment exist = paymentRepository.findPaymentById(id);
         if (exist == null) {
             return "NOT EXIST";
         }

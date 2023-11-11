@@ -19,13 +19,14 @@ function Card(param) {
     }, []);
 
     const handleDel = () => {
-        fetch(`http://localhost:8080/api/payment/setToNotUse?cardNumber=${userInfo[num].cardNumber}`, {
+        fetch(`http://localhost:8080/api/payment/setToNotUse?id=${userInfo[num].id}`, {
         method: "GET",
         headers: { "Content-Type": "application/json", 
         "Authorization": "Bearer " + cookie.token}
         }).then((response) => {
             return response.text();
         }).then((result) => {
+            console.log(result);
             if(result == "UPDATED") {
                 window.location.reload();
                 alert("Delete Successfull");
