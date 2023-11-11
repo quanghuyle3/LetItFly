@@ -26,6 +26,8 @@ import {
   isValidCarYear,
 } from "./Valdiation";
 import { roles, roleDB, genders, types, stateAcronyms } from "./Categories";
+import bg from "../mock-bg.jpg";
+import { styled } from '@mui/system';
 
 const BasicInfo = (props) => {
   const [firstName, setFirstName] = useState("");
@@ -80,6 +82,16 @@ const BasicInfo = (props) => {
       }
     }
   }, [dateError]);
+
+  const NextButton = styled(Button)({
+    backgroundColor: 'orange',
+    color: 'white', // Set text color to white
+    '&:hover': {
+      backgroundColor: '#white', // Change hover color if needed
+      color: 'orange', // Set text color to black
+      border: '1px solid orange',
+    },
+  });
 
   useEffect(() => {
     if (localStorage.getItem("oldData") != null) {
@@ -287,7 +299,10 @@ const BasicInfo = (props) => {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        background: "goldenrod",
+        background: `url(${bg})`,
+        backgroundSize: "cover",
+        backgroundRepeat: "repeat", // Set the background to repeat
+        backdropFilter: "blur(8px)",
       }}
     >
       <Paper
@@ -548,18 +563,16 @@ const BasicInfo = (props) => {
               </Stack>
             </div>
           )}
-          <Button
-            variant="outlined"
-            color="primary"
+          <NextButton
             type="submit"
             style={{ display: "block", margin: "0 auto", width: "200px" }}
           >
             Next
-          </Button>
+          </NextButton>
           {failed === 1 && (
             <div>
               <Alert
-                onClose={() => {}}
+                onClose={() => { }}
                 variant="filled"
                 severity="error"
                 sx={{ mb: 2, mt: 2 }}
@@ -571,7 +584,7 @@ const BasicInfo = (props) => {
           {failed === 2 && (
             <div>
               <Alert
-                onClose={() => {}}
+                onClose={() => { }}
                 variant="filled"
                 severity="error"
                 sx={{ mb: 2, mt: 2 }}
@@ -583,7 +596,7 @@ const BasicInfo = (props) => {
           {failed === 3 && (
             <div>
               <Alert
-                onClose={() => {}}
+                onClose={() => { }}
                 variant="filled"
                 severity="error"
                 sx={{ mb: 2, mt: 2 }}
