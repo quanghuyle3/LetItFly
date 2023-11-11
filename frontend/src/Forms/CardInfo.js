@@ -20,6 +20,8 @@ import {
   isValidCVV,
   isValidCard,
 } from "./Valdiation";
+import bg from "../mock-bg.jpg";
+import { styled } from '@mui/system';
 
 const CardInfo = (props) => {
   const [firstName, setFirstName] = useState("");
@@ -61,6 +63,26 @@ const CardInfo = (props) => {
       setZipCode("");
     }
   };
+
+  const PreviousButton = styled(Button)({
+    backgroundColor: 'orange',
+    color: 'white', // Set text color to white
+    '&:hover': {
+      backgroundColor: '#white', // Change hover color if needed
+      color: 'orange', // Set text color to black
+      border: '1px solid orange',
+    },
+  });
+
+  const SubmitButton = styled(Button)({
+    backgroundColor: 'orange',
+    color: 'white', // Set text color to white
+    '&:hover': {
+      backgroundColor: '#ed9b02', // Change hover color if needed
+      color: 'white', // Set text color to black
+      border: '1px solid orange',
+    },
+  });
 
   function handlePrevious(event) {
     setGoPrev(true);
@@ -194,7 +216,8 @@ const CardInfo = (props) => {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        background: "goldenrod",
+        background: `url(${bg})`,
+        backgroundSize: "cover",
         backdropFilter: "blur(8px)",
       }}
     >
@@ -318,28 +341,18 @@ const CardInfo = (props) => {
             onChange={changeUserInfo}
           />
           <Stack direction="row" sx={{ marginBottom: 2 }}>
-            <Button
-              variant="outlined"
-              color="primary"
+            <PreviousButton
               type="submit"
-              onClick={handlePrevious}
               style={{ display: "block", margin: "0 auto", width: "200px" }}
             >
-              Back
-            </Button>
-            <Button
-              variant="outlined"
-              color="primary"
+              Previous
+            </PreviousButton>
+            <SubmitButton
               type="submit"
-              style={{
-                display: "block",
-                margin: "0 auto",
-                width: "200px",
-                mb: "2px",
-              }}
+              style={{ display: "block", margin: "0 auto", width: "200px", mb: "2px", }}
             >
               Submit
-            </Button>
+            </SubmitButton>
           </Stack>
           {failed === 1 && (
             <div>
@@ -358,7 +371,7 @@ const CardInfo = (props) => {
           {failed === 3 && (
             <div>
               <Alert
-                onClose={() => {}}
+                onClose={() => { }}
                 variant="filled"
                 severity="error"
                 sx={{ mb: 2, mt: 2 }}

@@ -9,6 +9,8 @@ import Alert from "@mui/material/Alert";
 import { Link } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
+import bg from "../mock-bg.jpg";
+import { styled } from '@mui/system';
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -89,6 +91,26 @@ function Login() {
     }
   }
 
+  const LoginButton = styled(Button)({
+    backgroundColor: 'orange',
+    color: 'white', // Set text color to white
+    '&:hover': {
+      backgroundColor: '#ed9b02', // Change hover color if needed
+      color: 'white', // Set text color to black
+      border: '1px solid orange',
+    },
+  });
+
+  const SignUpButton = styled(Button)({
+    backgroundColor: 'limegreen',
+    color: 'white', // Set text color to white
+    '&:hover': {
+      backgroundColor: 'darkgreen', // Change hover color if needed
+      color: 'white', // Set text color to black
+      // border: '1px solid orange',
+    },
+  });
+
   return (
     <div
       style={{
@@ -96,7 +118,8 @@ function Login() {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        background: "goldenrod",
+        background: `url(${bg})`,
+        backgroundSize: "cover",
         backdropFilter: "blur(8px)",
       }}
     >
@@ -105,15 +128,13 @@ function Login() {
         style={{
           padding: "20px",
           margin: "0 auto",
-          maxWidth: "50vw",
+          maxWidth: "250px",
           minWidth: "30vw",
         }}
       >
-        <Grid container justifyContent="center" alignItems="center">
-          <Grid item>
-            <img src={logo} style={{ height: "100px" }} />
-          </Grid>
-        </Grid>
+
+
+        <img src={logo} style={{ maxWidth: '100%', height: 'auto', display: 'block' }} />
 
         {regSuccess === true && (
           <div>
@@ -122,7 +143,7 @@ function Login() {
             </Alert>
           </div>
         )}
-        <h2 style={{ textAlign: "center" }}>Login</h2>
+        <h2 style={{ textAlign: "center" }}>Let us take care your ride!</h2>
         <form onSubmit={handleSubmit}>
           <TextField
             type="email"
@@ -157,14 +178,24 @@ function Login() {
             sx={{ marginBottom: 4 }}
           />
 
-          <Button
-            variant="outlined"
-            color="primary"
+          <LoginButton
             type="submit"
-            style={{ display: "block", margin: "0 auto", width: "200px" }}
+            style={{ display: "block", margin: "0 auto", width: "100%" }}
           >
             Login
-          </Button>
+          </LoginButton>
+
+          <br></br>
+          <hr></hr>
+          <h5 style={{ textAlign: "center", marginBottom: "10px" }}>Don't have an account?</h5>
+          <Link to="/register" style={{ textDecoration: 'none' }}>
+            <SignUpButton
+              type="button"
+              style={{ display: "block", margin: "0 auto", width: "200px" }}
+            >
+              Create new account
+            </SignUpButton>
+          </Link>
           {failed === 1 && (
             <div>
               <Alert variant="filled" severity="error" sx={{ mb: 2, mt: 2 }}>
@@ -187,11 +218,6 @@ function Login() {
             </div>
           )}
         </form>
-        <div style={{ marginTop: "20px" }}>
-          <small>
-            Don't have an account? <Link to="/register"> Sign Up! </Link>
-          </small>
-        </div>
       </Paper>
     </div>
   );

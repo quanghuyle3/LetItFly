@@ -56,7 +56,7 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatusCode.valueOf(409)) // duplicated record
                     .body(null);
         }
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)) // unauthorized
+        return ResponseEntity.status(HttpStatusCode.valueOf(200))
                 .body(payment);
     }
 
