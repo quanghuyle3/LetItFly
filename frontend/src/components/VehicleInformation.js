@@ -151,15 +151,15 @@ function VehicleInformation({cookie}) {
                     {editCar ? (
                         <div>
                             <input type="text" onChange={changePlate} placeholder="license plate"></input>
-                            {plateError && <small>Invalid</small>}
+                            {plateError && <small>Invalid: Need 7 Digits.</small>}
                             <input type="text" onChange={changeMake}placeholder="make"></input>
-                            {makeError && <small>Invalid</small>}
+                            {makeError && <small>Invalid: No Special Characters. Only Letters</small>}
                             <input type="text" onChange={changeModel} placeholder="model"></input>
-                            {modelError && <small>Invalid</small>}
+                            {modelError && <small>Invalid: No special characters</small>}
                             <input type="text" onChange={changeYear} placeholder="year"></input>
-                            {yearError && <small>Invalid</small>}
+                            {yearError && <small>Invalid: Needs 4 Digits/Too Old</small>}
                             <input type="text" onChange={changeType} placeholder="type"></input>
-                            {typeError && <small>Invalid</small>}
+                            {typeError && <small>Invalid: Letters Only. No Special Characters</small>}
                             <button onClick={() => {setEditCar(!editCar); resetBooleans()}}>Cancel</button>
                             <button onClick={() => handleAdd()}>Submit</button>
                         </div>
