@@ -96,8 +96,16 @@ function Payment({cookie}) {
             "Authorization": "Bearer " + cookie.token},
             body: JSON.stringify(PaymentRequest)
             }).then((response) => {
-                window.location.reload();
-                alert("Update Successfull");
+                return response.status;
+            }).then((result) => {
+                if(result == 200) {
+                    window.location.reload();
+                    alert("Update Successfull");
+                }
+                else{
+                    window.location.reload();
+                    alert("Duplicate Card!");
+                }
             }).catch((error) => {
                 console.error("Update failed:", error);
             }); 
@@ -155,17 +163,17 @@ function Payment({cookie}) {
                     <h1>Payment Information: </h1>
                     {editCard ? (
                         <div>
-                            <input type="text" onChange={changeName} placeHolder="name"></input>
+                            <input type="text" onChange={changeName} placeholder="name"></input>
                             {nameError && <small>Invalid Name: Only Letters!</small>}
-                            <input type="text" onChange={changeNumber}placeHolder="card number"></input>
+                            <input type="text" onChange={changeNumber}placeholder="card number"></input>
                             {numberError && <small>Invalid Number: 16 digit number!</small>}
-                            <input type="text" onChange={changeType} placeHolder="type"></input>
+                            <input type="text" onChange={changeType} placeholder="type"></input>
                             {typeError && <small>Invalid Type: Only letters!</small>}
-                            <input type="text" onChange={changeExp} placeHolder="expiration"></input>
+                            <input type="text" onChange={changeExp} placeholder="expiration"></input>
                             {expError && <small>Invalid Expiration: month/year: **/**</small>}
-                            <input type="text" onChange={changeCvv} placeHolder="cvv"></input>
+                            <input type="text" onChange={changeCvv} placeholder="cvv"></input>
                             {cvvError && <small>Invalid CVV: 3 or 4 digits!</small>}
-                            <input type="text" onChange={changeBilling} placeHolder="billing address"></input>
+                            <input type="text" onChange={changeBilling} placeholder="billing address"></input>
                             {billingError && <small>Invalid Billing Address. No special characters</small>}
                             <button onClick={() => {setEditCard(!editCard); resetBooleans()}}>Cancel</button>
                             <button onClick={() => handleAdd()}>Submit</button>

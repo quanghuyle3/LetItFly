@@ -33,7 +33,7 @@ export function isValidDriverLicense(driverLicense) {
 }
 
 export function isValidLicensePlate(licensePlate) {
-  return licensePlate.length <= 7; 
+  return licensePlate.length == 7; 
 }
 
 export function isValidMake(make) {

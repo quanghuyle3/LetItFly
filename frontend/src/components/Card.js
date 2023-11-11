@@ -18,8 +18,6 @@ function Card(param) {
         })
     }, []);
 
-    console.log(userInfo);
-
     const handleDel = () => {
         fetch(`http://localhost:8080/api/payment/setToNotUse?cardNumber=${userInfo[num].cardNumber}`, {
         method: "GET",
@@ -28,7 +26,6 @@ function Card(param) {
         }).then((response) => {
             return response.text();
         }).then((result) => {
-            console.log(result);
             if(result == "UPDATED") {
                 window.location.reload();
                 alert("Delete Successfull");
@@ -59,7 +56,7 @@ function Card(param) {
                     <button onClick={handleDel}>Delete Card</button>
                 </div>
             ) : (
-                <p>Loading...</p>
+                <p>No Cards</p>
             )}  
         </div>
     );

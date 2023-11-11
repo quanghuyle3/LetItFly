@@ -100,7 +100,7 @@ function Account({cookie}) {
                     <label for="phone">Phone:</label>
                     {editPhone ? (
                         <div>
-                            <input type="text" onChange={handleChangePhone} placeHolder={userInfo.phone}></input>
+                            <input type="text" onChange={handleChangePhone} placeholder={userInfo.phone}></input>
                             <button onClick={() => {setEditPhone(!editPhone); setPhoneError(false); setInputValuePhone('')}}>Cancel</button>
                             <button onClick={() => handlePhone()}>Submit</button>
                             {phoneError && <small>Invalid Phone</small>}
@@ -114,7 +114,7 @@ function Account({cookie}) {
                     <label for="address">Address:</label>
                     {editAddress ? (
                         <div>
-                            <input type="text" onChange={handleChangeAddress} placeHolder={userInfo.address}></input>
+                            <input type="text" onChange={handleChangeAddress} placeholder={userInfo.address}></input>
                             <button onClick={() => {setEditAddress(!editAddress); setAddressError(false); setInputValueAddress('')}}>Cancel</button>
                             <button onClick={() => handleAddress()}>Submit</button>
                             {addressError && <small>Invalid Address</small>}
