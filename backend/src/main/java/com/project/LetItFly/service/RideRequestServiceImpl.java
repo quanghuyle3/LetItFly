@@ -30,7 +30,7 @@ public class RideRequestServiceImpl implements RideRequestService {
 
     @Override
     public List<RideRequest> findAllRideRequest() {
-        return rideRequestRepository.findAll();
+        return rideRequestRepository.findAllAvailableRideRequest();
     }
 
     @Override
