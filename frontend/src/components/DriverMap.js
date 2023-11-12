@@ -45,6 +45,19 @@ function DriverMap({ cookie }) {
         }
       });
     });
+    // update driver current location
+    userLocation.then((location) => {
+      const url = `${proxy}/api/driver-status/updateCoordinatesDriver?driverId=${cookie.id}&curLat=${location.lat}&curLong=${location.lng}`;
+      fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + cookie.token,
+        },
+      })
+        .then((response) => response.text())
+        .then((data) => console.log("updated location: ", data));
+    });
   }
 
   //fetch ride requests
@@ -93,12 +106,29 @@ function DriverMap({ cookie }) {
       infoWindow.open(map, marker);
       infoWindow.addListener("domready", () => {
         document.getElementById("infoButton").addEventListener("click", () => {
-          navigate("/driver/ride", {
-            state: { cookie: cookie, rideRequest: data },
+          updateDatabaseToAcceptRide(data).then((databaseUpdatedResponse) => {
+            if (databaseUpdatedResponse !== "SUCCESS")
+              console.error("ERROR: database did not get updated");
+            navigate("/driver/ride", {
+              state: { cookie: cookie, rideRequest: data },
+            });
           });
         });
       });
     });
+  }
+
+  function updateDatabaseToAcceptRide(rideRequest) {
+    const url = `${proxy}/api/ride-request/setDriverToRideRequest?driverId=${cookie.id}&rideId=${rideRequest.id}`;
+    return fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + cookie.token,
+      },
+    })
+      .then((response) => response.text())
+      .then((data) => data);
   }
 
   function createInfoWindowContent(data) {
