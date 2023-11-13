@@ -1,11 +1,16 @@
 import React from "react";
+import Settings from "../components/Settings";
+import Header from "../components/Header";
+import { useLocation } from "react-router-dom";
 
-function Settings() {
+function DriverSettings() {
+  const location = useLocation(); 
   return (
-    <div>
-      <h1>Driver Settings Page</h1>
-    </div>
+    <>
+      <Header cookie={location.state.cookie}/>
+      <Settings cookie={location.state.cookie}/>
+    </>
   );
 }
 
-export default Settings;
+export default DriverSettings;

@@ -20,7 +20,7 @@ public interface VehicleService {
     // update
     public String updateVehicle(VehicleRequest vehicleRequest);
 
-    public String setVehicleToNotUse(String licensePlate);
+    public String setVehicleToNotUse(int id);
 
     // delete
 
