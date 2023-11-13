@@ -93,8 +93,8 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public String setVehicleToNotUse(String licensePlate) {
-        Vehicle exist = vehicleRepository.findVehicleByLicensePlate(licensePlate);
+    public String setVehicleToNotUse(int id) {
+        Vehicle exist = vehicleRepository.findVehicleById(id);
         if (exist == null) {
             return "NOT EXIST";
         }
