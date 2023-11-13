@@ -1,25 +1,16 @@
-import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import "../css/Home.css";
 import {
   createMap,
   createMarker,
   getDirections,
+  getDistanceFromLatLngInKm,
   userLocation,
 } from "../components/MapUtilities";
 import carIcon from "../car.png";
 import personIcon from "../person.png";
 
-/**
- * TODO:
- * Phase 1:
- *  - render map with directions from current location to passenger
- *  - update current location and passenger location in real time
- *  - check distance, if distance < 50 meters ? move to phase 2
- * Phase 2:
- *  - render map with directions from current location to destination
- *  - update current location on map in real time
- *  - check distance, if distance < 50 meters ? display ride success page
- */
 function Home() {
   const currentMap = useRef(null);
   const currentRoute = useRef(null);
@@ -28,14 +19,8 @@ function Home() {
   const driverMarker = useRef(null);
   const destinationMarker = useRef(null);
   const intervalRef = useRef(null);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!currentMap.current) {
-      currentMap.current = userLocation.then((location) => {
-        createMap(document.getElementById("passenger-pickup-map"), location);
-      });
-    }
-  });
   const {
     state: { cookie, rideRequest },
   } = useLocation();
@@ -45,8 +30,15 @@ function Home() {
   const [passengerPickedUp, setPassengerPickedUp] = useState(false);
   const [rideCompleted, setRideComopleted] = useState(false);
 
+  // Initialize map
+  if (!currentMap.current) {
+    currentMap.current = userLocation.then((location) => {
+      return createMap(document.getElementById("driver-ride-map"), location);
+    });
+  }
+
   function updateDriverPassengerMarkers() {
-    const passengerUrl = `${proxy}/api/rideRequest/findById?id=${rideRequest.id}`;
+    const passengerUrl = `${proxy}/api/ride-request/findById?id=${rideRequest.id}`;
     const fetchPassengerCoords = fetch(passengerUrl, {
       method: "GET",
       headers: {
@@ -56,6 +48,7 @@ function Home() {
     })
       .then((response) => response.json())
       .then((data) => {
+        destinationLocation.current = { lat: data.curLat, lng: data.curLong };
         return { lat: data.curLat, lng: data.curLong };
       });
 
@@ -72,23 +65,60 @@ function Home() {
           },
         });
       })
-      .then((response) => response.json())
+      .then((response) => response.text())
       .then((data) => data);
 
     Promise.all([fetchPassengerCoords, updateDriverCoords]).then(
       ([passengerResponse, driverResponse]) => {
-        console.log("promise all response");
-        console.log(passengerResponse);
-        console.log(driverResponse);
+        // update markers
+        driverMarker.current.setPosition(driverLocation.current);
+        destinationMarker.current.setPosition(destinationLocation.current);
+
+        // check distance between passenger and driver
+        let distance = getDistanceFromLatLngInKm(
+          driverLocation.current.lat,
+          driverLocation.current.lng,
+          destinationLocation.current.lat,
+          destinationLocation.current.lng
+        );
+        console.log("distance: ", distance);
+        const FIftyMetersInKm = 0.05;
+        if (distance < FIftyMetersInKm) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+          setPassengerPickedUp(true);
+        }
       }
     );
+  }
+
+  function updateDriverMarkerOnly() {
+    userLocation.then((location) => {
+      driverLocation.current = location;
+      driverMarker.current.setPosition(driverLocation.current);
+
+      // check distance between passenger and driver
+      let distance = getDistanceFromLatLngInKm(
+        driverLocation.current.lat,
+        driverLocation.current.lng,
+        destinationLocation.current.lat,
+        destinationLocation.current.lng
+      );
+      console.log("distance: ", distance);
+      const FIftyMetersInKm = 0.05;
+      if (distance < FIftyMetersInKm) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+        setRideComopleted(true);
+      }
+    });
   }
 
   // --------------------------- PHASE 1 ---------------------------
   if (!passengerPickedUp) {
     // Render directions to pickup passenger
-    if (!currentRoute.current) {
-      userLocation.then((location) => {
+    userLocation
+      .then((location) => {
         driverLocation.current = location;
         destinationLocation.current = {
           lat: rideRequest.curLat,
@@ -97,48 +127,78 @@ function Home() {
         getDirections(
           driverLocation.current,
           destinationLocation.current,
-          currentMap,
+          currentMap.current,
           currentRoute
         );
+        // Create markers
+        createMarker({
+          currentMap: currentMap.current,
+          imageUrl: carIcon,
+          lat: driverLocation.current.lat,
+          lng: driverLocation.current.lng,
+        }).then((marker) => (driverMarker.current = marker));
+        destinationMarker.current = createMarker({
+          currentMap: currentMap.current,
+          imageUrl: personIcon,
+          lat: destinationLocation.current.lat,
+          lng: destinationLocation.current.lng,
+        }).then((marker) => (destinationMarker.current = marker));
+      })
+      // Update markers after rendering markers
+      .then(() => {
+        intervalRef.current = setInterval(() => {
+          updateDriverPassengerMarkers();
+        }, 3000);
       });
-
-      // Create markers
-      driverMarker.current = createMarker({
-        currentMap: currentMap.current,
-        imageUrl: carIcon,
-        lat: driverLocation.current.lat,
-        lng: driverLocation.current.lng,
-      });
-      destinationMarker.current = createMarker({
-        currentMap: currentMap.current,
-        imageUrl: personIcon,
-        lat: destinationLocation.current.lat,
-        lng: destinationLocation.current.lng,
-      });
-    }
-    // Route already rendered, just update markers
-    else {
-      updateDriverPassengerMarkers();
-    }
+    // DELETE THIS <----------------------------
+    setTimeout(() => {
+      clearInterval(intervalRef.current);
+    }, 15000);
   }
 
   // --------------------------- PHASE 2 ---------------------------
-  else if (passengerPickedUp && !rideCompleted) {
-    console.log("we're in phase 2 now");
-    // do something
-  }
+  else if (!rideCompleted) {
+    destinationLocation.current = {
+      lat: rideRequest.destLat,
+      lng: rideRequest.destLong,
+    };
+    // Render route to final destination
+    getDirections(
+      driverLocation.current,
+      destinationLocation.current,
+      currentMap.current
+    );
+    // Create markers
+    driverMarker.current.setPosition(driverLocation.current);
+    destinationMarker.current.setPosition(destinationLocation.current);
 
-  // ---------------------- RIDE COMPLETED -----------------------
-  else {
-    console.log("ride has been completed now");
-    // ride completed page
+    // update markers in intervals
+    intervalRef.current = setInterval(() => {
+      updateDriverMarkerOnly();
+    }, 3000);
+
+    // DELETE THIS <----------------------------
+    setTimeout(() => {
+      clearInterval(intervalRef.current);
+    }, 15000);
   }
 
   return (
     <>
       <h1>Driver Ride Page</h1>
-      {!passengerPickedUp && <div id="passenger-pickup-map" />}
-      {passengerPickedUp && !rideCompleted && <div id="destination-map" />}
+      {!rideCompleted && <div id="driver-ride-map" />}
+      {rideCompleted && (
+        <>
+          <h1>Congratulations, you completed the ride!</h1>
+          <button
+            onClick={() => {
+              navigate("/driver", { state: { tokenObject: cookie } });
+            }}
+          >
+            Return to home page
+          </button>
+        </>
+      )}
     </>
   );
 }
