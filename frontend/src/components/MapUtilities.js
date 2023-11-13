@@ -77,16 +77,18 @@ function autocomplete(inputElement, callback) {
   });
 }
 
-/**
- *
- * @param {lat: current_latitude, lng: current_longitude} currentLocation
- * @param {lat: destination_latitude, lng: destination_longitude} destinationLocation
- * @param {Promise} currentMap
- * @param {useRef} currentRoute
- * @returns
- */
 var directionsRenderer;
 var directionsService;
+/**
+ * - currentLocation: {lat: latitude, lng: longitude}
+ * - destinationLocation: {lat: latitude, lng: longitude}
+ * - currentMap: promise function
+ * - currentRoute: useRef hook
+ * @param {Object} currentLocation
+ * @param {Object} destinationLocation
+ * @param {Promise} currentMap
+ * @param {Object} currentRoute
+ */
 function getDirections(
   currentLocation,
   destinationLocation,
@@ -168,7 +170,7 @@ function createMap(mapContainer, centerCoords, zoomLevel) {
 /**
  * Returns a google map marker
  * @param {Object} paramObj with 4 fields
- *  - currentMap: map object to display marker on [REQUIRED]
+ *  - currentMap: map promise to display marker on [REQUIRED]
  *  - imageUrl: image to be used as marker icon [optional]
  *  - lat: latitude [REQUIRED]
  *  - lng: longitude [REQUIRED]

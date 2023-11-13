@@ -8,7 +8,7 @@ import {
   getDirections,
   userLocation,
 } from "./MapUtilities";
-import carIcon from "../driver-icon.png";
+import carIcon from "../car.png";
 import { useNavigate } from "react-router-dom";
 
 function DriverMap({ cookie }) {
@@ -44,6 +44,25 @@ function DriverMap({ cookie }) {
           infoWindowRef.current = null;
         }
       });
+    });
+    // update driver current location
+    userLocation.then((location) => {
+      const url = `${proxy}/api/driver-status/updateCoordinatesDriver?driverId=${cookie.id}&curLat=${location.lat}&curLong=${location.lng}`;
+      fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + cookie.token,
+        },
+      })
+        .then((response) => response.text())
+        .then((data) => data)
+        .catch((error) =>
+          console.log(
+            "ERROR: couldn't update current driver location.\n",
+            error
+          )
+        );
     });
   }
 
@@ -93,12 +112,29 @@ function DriverMap({ cookie }) {
       infoWindow.open(map, marker);
       infoWindow.addListener("domready", () => {
         document.getElementById("infoButton").addEventListener("click", () => {
-          navigate("/driver/ride", {
-            state: { cookie: cookie, rideRequest: data },
+          updateDatabaseToAcceptRide(data).then((databaseUpdatedResponse) => {
+            if (databaseUpdatedResponse !== "SUCCESS")
+              console.error("ERROR: database did not get updated");
+            navigate("/driver/ride", {
+              state: { cookie: cookie, rideRequest: data },
+            });
           });
         });
       });
     });
+  }
+
+  function updateDatabaseToAcceptRide(rideRequest) {
+    const url = `${proxy}/api/ride-request/setDriverToRideRequest?driverId=${cookie.id}&rideId=${rideRequest.id}`;
+    return fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + cookie.token,
+      },
+    })
+      .then((response) => response.text())
+      .then((data) => data);
   }
 
   function createInfoWindowContent(data) {
@@ -110,8 +146,9 @@ function DriverMap({ cookie }) {
         <p><strong>Rider:</strong> ${data.rider}</p>
         <p><strong>Distance:</strong> ${data.distance}</p>
         <p><strong>Duration:</strong> ${data.duration}</p>
-        <p><strong>Profit:</strong> <span style="color: green;">${data.profit
-      }</span></p>
+        <p><strong>Profit:</strong> <span style="color: green;">${
+          data.profit
+        }</span></p>
         <button id="infoButton" style="cursor: pointer;">Accept</button>
       </div>
     `;
