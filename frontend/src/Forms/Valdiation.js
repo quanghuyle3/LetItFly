@@ -52,7 +52,7 @@ export function isValidDriverLicense(driverLicense) {
 }
 
 export function isValidLicensePlate(licensePlate) {
-  return licensePlate.length <= 7;
+  return licensePlate.length == 7; 
 }
 
 export function isValidMake(make) {
@@ -86,3 +86,14 @@ export function isValidCVV(CVV) {
   const cvvRegex = /^\d{3,4}$/;
   return cvvRegex.test(CVV);
 }
+
+export function isValidCardType(CardType) {
+  const cardTypeRegex = /^[A-Za-z]{1,10}$/;
+  return cardTypeRegex.test(CardType);
+}
+
+export function isValidExpiration(exp) {
+  const expRegex = /^\d{2}\/\d{4}$/
+  return expRegex.test(exp);
+}
+
