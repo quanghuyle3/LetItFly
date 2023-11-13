@@ -20,9 +20,4 @@ public interface RideRequestRepository extends JpaRepository<RideRequest, Intege
 
     List<RideRequest> findRideRequestByDriverId(User passengerId);
 
-    // @Query("SELECT r FROM RideRequest r WHERE r.passengerId = :passengerId ORDER
-    // BY r.id DESC")
-    // RideRequest findLatestRideRequestByPassengerId(@Param("passengerId") User
-    // passengerId, Pageable pageable);
-
 }
