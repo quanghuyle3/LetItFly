@@ -30,7 +30,7 @@ public class RideRequestServiceImpl implements RideRequestService {
 
     @Override
     public List<RideRequest> findAllRideRequest() {
-        return rideRequestRepository.findAll();
+        return rideRequestRepository.findAllAvailableRideRequest();
     }
 
     @Override
@@ -76,17 +76,17 @@ public class RideRequestServiceImpl implements RideRequestService {
     }
 
     @Override
-    public String updateCoordinatesPassenger(int passengerId, double curLat, double curLong) {
+    public String updateCoordinatesPassenger(int rideRequestId, double curLat, double curLong) {
 
         // retrieve passenger object
-        User passenger = userRepository.findUserById(passengerId);
+        // User passenger = userRepository.findUserById(passengerId);
 
         // retrive the ride that the passenger currently requesting
-        List<RideRequest> rideRequests = rideRequestRepository.findRideRequestByPassengerId(passenger);
+        RideRequest rideRequest = rideRequestRepository.findRideRequestById(rideRequestId);
 
-        RideRequest rideRequest = null;
-        if (rideRequests != null)
-            rideRequest = rideRequests.get(rideRequests.size() - 1);
+        // RideRequest rideRequest = null;
+        // if (rideRequests != null)
+        // rideRequest = rideRequests.get(rideRequests.size() - 1);
 
         // update coords
         if (rideRequest == null) {

@@ -2,6 +2,7 @@ package com.project.LetItFly.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,6 +46,18 @@ public class PaymentController {
     @GetMapping("/setToNotUse")
     public String setToNotUse(@RequestParam("cardNumber") String cardNumber) {
         return paymentService.setPaymentToNotUse(cardNumber);
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<Payment> savePayment(@RequestBody PaymentRequest paymentRequest) {
+        Payment payment = paymentService.savePayment(paymentRequest);
+
+        if (payment == null) {
+            return ResponseEntity.status(HttpStatusCode.valueOf(409)) // duplicated record
+                    .body(null);
+        }
+        return ResponseEntity.status(HttpStatusCode.valueOf(200))
+                .body(payment);
     }
 
 }

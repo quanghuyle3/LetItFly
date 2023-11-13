@@ -1,15 +1,19 @@
-import React, { useState } from "react";
-import { TextField, Button, Stack } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { TextField, Button, Stack, collapseClasses } from "@mui/material";
 import { Link } from "react-router-dom";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DateValidationError } from "@mui/x-date-pickers";
 import Autocomplete from "@mui/material/Autocomplete";
 import Paper from "@mui/material/Paper";
 import Alert from "@mui/material/Alert";
+import Grid from "@mui/material/Grid";
+import logo from "../mock_logo.jpg";
 import dayjs from "dayjs";
 import {
   isValidMake,
+  isValidBirthday,
   isValidPassword,
   isValidZipCode,
   isValidAddress,
@@ -22,15 +26,18 @@ import {
   isValidCarYear,
 } from "./Valdiation";
 import { roles, roleDB, genders, types, stateAcronyms } from "./Categories";
+import bg from "../mock-bg.jpg";
+import { styled } from '@mui/system';
 
 const BasicInfo = (props) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhoneNumber] = useState("");
-  const [gender, setGender] = useState(genders[0]);
+  const [gender, setGender] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState(null);
   const [role, setRole] = useState(roles[0]);
+  const [roleInDB, setRoleInDB] = useState(roleDB[0]);
   const [address, setAddress] = useState("");
   const [state, setState] = useState("");
   const [zipcode, setZipCode] = useState("");
@@ -46,7 +53,7 @@ const BasicInfo = (props) => {
   const [lastNameError, setLastNameError] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [phoneError, setPhoneError] = useState(false);
-  const [dateError, setDateError] = useState(false);
+  const [dateError, setDateError] = useState(null);
   const [addressError, setAddressError] = useState(false);
   const [zipCodeError, setZipCodeError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
@@ -56,125 +63,184 @@ const BasicInfo = (props) => {
   const [modelError, setModelError] = useState(false);
   const [yearError, setYearError] = useState(false);
 
-  /*
-  const oldData = props.oldData;
-  console.log(oldData)
-  if (Object.keys(oldData).length !== 0){
-    setFirstName(oldData.firstName);
-    setLastName(oldData.lastName);
-    setEmail(oldData.email);
-    //setPhoneNumber(oldData.phone);
-  
-  */
+  const errorMessage = React.useMemo(() => {
+    switch (dateError) {
+      case "minDate": {
+        return "Invalid Date";
+      }
+      case "maxDate": {
+        return "Must be at least 18 years old";
+      }
+      case "invalidDate": {
+        return "Invalid Date: Must be at least 18 years old ";
+      }
+      case "dateRequired": {
+        return "Date of Birth Required";
+      }
+      default: {
+        return "";
+      }
+    }
+  }, [dateError]);
+
+  const NextButton = styled(Button)({
+    backgroundColor: 'orange',
+    color: 'white', // Set text color to white
+    '&:hover': {
+      backgroundColor: '#white', // Change hover color if needed
+      color: 'orange', // Set text color to black
+      border: '1px solid orange',
+    },
+  });
+
+  useEffect(() => {
+    if (localStorage.getItem("oldData") != null) {
+      const oldData = JSON.parse(localStorage.getItem("oldData"));
+      setFirstName(oldData.firstName);
+      setLastName(oldData.lastName);
+      setEmail(oldData.email);
+      setPhoneNumber(oldData.phone);
+      setGender(oldData.gender);
+      if (oldData.roleName == roles[0]) {
+        handleRoleChange(roles[0]);
+      } else if (oldData.roleName == roles[1]) {
+        handleRoleChange(roles[1]);
+      }
+
+      setDateOfBirth(dayjs(oldData.birthDate, "YYYY-MM-DD"));
+      setAddress(oldData.address);
+      setState(oldData.state);
+      setZipCode(oldData.zipcode);
+      setPassword(oldData.password);
+    }
+  }, []);
 
   function validation() {
     let isfailed = false;
     if (!isValidName(firstName)) {
-      setFirstNameError(true);
       isfailed = true;
+      setFirstNameError(true);
     } else {
-      isfailed = false;
       setFirstNameError(false);
     }
     if (!isValidName(lastName)) {
-      setLastNameError(true);
       isfailed = true;
-    }else {
-      isfailed = false;
+      setLastNameError(true);
+    } else {
       setLastNameError(false);
     }
     if (!isValidEmail(email)) {
-      setEmailError(true);
       isfailed = true;
+      setEmailError(true);
     } else {
-      isfailed = false;
       setEmailError(false);
     }
-    if(!dateOfBirth) {
+
+    if (!isValidBirthday(dateOfBirth)) {
       isfailed = true;
-      setDateError(true);
+      if (dateOfBirth === null) {
+        setDateError("dateRequired");
+      } else if (dateOfBirth !== null) {
+        setDateError("invalidDate");
+      }
     } else {
-      isfailed = false;
       setDateError(false);
     }
+    console.log(dateError);
+    console.log(dateOfBirth);
     if (!isValidPhoneNumber(phone)) {
       isfailed = true;
       setPhoneError(true);
     } else {
-      isfailed = false;
       setPhoneError(false);
     }
     if (!isValidAddress(address)) {
       isfailed = true;
       setAddressError(true);
     } else {
-      isfailed = false;
       setAddressError(false);
     }
     if (!isValidZipCode(zipcode)) {
       isfailed = true;
       setZipCodeError(true);
     } else {
-      isfailed = false;
       setZipCodeError(false);
     }
     if (!isValidPassword(password)) {
       isfailed = true;
       setPasswordError(true);
     } else {
-      isfailed = false;
       setPasswordError(false);
     }
-    if (role == roleDB[1]) {
+    if (roleInDB == roleDB[1]) {
       if (!isValidDriverLicense(driverL)) {
         isfailed = true;
         setDriverLicenseError(true);
       } else {
-        isfailed = false;
         setDriverLicenseError(false);
       }
       if (!isValidLicensePlate(licensePlate)) {
         isfailed = true;
         setlicensePlateError(licensePlate);
       } else {
-        isfailed = false;
         setlicensePlateError(false);
       }
       if (!isValidMake(make)) {
         isfailed = true;
         setMakeError(true);
       } else {
-        isfailed = false;
         setMakeError(false);
       }
       if (!isValidModel(model)) {
         isfailed = true;
         setModelError(true);
       } else {
-        isfailed = false;
         setModelError(false);
       }
       if (!isValidCarYear(year)) {
         isfailed = true;
         setYearError(true);
       } else {
-        isfailed = false;
         setYearError(false);
       }
     }
     return isfailed;
   }
 
+  function handleRoleChange(event, newValue) {
+    if (newValue === null) {
+      setRole(roles[0]);
+      setRoleInDB(roleDB[0]);
+    } else if (newValue === roles[0]) {
+      setRole(roles[0]);
+      setRoleInDB(roleDB[0]);
+    } else {
+      setRole(roles[1]);
+      setRoleInDB(roleDB[1]);
+    }
+  }
+
   function handleNext(event) {
     event.preventDefault();
-    /*
+    setFailed(0);
+    let isfail = validation();
+    console.log(isfail);
+    if (isfail) {
+      console.log("hello");
+      setFailed(3);
+      return;
+    }
     if (email != "") {
       fetch(`http://localhost:8080/api/check/email?email=${email}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       }).then((response) => {
         response.text().then((message) => {
-          setFailed(1);
+          if (message == "EXIST") {
+            console.log("here email check");
+            setFailed(1);
+            return;
+          }
         });
       });
     }
@@ -187,11 +253,13 @@ const BasicInfo = (props) => {
         }
       ).then((response) => {
         response.text().then((message) => {
-          setFailed(2);
+          if (message == "EXIST") {
+            setFailed(2);
+            return;
+          }
         });
       });
     }
-    */
     if (failed == 3 || failed == 0) {
       let isfail = validation();
       if (isfail) {
@@ -210,7 +278,7 @@ const BasicInfo = (props) => {
           state: state,
           zipcode: zipcode,
           phone: phone,
-          roleName: role,
+          roleName: roleInDB,
           dateJoin: null,
           driverLicense: driverL,
           licensePlate: licensePlate,
@@ -231,13 +299,21 @@ const BasicInfo = (props) => {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        background: "goldenrod",
+        background: `url(${bg})`,
+        backgroundSize: "cover",
+        backgroundRepeat: "repeat", // Set the background to repeat
+        backdropFilter: "blur(8px)",
       }}
     >
       <Paper
         elevation={3}
         style={{ padding: "20px", margin: "0 auto", maxWidth: "90vw" }}
       >
+        <Grid container justifyContent="center" alignItems="center">
+          <Grid item>
+            <img src={logo} style={{ height: "100px" }} />
+          </Grid>
+        </Grid>
         <h2 style={{ textAlign: "center" }}>Sign Up</h2>
         <h3>Personal Information: </h3>
         <form onSubmit={handleNext}>
@@ -252,6 +328,7 @@ const BasicInfo = (props) => {
                 setFirstName(e.target.value);
               }}
               error={firstNameError}
+              helperText={firstNameError ? "Invalid First Name (ex. John)" : ""}
               value={firstName}
               fullWidth
               required
@@ -261,6 +338,7 @@ const BasicInfo = (props) => {
               variant="outlined"
               color="primary"
               label="Last Name"
+              helperText={lastNameError ? "Invalid Last Name (ex. Smith)" : ""}
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               error={lastNameError}
@@ -276,6 +354,9 @@ const BasicInfo = (props) => {
               label="Email"
               onChange={(e) => setEmail(e.target.value)}
               value={email}
+              helperText={
+                emailError ? "Invalid Email (ex. john.smith@gmail.com)" : ""
+              }
               error={emailError}
               fullWidth
               required
@@ -288,7 +369,9 @@ const BasicInfo = (props) => {
               label="Phone Number"
               onChange={(e) => setPhoneNumber(e.target.value)}
               error={phoneError}
-              helperText={phoneError ? "Need 10 digits" : ""}
+              helperText={
+                phoneError ? "Invalid Phone Number: Must have 10 digits" : ""
+              }
               value={phone}
               fullWidth
               required
@@ -298,8 +381,9 @@ const BasicInfo = (props) => {
           <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
             <Autocomplete
               disablePortal
+              value={gender}
               options={genders}
-              sx={{ width: 300 }}
+              sx={{ width: 400 }}
               onChange={(event, newValue) => {
                 setGender(newValue);
               }}
@@ -307,31 +391,30 @@ const BasicInfo = (props) => {
                 <TextField {...params} label="Gender" required />
               )}
             />
+
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label="Date of Birth"
+                label="Date of Birth*"
                 value={dateOfBirth}
-                minDate={dayjs().subtract(150, "year")}
-                maxDate={dayjs()}
-                error={dateError}
                 onChange={(newValue) => setDateOfBirth(newValue)}
+                onError={(newError) => setDateError(newError)}
+                slotProps={{
+                  textField: {
+                    helperText: errorMessage,
+                  },
+                }}
+                minDate={dayjs().subtract(115, "year")}
+                maxDate={dayjs().subtract(18, "year")}
                 sx={{ mb: 4 }}
               />
             </LocalizationProvider>
             <Autocomplete
               disablePortal
               required
+              value={role}
               options={roles}
               sx={{ width: 300 }}
-              onChange={(event, newValue) => {
-                if (newValue === null) {
-                  setRole(roles[0]);
-                } else if (newValue === roles[0]) {
-                  setRole(roleDB[0]);
-                } else {
-                  setRole(roleDB[1]);
-                }
-              }}
+              onChange={handleRoleChange}
               renderInput={(params) => (
                 <TextField {...params} label="I'm a.." required />
               )}
@@ -347,6 +430,7 @@ const BasicInfo = (props) => {
               onChange={(e) => setAddress(e.target.value)}
               value={address}
               error={addressError}
+              helperText={addressError ? "Invalid Address" : ""}
               fullWidth
               sx={{ mb: 4 }}
             />
@@ -366,6 +450,7 @@ const BasicInfo = (props) => {
               variant="outlined"
               color="primary"
               label="Zipcode"
+              helperText={zipCodeError ? "Invalid Zipcode" : ""}
               onChange={(e) => setZipCode(e.target.value)}
               value={zipcode}
               error={zipCodeError}
@@ -373,8 +458,23 @@ const BasicInfo = (props) => {
               required
             />
           </Stack>
+          <TextField
+            type="password"
+            variant="outlined"
+            color="primary"
+            label="Password"
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+            error={passwordError}
+            helperText={
+              "Password must: Be a minimum of 8 characters, contain at least one uppercase letter (A-Z), contain at least one lowercase letter (a-z), and at least one digit (0-9)."
+            }
+            required
+            fullWidth
+            sx={{ mb: 4 }}
+          />
 
-          {role === roleDB[1] && (
+          {roleInDB === roleDB[1] && (
             <div>
               <h3>Driver and Vechile Information:</h3>
               <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
@@ -385,6 +485,9 @@ const BasicInfo = (props) => {
                   label="Driver's License"
                   onChange={(e) => setDriverL(e.target.value)}
                   value={driverL}
+                  helperText={
+                    driverLicenseError ? "Invalid Driver License" : ""
+                  }
                   required
                   fullWidth
                   error={driverLicenseError}
@@ -394,9 +497,10 @@ const BasicInfo = (props) => {
                   type="text"
                   variant="outlined"
                   color="primary"
-                  label="License's Plate"
+                  label="License Plate"
                   onChange={(e) => setLicensePlate(e.target.value)}
                   value={licensePlate}
+                  helperText={licensePlateError ? "Invalid License Plate" : ""}
                   error={licensePlateError}
                   required
                   fullWidth
@@ -409,6 +513,9 @@ const BasicInfo = (props) => {
                   label="Make"
                   onChange={(e) => setMake(e.target.value)}
                   value={make}
+                  helperText={
+                    makeError ? "Invalid Make of Car (ex. Nissan)" : ""
+                  }
                   error={makeError}
                   required
                   fullWidth
@@ -422,6 +529,7 @@ const BasicInfo = (props) => {
                   color="primary"
                   label="Model"
                   onChange={(e) => setModel(e.target.value)}
+                  helperText={modelError ? "Invalid Model of Car" : ""}
                   value={model}
                   error={modelError}
                   required
@@ -434,7 +542,7 @@ const BasicInfo = (props) => {
                   color="primary"
                   label="Year"
                   onChange={(e) => setYear(e.target.value)}
-                  helperText={yearError ? "Within 50 years" : ""}
+                  helperText={yearError ? "Must be within 50 years" : ""}
                   value={year}
                   error={yearError}
                   required
@@ -455,31 +563,16 @@ const BasicInfo = (props) => {
               </Stack>
             </div>
           )}
-
-          <TextField
-            type="password"
-            variant="outlined"
-            color="primary"
-            label="Password"
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-            error={passwordError}
-            required
-            fullWidth
-            sx={{ mb: 4 }}
-          />
-          <Button
-            variant="outlined"
-            color="primary"
+          <NextButton
             type="submit"
             style={{ display: "block", margin: "0 auto", width: "200px" }}
           >
             Next
-          </Button>
+          </NextButton>
           {failed === 1 && (
             <div>
               <Alert
-                onClose={() => {}}
+                onClose={() => { }}
                 variant="filled"
                 severity="error"
                 sx={{ mb: 2, mt: 2 }}
@@ -491,7 +584,7 @@ const BasicInfo = (props) => {
           {failed === 2 && (
             <div>
               <Alert
-                onClose={() => {}}
+                onClose={() => { }}
                 variant="filled"
                 severity="error"
                 sx={{ mb: 2, mt: 2 }}
@@ -503,7 +596,7 @@ const BasicInfo = (props) => {
           {failed === 3 && (
             <div>
               <Alert
-                onClose={() => {}}
+                onClose={() => { }}
                 variant="filled"
                 severity="error"
                 sx={{ mb: 2, mt: 2 }}

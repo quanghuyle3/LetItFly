@@ -7,23 +7,24 @@ const RegisterForm = () => {
     const [basicDataRender, setbasicDataRender] = useState(true)
     const [cardInfoRender, setcardInfoRender] = useState(false);
 
-    function save() {
-        localStorage.setItem("oldData", JSON.stringify(basicData));
+    function save (data) {
+        localStorage.setItem("oldData", JSON.stringify(data ));
         console.log("Save");
     }
-    save();
    console.log(JSON.parse(localStorage.getItem("oldData")));
     //console.log(basicData)
     const getBasicInfoDataHandler = ( data ) => {
         setBasicData(data)
         setbasicDataRender(false)
         setcardInfoRender(true)
+        save(data);
     }
     
     const prevHandler = () => {
         setbasicDataRender(true)
         setcardInfoRender(false)
     }
+
     
     return (
         <div>
