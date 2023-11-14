@@ -2,7 +2,7 @@ import "../css/Settings.css";
 import Card from "../components/Card";
 import { Fragment, useEffect } from "react";
 import React, { useState } from 'react';
-import { isValidName, isValidCard, isValidCardType, isValidExpiration,isValidCVV, isValidAddress } from "../Forms/Valdiation"
+import { isValidName, isValidCard, isValidCardType, isValidExpiration,isValidCVV, isValidAddress } from "../Forms/Validation"
 
 function Payment({cookie}) {
 

@@ -9,6 +9,8 @@ import {
 import { useState, useRef, useEffect } from "react";
 import pickupIcon from "../person.png";
 import carIcon from "../car.png";
+import Header from "../components/Header";
+
 
 function CustomerRide() {
   const {
@@ -231,6 +233,8 @@ function CustomerRide() {
 
   return (
     <>
+      
+      <Header cookie={cookie} />
       <h1>Customer Ride Page</h1>
 
       {!rideAccepted && <h1>WAITING FOR RIDE ...</h1>}

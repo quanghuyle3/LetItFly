@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import "../css/Home.css";
 import { autocomplete, geocode, getDirections } from "./MapUtilities";
 import { useLocation, useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button";
 
 function SearchBar({
   currentMap,
@@ -74,15 +75,35 @@ function SearchBar({
   }
 
   return (
-    <div className="search-bar-wrapper">
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: "30px",
+      }}
+    >
       <input
         className="search-bar"
         type="text"
         placeholder="Enter address..."
       />
-      <button id="go-button" onClick={() => goButtonClickHandler()}>
-        START
-      </button>
+      <Button
+        variant="contained"
+        sx={{
+          margin: "10px",
+          marginLeft: "20px",
+          height: "50px",
+          backgroundColor: "goldenrod",
+          color: "black",
+          "&:hover": {
+            backgroundColor: "goldenrod",
+          },
+        }}
+        onClick={() => goButtonClickHandler()}
+      >
+        Request Ride
+      </Button>
     </div>
   );
 }

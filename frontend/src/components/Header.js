@@ -1,12 +1,63 @@
 import React from "react";
-import styled from "styled-components";
-import { Link, useLocation } from "react-router-dom";
-import logo from "../mock_logo.jpg";
-import "../css/Home.css";
+import { Link } from "react-router-dom";
+import { AppBar, Toolbar, Typography, Button } from "@mui/material";
+import logo from "../logo.png";
+import { alignProperty } from "@mui/material/styles/cssUtils";
 
 function Header({ cookie }) {
   return (
-    <header>
+    <AppBar position="static" sx={{ bgcolor: "#fbeddb", overflow: "hidden" }}>
+      <Toolbar>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Link
+            to={cookie.roleName === "ROLE_DRIVER" ? "/driver" : "/customer"}
+            state={{ tokenObject: cookie }}
+          >
+            <img
+              className="header-left"
+              src={logo}
+              alt="Let It Fly Logo"
+              height="60px"
+              width="auto"
+              maxWidth="30%"
+            />
+          </Link>
+        </Typography>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "left",
+            color:"black",
+            
+          }}
+        >
+          <Button
+            color="inherit"
+            
+            component={Link}
+            to="/customer/settings"
+            state={{ cookie: cookie }}
+            sx = {{marginRight: '30px', fontSize: '18px'}}
+          >
+            Settings
+          </Button>
+
+          <Button color="inherit" component={Link} to="/" sx={{ fontSize: '18px'}} >
+            Logout
+          </Button>
+        </div>
+      </Toolbar>
+    </AppBar>
+  );
+}
+
+export default Header;
+/*
+
+ <div className="header">
+  <nav>
+    <a>
       <Link
         to={cookie.roleName === "ROLE_DRIVER" ? "/driver" : "/customer"}
         state={{ tokenObject: cookie }}
@@ -18,37 +69,28 @@ function Header({ cookie }) {
           height={100}
         />
       </Link>
-      <div className="header-right">
-        <div className="header-right-top">
-          <p className="header-username">
-            {cookie.email ? `Hi ${cookie.firstName}!` : "Hi username!"}
-          </p>
-        </div>
-
-        <ul className="navbar-home">
+    </a>
+    <div className="header-right">
+      <p className="header-username">
+        {cookie.email ? `Hi ${cookie.firstName}!` : "Hi username!"}
+      </p>
+      <div class="rightSection">
+       
+        <a class="links">
+          <Link to={"/"}>Logout</Link>
+        </a>
+        <a class="links">
           <Link
             to={{
               pathname: "/customer/settings",
             }}
             state={{ cookie: cookie }}
           >
-            <li>Settings</li>
+            Settings
           </Link>
-          <Link to={"/"}>
-            <li>Logout</li>
-          </Link>
-        </ul>
+        </a>
       </div>
-    </header>
-  );
-}
-
-const Nav = styled.div`
-  background-color: violet;
-  display: flex;
-  height: 100%;
-  border-bottom: 5px solid blue;
-  /* justify-content: center; */
-`;
-
-export default Header;
+    </div>
+  </nav>
+</div>
+*/

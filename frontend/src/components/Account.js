@@ -2,7 +2,7 @@ import "../css/Settings.css";
 import Card from "./Card";
 import { Fragment, useEffect } from "react";
 import React, { useState } from 'react';
-import { isValidPhoneNumber, isValidAddress } from "../Forms/Valdiation"
+import { isValidPhoneNumber, isValidAddress } from "../Forms/Validation"
 
 function Account({cookie}) {
 
