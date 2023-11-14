@@ -20,7 +20,7 @@ public interface PaymentService {
     // update
     public String updatePayment(PaymentRequest paymentRequest);
 
-    public String setPaymentToNotUse(String cardNumber);
+    public String setPaymentToNotUse(int id);
 
     // delete
 }

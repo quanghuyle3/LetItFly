@@ -14,18 +14,36 @@ function Vehicle(param) {
         "Authorization": "Bearer " + cookie.token}
         }).then((response) => {
             response.json().then((jsonObject) => {
-                setUserInfo(JSON.parse(JSON.stringify(jsonObject)));
+                setUserInfo(jsonObject);
             })
         })
     }, []);
 
+
     const handleDel = () => {
-        alert("delete");
+        fetch(`http://localhost:8080/api/vehicle/setToNotUse?id=${userInfo[num].id}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json", 
+        "Authorization": "Bearer " + cookie.token}
+        }).then((response) => {
+            return response.text();
+        }).then((result) => {
+            console.log(result);
+            if(result == "UPDATED") {
+                window.location.reload();
+                alert("Delete Successfull");
+            }
+            else{
+                alert("Delete Unsucessfull");
+            }
+        }).catch((error) => {
+            console.error("Delete failed:", error);
+        }); 
     };
 
     return (
         <div className="row">
-            {userInfo !== null ? ( 
+            {userInfo !== null && userInfo[num].inUse == true ? ( 
                 <div>
                     <h3>Vehicle {num+1}: </h3>  
                     <p>License Plate: {userInfo[num].licensePlate}</p>
@@ -36,7 +54,7 @@ function Vehicle(param) {
                     <button onClick={handleDel}>Delete Vehicle</button>
                 </div>
             ) : (
-                <p>Loading...</p>
+                <p>No Vehicles</p>
             )}  
         </div>
     );

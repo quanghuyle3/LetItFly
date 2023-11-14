@@ -77,16 +77,18 @@ function autocomplete(inputElement, callback) {
   });
 }
 
-/**
- *
- * @param {lat: current_latitude, lng: current_longitude} currentLocation
- * @param {lat: destination_latitude, lng: destination_longitude} destinationLocation
- * @param {Promise} currentMap
- * @param {useRef} currentRoute
- * @returns
- */
 var directionsRenderer;
 var directionsService;
+/**
+ * - currentLocation: {lat: latitude, lng: longitude}
+ * - destinationLocation: {lat: latitude, lng: longitude}
+ * - currentMap: promise function
+ * - currentRoute: useRef hook
+ * @param {Object} currentLocation
+ * @param {Object} destinationLocation
+ * @param {Promise} currentMap
+ * @param {Object} currentRoute
+ */
 function getDirections(
   currentLocation,
   destinationLocation,
@@ -112,7 +114,7 @@ function getDirections(
         });
       }
       currentMap.then((map) => {
-        if (directionsRenderer.getMap() != map) directionsRenderer.setMap(map);
+        if (directionsRenderer.getMap() !== map) directionsRenderer.setMap(map);
       });
 
       var request = {
@@ -125,19 +127,21 @@ function getDirections(
         if (status === "OK") {
           directionsRenderer.setDirections(results);
         } else console.log("Directions Failed: ", status);
-        currentRoute.current = {
-          distance: results.routes[0].legs[0].distance.text,
-          duration: results.routes[0].legs[0].duration.text,
-          cost: (
-            (Number(results.routes[0].legs[0].distance.value) / 1609.34 - 2) /
-              5 +
-            15
-          ).toFixed(2),
-          startLat: results.routes[0].legs[0].start_location.lat(),
-          startLng: results.routes[0].legs[0].start_location.lng(),
-          endLat: results.routes[0].legs[0].end_location.lat(),
-          endLng: results.routes[0].legs[0].end_location.lng(),
-        };
+        if (currentRoute) {
+          currentRoute.current = {
+            distance: results.routes[0].legs[0].distance.text,
+            duration: results.routes[0].legs[0].duration.text,
+            cost: (
+              (Number(results.routes[0].legs[0].distance.value) / 1609.34 - 2) /
+                5 +
+              15
+            ).toFixed(2),
+            startLat: results.routes[0].legs[0].start_location.lat(),
+            startLng: results.routes[0].legs[0].start_location.lng(),
+            endLat: results.routes[0].legs[0].end_location.lat(),
+            endLng: results.routes[0].legs[0].end_location.lng(),
+          };
+        }
         if (setDistance) setDistance(currentRoute.current.distance);
         if (setDuration) setDuration(currentRoute.current.duration);
         if (setCost) setCost(currentRoute.current.cost);
@@ -145,10 +149,14 @@ function getDirections(
     });
 }
 
-function createMap(mapContainer, centerCoords) {
+function clearDirections() {
+  if (directionsRenderer) directionsRenderer.set("directions", null);
+}
+
+function createMap(mapContainer, centerCoords, zoomLevel) {
   const mapOptions = {
     center: centerCoords,
-    zoom: 17,
+    zoom: zoomLevel ? zoomLevel : 17,
     disableDefaultUI: true,
     clickableIcons: false,
   };
@@ -159,33 +167,16 @@ function createMap(mapContainer, centerCoords) {
   });
 }
 
-function closeInfoBox() {
-  document.getElementById("customInfoBox").style.display = "none";
-}
-
-<div id="customInfoBox" class="custom-info-box">
-  <div class="content">
-    <h1>Title</h1>
-    <p>Description goes here.</p>
-    <button onclick="closeInfoBox()">Close</button>
-  </div>
-</div>;
-
 /**
  * Returns a google map marker
  * @param {Object} paramObj with 4 fields
- *  - currentMap: map object to display marker on [REQUIRED]
+ *  - currentMap: map promise to display marker on [REQUIRED]
  *  - imageUrl: image to be used as marker icon [optional]
  *  - lat: latitude [REQUIRED]
  *  - lng: longitude [REQUIRED]
  */
-function createRideMarker(paramObj) {
-  const {
-    currentMap: currentMap,
-    imageUrl: imageUrl,
-    lat: latitude,
-    lng: longitude,
-  } = paramObj;
+function createMarker(paramObj) {
+  const { currentMap, imageUrl, lat: latitude, lng: longitude } = paramObj;
   return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
     return currentMap.then((map) => {
       if (imageUrl) {
@@ -206,81 +197,6 @@ function createRideMarker(paramObj) {
   });
 }
 
-function createInfoWindowContent(data) {
-  return `
-    <div id="infoContent" style="padding: 0; margin: 0;">
-      <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">Ride Request</h1>
-      <p><strong>Date:</strong> ${data.date}</p>
-      <p><strong>Time:</strong> ${convertTo12Hour(data.time)}</p>
-      <p><strong>Rider:</strong> ${data.rider}</p>
-      <p><strong>Distance:</strong> ${data.distance}</p>
-      <p><strong>Duration:</strong> ${data.duration}</p>
-      <p><strong>Profit:</strong> <span style="color: green;">${
-        data.profit
-      }</span></p>
-      <button id="infoButton" style="width: 100%; background-color: rgb(242, 201, 98); color: rgb(255, 255, 255); border: none; padding: 15px 0; box-sizing: border-box; font-size: 18px; font-weight: bold;">Accept</button>
-    </div>
-  `;
-}
-
-function updateInfoWindow(infoWindow, data) {
-  const newContent = createInfoWindowContent(data);
-  infoWindow.setContent(newContent);
-}
-
-function convertTo12Hour(timeString) {
-  const [hours, minutes, seconds] = timeString.split(":");
-
-  let hrs = parseInt(hours, 10);
-  let mins = parseInt(minutes, 10);
-  let secs = parseInt(seconds, 10);
-
-  const suffix = hrs >= 12 ? "PM" : "AM";
-
-  // Convert hours to 12-hour format
-  hrs = hrs % 12;
-  hrs = hrs ? hrs : 12; // the hour '0' should be '12'
-
-  const paddedMins = mins < 10 ? `0${mins}` : mins;
-  const paddedSecs = secs < 10 ? `0${secs}` : secs;
-
-  return `${hrs}:${paddedMins}:${paddedSecs} ${suffix}`;
-}
-
-function createMarker(map, infoWindow, data, passLat, passedLng) {
-  return googleApiLoader.importLibrary("marker").then(({ Marker }) => {
-    const image =
-      "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
-
-    map.then((actualMap) => {
-      //console.log("Passed", typeof passLat, typeof passedLng)
-      const marker = new Marker({
-        position: { lat: passLat, lng: passedLng },
-        map: actualMap,
-        // icon: image,
-      });
-      //click event
-      marker.addListener("click", function () {
-        actualMap.setCenter(marker.getPosition());
-        infoWindow.then((actualWindow) => {
-          //update
-          console.log(data);
-          const windowData = {
-            date: data.date,
-            time: convertTo12Hour(data.timeRequest),
-            rider: data.passengerId.firstName + " " + data.passengerId.lastName,
-            distance: data.distance,
-            duration: data.duration,
-            profit: "$" + data.cost,
-          };
-          updateInfoWindow(actualWindow, windowData);
-          actualWindow.open(actualMap, marker);
-        });
-      });
-      return marker;
-    });
-  });
-}
 function createInfowindow(infoWindowContent) {
   return googleApiLoader.importLibrary("maps").then(({ InfoWindow }) => {
     const infoWindow = new InfoWindow({
@@ -297,8 +213,8 @@ export {
   createMap,
   getDirections,
   userLocation,
-  createMarker,
   getDistanceFromLatLngInKm,
-  createRideMarker,
+  createMarker,
   createInfowindow,
+  clearDirections,
 };

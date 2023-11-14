@@ -78,7 +78,9 @@ header {
 }
 
 .map-container,
+#driver-map-container,
 #passenger-picked-up-map,
+#driver-ride-map,
 #ride-accepted-map {
   z-index: 10;
   border-radius: 1rem;
@@ -127,6 +129,18 @@ header {
     cursor: pointer;
     background-color: rgb(159, 253, 59);
   }
+}
+
+#infoButton {
+  width: 100%;
+  background-color: rgb(242, 201, 98);
+  /* color: rgb(0, 0, 0); */
+  color: #351851;
+  border: none;
+  padding: 15px 0;
+  box-sizing: border-box;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .route-details {
