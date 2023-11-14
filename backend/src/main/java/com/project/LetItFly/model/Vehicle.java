@@ -12,7 +12,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "vehicle")
 public class Vehicle {
@@ -30,7 +38,7 @@ public class Vehicle {
     @Column(name = "model")
     private String model;
 
-    @Column(name = "year")
+    @Column(name = "`year`")
     private int year;
 
     @Column(name = "type")
@@ -42,9 +50,6 @@ public class Vehicle {
     @ManyToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH })
     @JoinColumn(name = "user_id")
     private User userId;
-
-    public Vehicle() {
-    }
 
     public Vehicle(String licensePlate, String make, String model, int year, String type, boolean inUse, User userId) {
         this.licensePlate = licensePlate;
@@ -72,76 +77,6 @@ public class Vehicle {
         this.year = registrationRequest.getYear();
         this.type = registrationRequest.getVehicleType();
         this.inUse = registrationRequest.isVehicleInUse();
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getLicensePlate() {
-        return licensePlate;
-    }
-
-    public void setLicensePlate(String licensePlate) {
-        this.licensePlate = licensePlate;
-    }
-
-    public String getMake() {
-        return make;
-    }
-
-    public void setMake(String make) {
-        this.make = make;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public boolean isInUse() {
-        return inUse;
-    }
-
-    public void setInUse(boolean inUse) {
-        this.inUse = inUse;
-    }
-
-    public User getUserId() {
-        return userId;
-    }
-
-    public void setUserId(User userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    public String toString() {
-        return "Vehicle [id=" + id + ", licensePlate=" + licensePlate + ", make=" + make + ", model=" + model
-                + ", year=" + year + ", type=" + type + ", inUse=" + inUse + ", userId=" + userId + "]";
     }
 
 }
