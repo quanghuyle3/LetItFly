@@ -9,7 +9,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Paper from "@mui/material/Paper";
 import Alert from "@mui/material/Alert";
 import Grid from "@mui/material/Grid";
-import logo from "../mock_logo.jpg";
+import logo from "../logo.png";
 import dayjs from "dayjs";
 import {
   isValidMake,
@@ -24,7 +24,7 @@ import {
   isValidLicensePlate,
   isValidModel,
   isValidCarYear,
-} from "./Valdiation";
+} from "./Validation";
 import { roles, roleDB, genders, types, stateAcronyms } from "./Categories";
 import bg from "../mock-bg.jpg";
 import { styled } from '@mui/system';
@@ -106,8 +106,7 @@ const BasicInfo = (props) => {
       } else if (oldData.roleName == roles[1]) {
         handleRoleChange(roles[1]);
       }
-
-      setDateOfBirth(dayjs(oldData.birthDate, "YYYY-MM-DD"));
+      setDateOfBirth(dayjs(oldData.birthdate, "YYYY-MM-DD"));
       setAddress(oldData.address);
       setState(oldData.state);
       setZipCode(oldData.zipcode);
@@ -135,7 +134,6 @@ const BasicInfo = (props) => {
     } else {
       setEmailError(false);
     }
-
     if (!isValidBirthday(dateOfBirth)) {
       isfailed = true;
       if (dateOfBirth === null) {
@@ -146,8 +144,6 @@ const BasicInfo = (props) => {
     } else {
       setDateError(false);
     }
-    console.log(dateError);
-    console.log(dateOfBirth);
     if (!isValidPhoneNumber(phone)) {
       isfailed = true;
       setPhoneError(true);
@@ -224,9 +220,7 @@ const BasicInfo = (props) => {
     event.preventDefault();
     setFailed(0);
     let isfail = validation();
-    console.log(isfail);
     if (isfail) {
-      console.log("hello");
       setFailed(3);
       return;
     }
@@ -237,7 +231,6 @@ const BasicInfo = (props) => {
       }).then((response) => {
         response.text().then((message) => {
           if (message == "EXIST") {
-            console.log("here email check");
             setFailed(1);
             return;
           }
@@ -272,7 +265,7 @@ const BasicInfo = (props) => {
           password: password,
           firstName: firstName,
           lastName: lastName,
-          birthDate: dateOfBirth,
+          birthdate: dateOfBirth,
           gender: gender,
           address: address,
           state: state,
@@ -398,6 +391,7 @@ const BasicInfo = (props) => {
                 value={dateOfBirth}
                 onChange={(newValue) => setDateOfBirth(newValue)}
                 onError={(newError) => setDateError(newError)}
+                error={dateError}
                 slotProps={{
                   textField: {
                     helperText: errorMessage,

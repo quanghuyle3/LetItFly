@@ -1,18 +1,16 @@
-header {
-  /* background-color: blue; */
+.header {
   height: 100px;
-  width: 50%;
   display: flex;
   margin: 0 auto;
-  margin-top: 10px;
   gap: 10px;
-  border-bottom: 5px solid blue;
+  overflow: hidden;
+  background-color: goldenrod;
 }
+
 
 .header-left {
   flex: 1;
-  /* outline: 5px solid green; */
-  /* margin-right: 10vw; */
+  margin-top: 10px;
   justify-content: flex-start;
   align-self: left;
 }
@@ -87,10 +85,11 @@ header {
   display: block;
   margin: 20px auto;
   margin-bottom: -5px;
-  width: 49%;
+  width: 90vw; 
   height: 50vh;
   /* height: 600px; */
-  border: 5px solid goldenrod;
+  border: 2px solid goldenrod;
+  border-radius: 8px;
 }
 
 .search-bar-wrapper {
@@ -102,32 +101,34 @@ header {
   font-family: "Titillium Web", sans-serif;
   padding: 10px;
   padding-left: 20px;
-  margin-top: 20px;
-  margin-left: 20px;
   font-weight: 400;
+  margin-left: 20px;
   font-size: 20px;
-  z-index: 30;
-  width: 50%;
-  border-radius: 1.25rem;
-  border: 2px solid rgb(113, 113, 113);
+  width: 77%;
+  border: 2px solid goldenrod;
+  transition: border-color 0.3s; 
+  &:focus {
+    border-color: #2196f3; /* Change border color on focus */
+  }
 }
 
 #go-button {
-  font-family: "Titillium Web", sans-serif;
+  font-family: "Roboto", sans-serif;
   /* height: 20px; */
   font-size: 20px;
   font-weight: 900;
-  border-radius: 1.25rem;
-  width: 100px;
+  width: 50%;
   color: black;
   padding: 10px;
   margin-left: 20px;
-  background-color: rgb(0, 248, 103);
   border: 2px solid black;
-
+  background-color: 'orange';
+  color: 'white';
+  
   &:hover {
-    cursor: pointer;
-    background-color: rgb(159, 253, 59);
+    background-color: '#ed9b02';
+    color: 'white'; 
+    border: '1px solid orange';
   }
 }
 
@@ -142,6 +143,7 @@ header {
   font-size: 18px;
   font-weight: bold;
 }
+
 
 .route-details {
   font-family: "Titillium Web", sans-serif;
