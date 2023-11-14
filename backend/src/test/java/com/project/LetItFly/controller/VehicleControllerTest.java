@@ -120,10 +120,10 @@ public class VehicleControllerTest {
         // when
         ResultActions response = mockMvc.perform(get("/api/vehicle/setToNotUse")
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("licensePlate", Mockito.anyString()));
+                .param("id", "3"));
 
         // then
-        verify(vehicleService).setVehicleToNotUse(Mockito.anyString());
+        verify(vehicleService).setVehicleToNotUse(Mockito.anyInt());
         response.andExpect(MockMvcResultMatchers.status().isOk());
     }
 

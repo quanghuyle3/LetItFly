@@ -15,62 +15,76 @@ import com.project.LetItFly.model.User;
 @DataJpaTest
 public class RideRequestRepositoryTest {
 
-    @Autowired
-    private RideRequestRepository rideRequestRepository;
+        @Autowired
+        private RideRequestRepository rideRequestRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+        @Autowired
+        private UserRepository userRepository;
 
-    @Test
-    void testFindRideRequestByDriverId() {
-        // given
-        User user = User.builder().email("useraccount@gmail.com").password("Test123456").firstName("Andy")
-                .lastName("Jose").driverLicense("Y672674").build();
-        user = userRepository.save(user);
+        @Test
+        void testFindAllAvailableRideRequest() {
+                // given
+                RideRequest rideRequest = RideRequest.builder().curLat(-37.9862).curLong(120.85733).destLat(-38.9788)
+                                .destLong(120.64743).build();
+                rideRequest = rideRequestRepository.save(rideRequest);
 
-        RideRequest rideRequest = RideRequest.builder().driverId(user).curLat(-37.9862).curLong(120.85733)
-                .destLat(-38.9788)
-                .destLong(120.64743).build();
-        rideRequest = rideRequestRepository.save(rideRequest);
+                // when
+                List<RideRequest> retrievedRideRequests = rideRequestRepository.findAllAvailableRideRequest();
 
-        // when
-        List<RideRequest> retrievedRideRequests = rideRequestRepository.findRideRequestByDriverId(user);
+                // then
+                assertThat(retrievedRideRequests.size()).isGreaterThan(0);
+        }
 
-        // then
-        assertThat(retrievedRideRequests).isEqualTo(Arrays.asList(rideRequest));
+        @Test
+        void testFindRideRequestByDriverId() {
+                // given
+                User user = User.builder().email("useraccount@gmail.com").password("Test123456").firstName("Andy")
+                                .lastName("Jose").driverLicense("Y672674").build();
+                user = userRepository.save(user);
 
-    }
+                RideRequest rideRequest = RideRequest.builder().driverId(user).curLat(-37.9862).curLong(120.85733)
+                                .destLat(-38.9788)
+                                .destLong(120.64743).build();
+                rideRequest = rideRequestRepository.save(rideRequest);
 
-    @Test
-    void testFindRideRequestById() {
-        // given
-        RideRequest rideRequest = RideRequest.builder().curLat(-37.9862).curLong(120.85733).destLat(-38.9788)
-                .destLong(120.64743).build();
-        rideRequest = rideRequestRepository.save(rideRequest);
+                // when
+                List<RideRequest> retrievedRideRequests = rideRequestRepository.findRideRequestByDriverId(user);
 
-        // when
-        RideRequest retrievedRideRequest = rideRequestRepository.findRideRequestById(rideRequest.getId());
+                // then
+                assertThat(retrievedRideRequests).isEqualTo(Arrays.asList(rideRequest));
 
-        // then
-        assertThat(retrievedRideRequest).isEqualTo(rideRequest);
-    }
+        }
 
-    @Test
-    void testFindRideRequestByPassengerId() {
-        // given
-        User user = User.builder().email("useraccount@gmail.com").password("Test123456").firstName("Andy")
-                .lastName("Jose").driverLicense("Y672674").build();
-        user = userRepository.save(user);
+        @Test
+        void testFindRideRequestById() {
+                // given
+                RideRequest rideRequest = RideRequest.builder().curLat(-37.9862).curLong(120.85733).destLat(-38.9788)
+                                .destLong(120.64743).build();
+                rideRequest = rideRequestRepository.save(rideRequest);
 
-        RideRequest rideRequest = RideRequest.builder().passengerId(user).curLat(-37.9862).curLong(120.85733)
-                .destLat(-38.9788)
-                .destLong(120.64743).build();
-        rideRequest = rideRequestRepository.save(rideRequest);
+                // when
+                RideRequest retrievedRideRequest = rideRequestRepository.findRideRequestById(rideRequest.getId());
 
-        // when
-        List<RideRequest> retrievedRideRequests = rideRequestRepository.findRideRequestByPassengerId(user);
+                // then
+                assertThat(retrievedRideRequest).isEqualTo(rideRequest);
+        }
 
-        // then
-        assertThat(retrievedRideRequests).isEqualTo(Arrays.asList(rideRequest));
-    }
+        @Test
+        void testFindRideRequestByPassengerId() {
+                // given
+                User user = User.builder().email("useraccount@gmail.com").password("Test123456").firstName("Andy")
+                                .lastName("Jose").driverLicense("Y672674").build();
+                user = userRepository.save(user);
+
+                RideRequest rideRequest = RideRequest.builder().passengerId(user).curLat(-37.9862).curLong(120.85733)
+                                .destLat(-38.9788)
+                                .destLong(120.64743).build();
+                rideRequest = rideRequestRepository.save(rideRequest);
+
+                // when
+                List<RideRequest> retrievedRideRequests = rideRequestRepository.findRideRequestByPassengerId(user);
+
+                // then
+                assertThat(retrievedRideRequests).isEqualTo(Arrays.asList(rideRequest));
+        }
 }

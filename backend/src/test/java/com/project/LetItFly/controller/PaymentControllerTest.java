@@ -108,10 +108,10 @@ public class PaymentControllerTest {
         // when
         ResultActions response = mockMvc.perform(get("/api/payment/setToNotUse")
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("cardNumber", "5627891652"));
+                .param("id", "2"));
 
         // then
-        verify(paymentService).setPaymentToNotUse("5627891652");
+        verify(paymentService).setPaymentToNotUse(2);
         response.andExpect(MockMvcResultMatchers.status().isOk());
     }
 

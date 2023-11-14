@@ -85,7 +85,7 @@ public class RideRequestServiceImplTest {
     @Test
     void testFindAllRideRequest() {
         rideRequestService.findAllRideRequest();
-        verify(rideRequestRepository).findAll();
+        verify(rideRequestRepository).findAllAvailableRideRequest();
 
     }
 

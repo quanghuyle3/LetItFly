@@ -172,9 +172,9 @@ public class VehicleServiceImplTest {
                                 .year(2015).build();
 
                 // when
-                when(vehicleRepository.findVehicleByLicensePlate(Mockito.anyString())).thenReturn(vehicle);
+                when(vehicleRepository.findVehicleById(Mockito.anyInt())).thenReturn(vehicle);
 
-                String result = vehicleService.setVehicleToNotUse(Mockito.anyString());
+                String result = vehicleService.setVehicleToNotUse(Mockito.anyInt());
 
                 // then
                 verify(vehicleRepository).save(vehicle);
@@ -188,9 +188,9 @@ public class VehicleServiceImplTest {
                 // given
 
                 // when
-                when(vehicleRepository.findVehicleByLicensePlate(Mockito.anyString())).thenReturn(null);
+                when(vehicleRepository.findVehicleById(Mockito.anyInt())).thenReturn(null);
 
-                String result = vehicleService.setVehicleToNotUse(Mockito.anyString());
+                String result = vehicleService.setVehicleToNotUse(Mockito.anyInt());
 
                 // then
                 verify(vehicleRepository, never()).save(Mockito.any(Vehicle.class));

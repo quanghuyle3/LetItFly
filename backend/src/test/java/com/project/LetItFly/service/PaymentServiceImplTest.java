@@ -102,9 +102,9 @@ public class PaymentServiceImplTest {
         Payment payment = Payment.builder().cardNumber("1785637892").expiration("12/2025").cvv(123).build();
 
         // when
-        when(paymentService.findPaymentByCardNumber(Mockito.anyString())).thenReturn(payment);
+        when(paymentService.findPaymentById(Mockito.anyInt())).thenReturn(payment);
 
-        String result = paymentService.setPaymentToNotUse(Mockito.anyString());
+        String result = paymentService.setPaymentToNotUse(Mockito.anyInt());
 
         // then
         verify(paymentRepository).save(payment);
@@ -116,9 +116,9 @@ public class PaymentServiceImplTest {
         // given
 
         // when
-        when(paymentService.findPaymentByCardNumber(Mockito.anyString())).thenReturn(null);
+        when(paymentService.findPaymentById(Mockito.anyInt())).thenReturn(null);
 
-        String result = paymentService.setPaymentToNotUse(Mockito.anyString());
+        String result = paymentService.setPaymentToNotUse(Mockito.anyInt());
 
         // then
         verify(paymentRepository, never()).save(Mockito.any());
