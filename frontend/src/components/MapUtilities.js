@@ -184,6 +184,7 @@ function createMarker(paramObj) {
           position: { lat: latitude, lng: longitude },
           map: map,
           icon: imageUrl,
+          zIndex: 300,
         });
         return marker;
       } else {
