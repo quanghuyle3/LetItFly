@@ -12,6 +12,9 @@ import carIcon from "../car.png";
 import { useNavigate } from "react-router-dom";
 
 function DriverMap({ cookie }) {
+  const rideRequestData = useRef();
+  const requestUpdateInterval = useRef();
+  const locationUpdateInterval = useRef();
   const navigate = useNavigate();
   const currentMap = useRef();
   const infoWindowRef = useRef();
@@ -45,50 +48,127 @@ function DriverMap({ cookie }) {
         }
       });
     });
-    // update driver current location
-    userLocation.then((location) => {
-      const url = `${proxy}/api/driver-status/updateCoordinatesDriver?driverId=${cookie.id}&curLat=${location.lat}&curLong=${location.lng}`;
-      fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + cookie.token,
-        },
-      })
-        .then((response) => response.text())
-        .then((data) => data)
-        .catch((error) =>
-          console.log(
-            "ERROR: couldn't update current driver location.\n",
-            error
-          )
-        );
-    });
+    function updateUserLocation() {
+      userLocation.then((location) => {
+        const url = `${proxy}/api/driver-status/updateCoordinatesDriver?driverId=${cookie.id}&curLat=${location.lat}&curLong=${location.lng}`;
+        fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + cookie.token,
+          },
+        })
+          .then((response) => response.text())
+          .then((data) => data)
+          .catch((error) =>
+            console.log(
+              "ERROR: couldn't update current driver location.\n",
+              error
+            )
+          );
+      });
+    }
+
+    locationUpdateInterval.current = setInterval(() => {
+      updateUserLocation();
+    }, 3000);
+
+    // DELETE THIS LATER <-----------------------------------
+    setTimeout(() => {
+      clearInterval(locationUpdateInterval.current);
+    }, 15000);
   }
+  const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
 
   //fetch ride requests
-  const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
-  const url = `${proxy}/api/ride-request/findAll`;
+  function getRideRequestsFromBackend() {
+    const url = `${proxy}/api/ride-request/findAll`;
+    fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + cookie.token,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // create marker references if first render
+        if (!rideRequestData.current) {
+          rideRequestData.current = {};
 
-  fetch(url, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + cookie.token,
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      for (let i = 0; i < data.length; i++) {
-        const rideRequestMarker = createMarker({
-          currentMap: currentMap.current,
-          lat: data[i].curLat,
-          lng: data[i].curLong,
+          for (let i = 0; i < data.length; i++) {
+            const rideRequestMarker = createMarker({
+              currentMap: currentMap.current,
+              lat: data[i].curLat,
+              lng: data[i].curLong,
+            });
+            rideRequestMarker.then((marker) => {
+              marker.addListener("click", () =>
+                markerCallback(marker, data[i])
+              );
+            });
+
+            rideRequestData.current[data[i].id] = {
+              data: data[i],
+              marker: rideRequestMarker,
+            };
+          }
+          return;
+        }
+
+        // compare incoming data with rendered markers
+        let markerArr = Object.keys(rideRequestData.current);
+        let dataArr = [];
+        let dataMap = {};
+        for (let i = 0; i < data.length; i++) {
+          dataArr.push(String(data[i].id));
+          dataMap[data[i].id] = data[i];
+        }
+        let rmMarker = [];
+        rmMarker = markerArr.filter((element) => !dataArr.includes(element));
+        let addMarker = [];
+        addMarker = dataArr.filter((element) => !markerArr.includes(element));
+
+        // delete markers from map
+        rmMarker.forEach((i) => {
+          i = Number(i);
+          rideRequestData.current[i].marker.then((marker) =>
+            marker.setMap(null)
+          );
+          delete rideRequestData.current[i];
         });
-        rideRequestMarker.then((marker) => {
-          marker.addListener("click", () => markerCallback(marker, data[i]));
+
+        // add markers to map
+        addMarker.forEach((i) => {
+          i = Number(i);
+          const newMarker = createMarker({
+            currentMap: currentMap.current,
+            lat: dataMap[i].curLat,
+            lng: dataMap[i].curLong,
+          });
+
+          newMarker.then((marker) => {
+            marker.addListener("click", () =>
+              markerCallback(marker, dataMap[i])
+            );
+          });
+
+          rideRequestData.current[i] = {
+            data: dataMap[i],
+            marker: newMarker,
+          };
         });
-      }
-    });
+      });
+  }
+  getRideRequestsFromBackend();
+
+  requestUpdateInterval.current = setInterval(() => {
+    getRideRequestsFromBackend();
+  }, 6000);
+
+  // DELETE THIS LATER <---------------------------------------
+  setTimeout(() => {
+    clearInterval(requestUpdateInterval.current);
+  }, 11000);
 
   function markerCallback(marker, data) {
     const map = marker.getMap();
