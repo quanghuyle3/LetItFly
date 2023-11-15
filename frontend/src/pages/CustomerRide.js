@@ -119,8 +119,41 @@ function CustomerRide() {
         .then((response) => response.json())
         .then((data) => data);
 
-      Promise.all([updatePassengerCoords, getDriverCoords]).then(
-        ([passengerCoordsResponse, DriverCoordsResponse]) => {
+      const checkRideCancelUrl = `${proxy}/api/ride-request/findById?id=${rideRequestId}`;
+      const checkRideCancel = fetch(checkRideCancelUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data.driverId.id) {
+            console.log(data.driverId.id);
+            setRideAccepted(false);
+            return data;
+          }
+        })
+        .catch((error) => {
+          clearInterval(intervalRef.current);
+          setRideCancelled(true);
+          return "RIDE CANCELLED";
+        });
+
+      Promise.all([
+        updatePassengerCoords,
+        getDriverCoords,
+        checkRideCancel,
+      ]).then(
+        ([
+          passengerCoordsResponse,
+          DriverCoordsResponse,
+          checkRideCancelResponse,
+        ]) => {
+          // exit function if ride cancelled
+          if (!rideAccepted || rideCancelled) return;
+
           if (c1 < 2) {
             driverLocation.current = {
               lat: DriverCoordsResponse.curLat,
@@ -214,6 +247,33 @@ function CustomerRide() {
   else if (!rideCompleted) {
     var c2 = 1;
     function updatePassengerMarkerOnly() {
+      // check if ride cancelled
+      const checkRideCancelUrl = `${proxy}/api/ride-request/findById?id=${rideRequestId}`;
+      fetch(checkRideCancelUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data.driverId.id) {
+            console.log(data.driverId.id);
+            setPassengerPickedUp(false);
+            setRideAccepted(false);
+            return data;
+          }
+        })
+        .catch((error) => {
+          clearInterval(intervalRef.current);
+          setRideCancelled(true);
+          return "RIDE CANCELLED";
+        });
+
+      // exit function if ride cancelled
+      if (!rideAccepted || rideCancelled) return;
+
       userLocation.then((location) => {
         if (c2 < 2) passengerLocation.current = location;
         else if (c2 < 3)
