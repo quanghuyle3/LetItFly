@@ -6,11 +6,10 @@ import {
   getDistanceFromLatLngInKm,
   userLocation,
 } from "../components/MapUtilities";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import pickupIcon from "../person.png";
 import carIcon from "../car.png";
 import Header from "../components/Header";
-
 
 function CustomerRide() {
   const {
@@ -22,14 +21,8 @@ function CustomerRide() {
   } = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (rideAccepted && !passengerPickedUp) initMap("ride-accepted-map");
-    if (passengerPickedUp && !rideCompleted) initMap("passenger-picked-up-map");
-  });
-
+  const intervalRef = useRef(null);
   const driverId = useRef(null);
-  const afterRideAcceptedInterval = useRef(null);
-  const afterPassengerPickupInterval = useRef(null);
   const passengerLocation = useRef(null);
   const driverLocation = useRef(null);
   const destinationLocation = useRef(null);
@@ -39,233 +32,266 @@ function CustomerRide() {
   const driverMarker = useRef(null);
   const rideRecord = useRef(null);
 
-  const beforeRideAccepted = "BEFORE RIDE ACCEPTED";
-  const rideAcceptedBeforePickup = "RIDE ACCEPTED, BEFORE PICKUP";
-  const afterPickup = "AFTER PICKUP";
-
   const [rideAccepted, setRideAccepted] = useState(false);
   const [passengerPickedUp, setPassengerPickedUp] = useState(false);
   const [rideCompleted, setRideCompleted] = useState(false);
-  const customerRideWorker = new Worker("/worker/CustomerRideWorker.js");
 
   const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
 
-  function workerPhaseTwoPostMessage() {
-    userLocation.then((coords) => {
-      passengerLocation.current = coords;
-      customerRideWorker.postMessage({
-        proxy: proxy,
-        typeString: rideAcceptedBeforePickup,
-        token: token,
-        param1: rideRequestId,
-        param2: driverId.current,
-        param3: coords,
-      });
-    });
-  }
-
   function initMap(mapElementId) {
-    userLocation.then((location) => {
-      currentMap.current = createMap(
+    currentMap.current = userLocation.then((location) => {
+      let zoomLevel = 13;
+      passengerLocation.current = location;
+      return createMap(
         document.getElementById(mapElementId),
-        location
+        location,
+        zoomLevel
       );
     });
   }
 
-  /*
-          --------- POST MESSAGE ---------
-   */
-  // PHASE 1 POST MESSAGE
+  if (!currentMap.current) initMap("ride-accepted-map");
+
+  // --------------------------------- PHASE 1 ---------------------------------
   if (!rideAccepted) {
-    customerRideWorker.postMessage({
-      proxy: proxy,
-      typeString: beforeRideAccepted,
-      token: token,
-      param1: rideRequestId,
-    });
-  }
-  // PHASE 2 POST MESSAGE
-  else if (!passengerPickedUp) {
-    workerPhaseTwoPostMessage();
-    afterRideAcceptedInterval.current = setInterval(() => {
-      workerPhaseTwoPostMessage();
+    function checkRideAccepted() {
+      console.log("checking");
+      const url = `${proxy}/api/ride-request/findById?id=${rideRequestId}`;
+      return fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          if (data.driverId) {
+            clearInterval(intervalRef.current);
+            driverId.current = data.driverId.id;
+            destinationLocation.current = {
+              lat: data.destLat,
+              lng: data.destLong,
+            };
+            setRideAccepted(true);
+            rideRecord.current = data;
+          }
+        });
+    }
+
+    checkRideAccepted();
+    intervalRef.current = setInterval(() => {
+      checkRideAccepted();
     }, 3000);
   }
-  // PHASE 3
-  else if (passengerPickedUp && rideAccepted && !rideCompleted) {
-    customerRideWorker.postMessage({
-      proxy: proxy,
-      typeString: afterPickup,
-      token: token,
-      param1: rideRequestId,
-    });
-  }
+  // --------------------------------- PHASE 2 ---------------------------------
+  else if (!passengerPickedUp) {
+    var c1 = 1;
+    function updatePassengerDriverLocation() {
+      const updatePassengerCoords = userLocation.then((passengerCoords) => {
+        passengerLocation.current = passengerCoords;
+        const passengerUrl = `${proxy}/api/ride-request/updateCoordinatesPassenger?rideRequestId=${rideRequestId}&curLat=${passengerCoords.lat}&curLong=${passengerCoords.lng}`;
+        return fetch(passengerUrl, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        })
+          .then((response) => response.text())
+          .then((data) => data);
+      });
 
-  /*
-          --------- ONMESSAGE ---------
-   */
-  customerRideWorker.onmessage = (e) => {
-    // PHASE 1 ON MESSAGE
-    if (e.data.responseString === "AFTER RIDE ACCEPTED") {
-      driverId.current = e.data.driverId.id;
-      setRideAccepted(true);
-    }
-    // PHASE 2 ON MESSAGE
-    else if (e.data.responseString === "DRIVER LOCATION RECEIVED") {
-      driverLocation.current = e.data.driverCoords;
-      // Route already rendered
-      if (currentRoute.current) {
-        // update marker positions
-        passengerMarker.current.setPosition({
-          lat: passengerLocation.current.lat,
-          lng: passengerLocation.current.lng,
-        });
-        driverMarker.current.setPosition({
-          lat: driverLocation.current.lat,
-          lng: driverLocation.current.lng,
-        });
-        // check distance between driver and passenger
-        let distance = getDistanceFromLatLngInKm(
-          passengerLocation.current.lat,
-          passengerLocation.current.lng,
-          driverLocation.current.lat,
-          driverLocation.current.lng
-        );
-        console.log("driver distance: ", distance, "km");
+      const driverUrl = `${proxy}/api/driver-status/findByDriverId?driverId=${driverId.current}`;
+      const getDriverCoords = fetch(driverUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => data);
 
-        // criteria to check if passenger has been picked up
-        const FiftyMetersInKm = 0.05;
-        if (distance < FiftyMetersInKm) {
-          console.log("picked up passenger!!");
-          clearInterval(afterRideAcceptedInterval.current);
-          setPassengerPickedUp(true);
+      Promise.all([updatePassengerCoords, getDriverCoords]).then(
+        ([passengerCoordsResponse, DriverCoordsResponse]) => {
+          if (c1 < 2) {
+            driverLocation.current = {
+              lat: DriverCoordsResponse.curLat,
+              lng: DriverCoordsResponse.curLong,
+            };
+          } else if (c1 < 3) {
+            driverLocation.current = {
+              lat: 37.342430731542294,
+              lng: -121.85440702637351,
+            };
+          } else {
+            driverLocation.current = {
+              lat: 37.33045462745464,
+              lng: -121.88346056553847,
+            };
+          }
+          c1++;
+
+          // update marker locations
+          passengerMarker.current.setPosition(passengerLocation.current);
+          driverMarker.current.setPosition(driverLocation.current);
+
+          // check distance between driver and passenger
+          let distance = getDistanceFromLatLngInKm(
+            passengerLocation.current.lat,
+            passengerLocation.current.lng,
+            driverLocation.current.lat,
+            driverLocation.current.lng
+          );
+          console.log("distance: ", distance, "km");
+
+          // criteria to check if passenger has been picked up
+          const FiftyMetersInKm = 0.5;
+          if (distance < FiftyMetersInKm) {
+            clearInterval(intervalRef.current);
+            setPassengerPickedUp(true);
+          }
         }
-        // DELETE LATER <------------------------------
-        setTimeout(() => {
-          clearInterval(afterRideAcceptedInterval.current);
-        }, 20000);
-      }
+      );
+    }
 
-      // Render route between driver and passenger
-      else {
+    // get driver location
+    const driverUrl = `${proxy}/api/driver-status/findByDriverId?driverId=${driverId.current}`;
+    fetch(driverUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((response) => response.json())
+      .then((driverRecord) => {
+        driverLocation.current = {
+          lat: driverRecord.curLat,
+          lng: driverRecord.curLong,
+        };
+      })
+
+      // render route between driver and passenger
+      .then(() => {
         getDirections(
           passengerLocation.current,
           driverLocation.current,
           currentMap.current,
           currentRoute
         );
+      })
 
-        // Create passenger marker
+      // Create markers
+      .then(() => {
         createMarker({
           currentMap: currentMap.current,
           lat: passengerLocation.current.lat,
           lng: passengerLocation.current.lng,
           imageUrl: pickupIcon,
-        }).then((marker) => {
-          passengerMarker.current = marker;
-        });
-
-        // Create driver marker
+        }).then((marker) => (passengerMarker.current = marker));
         createMarker({
           currentMap: currentMap.current,
           lat: driverLocation.current.lat,
           lng: driverLocation.current.lng,
           imageUrl: carIcon,
-        }).then((marker) => {
-          driverMarker.current = marker;
-        });
-      }
-    }
-    // PHASE 3 ON MESSAGE
-    else if (e.data.responseString === "FINAL DESTINATION RETRIEVED") {
-      rideRecord.current = e.data.record;
-      destinationLocation.current = e.data.destination;
-      getDirections(
-        passengerLocation.current,
-        destinationLocation.current,
-        currentMap.current,
-        currentRoute
-      );
-      // update passenger marker
-      createMarker({
-        currentMap: currentMap.current,
-        imageUrl: carIcon,
-        lat: passengerLocation.current.lat,
-        lng: passengerLocation.current.lng,
-      })
-        .then((marker) => {
-          passengerMarker.current = marker;
-        })
-        .then(() => {
-          afterPassengerPickupInterval.current = setInterval(
-            updateMarkerLocation,
-            3000
-          );
-          setTimeout(() => {
-            clearInterval(afterPassengerPickupInterval.current);
-          }, 20000);
-        });
+        }).then((marker) => (driverMarker.current = marker));
 
-      function updateMarkerLocation() {
-        userLocation
-          .then((location) => {
-            passengerMarker.current.setPosition(location);
-            passengerLocation.current = location;
-          })
-          .then(() => {
-            let distance = getDistanceFromLatLngInKm(
-              passengerLocation.current.lat,
-              passengerLocation.current.lng,
-              destinationLocation.current.lat,
-              destinationLocation.current.lng
-            );
-            console.log("destination distance: ", distance, "km");
-            const FiftyMetersInKm = 0.05;
-            if (distance < FiftyMetersInKm) {
-              clearInterval(afterPassengerPickupInterval.current);
-              setRideCompleted(true);
-            }
-          });
-      }
+        intervalRef.current = setInterval(() => {
+          updatePassengerDriverLocation();
+        }, 3000);
+      });
+  }
+
+  // --------------------------------- PHASE 3 ---------------------------------
+  else if (!rideCompleted) {
+    var c2 = 1;
+    function updatePassengerMarkerOnly() {
+      userLocation.then((location) => {
+        if (c2 < 2) passengerLocation.current = location;
+        else if (c2 < 3)
+          passengerLocation.current = {
+            lat: 37.476584650800355,
+            lng: -122.17503098766385,
+          };
+        else
+          passengerLocation.current = {
+            lat: 37.615352393734575,
+            lng: -122.38988933765685,
+          };
+        c2++;
+
+        passengerMarker.current.setPosition(passengerLocation.current);
+
+        // check distance between passenger and driver
+        let distance = getDistanceFromLatLngInKm(
+          passengerLocation.current.lat,
+          passengerLocation.current.lng,
+          destinationLocation.current.lat,
+          destinationLocation.current.lng
+        );
+        console.log("destination distance: ", distance, "km");
+
+        // criteria to check if passenger has been picked up
+        const FiftyMetersInKm = 0.6;
+        if (distance < FiftyMetersInKm) {
+          console.log("ride complete!!");
+          clearInterval(intervalRef.current);
+          setRideCompleted(true);
+        }
+      });
     }
-  };
+
+    // update route to final destination
+    getDirections(
+      passengerLocation.current,
+      destinationLocation.current,
+      currentMap.current,
+      currentRoute
+    );
+    // update markers
+    driverMarker.current.setMap(null);
+    passengerMarker.current.setPosition(passengerLocation.current);
+    createMarker({
+      currentMap: currentMap.current,
+      lat: destinationLocation.current.lat,
+      lng: destinationLocation.current.lng,
+    });
+
+    intervalRef.current = setInterval(() => {
+      updatePassengerMarkerOnly();
+    }, 3000);
+  }
 
   return (
     <>
-      
       <Header cookie={cookie} />
       <h1>Customer Ride Page</h1>
 
-      {!rideAccepted && <h1>WAITING FOR RIDE ...</h1>}
-      {!passengerPickedUp && rideAccepted && (
+      {!rideAccepted && !rideCompleted ? (
+        <h1>WAITING FOR RIDE ...</h1>
+      ) : !rideCompleted ? (
+        <h1>RIDE HAS BEEN ACCEPTED!!!!!</h1>
+      ) : (
+        <></>
+      )}
+      {!rideCompleted && (
         <>
-          <h1>RIDE HAS BEEN ACCEPTED!!!!!</h1>
           <div id="ride-accepted-map"></div>
           <button
             onClick={() => {
               console.log("interval stopped");
-              clearInterval(afterRideAcceptedInterval.current);
+              clearInterval(intervalRef.current);
             }}
           >
             stop interval
           </button>
         </>
       )}
-      {passengerPickedUp && rideAccepted && !rideCompleted && (
-        <>
-          <h1>PASSENGER PICKED UP!!</h1>
-          <div id="passenger-picked-up-map"></div>
-          <button
-            onClick={() => {
-              console.log("interval stopped");
-              clearInterval(afterPassengerPickupInterval.current);
-            }}
-          >
-            stop interval
-          </button>
-        </>
-      )}
+
       {rideCompleted && (
         <>
           <h1>YOU DID IT!!!</h1>

@@ -168,7 +168,7 @@ function Home() {
       destinationLocation.current,
       currentMap.current
     );
-    // Create markers
+    // update markers
     driverMarker.current.setPosition(driverLocation.current);
     destinationMarker.current.setPosition(destinationLocation.current);
 
