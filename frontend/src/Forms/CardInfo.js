@@ -11,7 +11,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Alert from "@mui/material/Alert";
 import { stateAcronyms } from "./Categories";
 import Grid from "@mui/material/Grid";
-import logo from "../mock_logo.jpg";
+import logo from "../logo.png";
 import dayjs from "dayjs";
 import {
   isValidZipCode,
@@ -19,7 +19,7 @@ import {
   isValidName,
   isValidCVV,
   isValidCard,
-} from "./Valdiation";
+} from "./Validation";
 import bg from "../mock-bg.jpg";
 import { styled } from '@mui/system';
 
@@ -39,7 +39,7 @@ const CardInfo = (props) => {
   const [addressError, setAddressError] = useState(false);
   const [zipCodeError, setZipCodeError] = useState(false);
   const [cardNumberError, setCardNumberError] = useState(false);
-  const [expDateError, setExpDateError] = useState(false);
+  const [expDateError, setExpDateError] = useState(null);
   const [cvvError, setCVVError] = useState(false);
   const [regSuccess, setRegSuccess] = useState(true);
   const [failed, setFailed] = useState(0);
@@ -63,6 +63,20 @@ const CardInfo = (props) => {
       setZipCode("");
     }
   };
+
+  const errorMessage = React.useMemo(() => {
+    switch (expDateError) {
+      case "minDate": {
+        return "Invalid Date: Expired Card Entered";
+      }
+      case "dateRequired": {
+        return "Card Expiration Required";
+      }
+      default: {
+        return "";
+      }
+    }
+  }, [expDateError]);
 
   const PreviousButton = styled(Button)({
     backgroundColor: 'orange',
@@ -121,12 +135,16 @@ const CardInfo = (props) => {
     } else {
       setCardNumberError(false);
     }
-    if (!exprDate) {
+    console.log(exprDate);
+
+    if (exprDate == null) {
       isfailed = true;
-      setExpDateError(true);
-    } else {
-      setExpDateError(false);
-    }
+      setExpDateError("dateRequired");
+    } else if ((dayjs(exprDate, 'MM/YYYY')).isBefore(dayjs)) {
+      isfailed = true;
+      setExpDateError("minDate");
+    } 
+   
     if (!isValidCVV(CVV)) {
       isfailed = true;
       setCVVError(CVV);
@@ -151,12 +169,12 @@ const CardInfo = (props) => {
         password: basicInfo.password,
         firstName: basicInfo.firstName,
         lastName: basicInfo.lastName,
-        birthDate: null, //basicInfo.birthDate ? basicInfo.birthDate.format("YYYY-MM-DD") : null,
+        birthdate: basicInfo.birthdate.format("YYYY-MM-DD"),
         gender: basicInfo.gender,
         address:
           basicInfo.address + " " + basicInfo.state + " " + basicInfo.zipcode,
         phone: basicInfo.phone,
-        dateJoin: null, //dayjs().format("YYYY-MM-DD"),
+        dateJoin: dayjs().format("YYYY-MM-DD"),
         driverLicense: basicInfo.driverLicense,
         roleName: basicInfo.roleName,
         cardNumber: cardNumber,
@@ -248,10 +266,16 @@ const CardInfo = (props) => {
             />
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                format="MM / YY"
+                format="MM / YYYY"
                 label="Expiration Date"
                 value={exprDate}
+                onError={(newError) => setExpDateError(newError)}
                 minDate={dayjs()}
+                slotProps={{
+                  textField: {
+                    helperText: errorMessage,
+                  },
+                }}
                 views={["month", "year"]}
                 onChange={(newValue) => setExprDate(newValue)}
                 sx={{ mb: 4 }}
@@ -343,6 +367,7 @@ const CardInfo = (props) => {
           <Stack direction="row" sx={{ marginBottom: 2 }}>
             <PreviousButton
               type="submit"
+              onClick={handlePrevious}
               style={{ display: "block", margin: "0 auto", width: "200px" }}
             >
               Previous
