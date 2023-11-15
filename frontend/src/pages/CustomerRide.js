@@ -35,6 +35,7 @@ function CustomerRide() {
   const [rideAccepted, setRideAccepted] = useState(false);
   const [passengerPickedUp, setPassengerPickedUp] = useState(false);
   const [rideCompleted, setRideCompleted] = useState(false);
+  const [rideCancelled, setRideCancelled] = useState(false);
 
   const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
 
@@ -52,8 +53,11 @@ function CustomerRide() {
 
   if (!currentMap.current) initMap("ride-accepted-map");
 
+  if (rideCancelled) {
+    console.log("ride request cancelled!");
+  }
   // --------------------------------- PHASE 1 ---------------------------------
-  if (!rideAccepted) {
+  else if (!rideAccepted) {
     function checkRideAccepted() {
       console.log("checking");
       const url = `${proxy}/api/ride-request/findById?id=${rideRequestId}`;
@@ -266,28 +270,63 @@ function CustomerRide() {
     }, 3000);
   }
 
+  function cancelRideHandler() {
+    clearInterval(intervalRef.current);
+    const url = `${proxy}/api/ride-request/delete?id=${rideRequestId}`;
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((response) => response.text())
+      .then((data) => {
+        if (data !== "SUCCESS")
+          console.log("ride request delete operation failed");
+      })
+      .catch((error) => {
+        console.log("error while deleting: ", error);
+      });
+    setRideCancelled(true);
+  }
+
   return (
     <>
       <Header cookie={cookie} />
       <h1>Customer Ride Page</h1>
 
-      {!rideAccepted && !rideCompleted ? (
+      {rideCancelled && (
+        <>
+          <h2>The ride has been cancelled!</h2>
+          <button
+            onClick={() => {
+              console.log("returned to home page");
+              navigate("/customer", { state: { tokenObject: cookie } });
+            }}
+          >
+            Go to home page
+          </button>
+        </>
+      )}
+
+      {!rideCancelled && !rideAccepted && !rideCompleted ? (
         <h1>WAITING FOR RIDE ...</h1>
-      ) : !rideCompleted ? (
+      ) : !rideCancelled && !rideCompleted ? (
         <h1>RIDE HAS BEEN ACCEPTED!!!!!</h1>
       ) : (
         <></>
       )}
-      {!rideCompleted && (
+
+      {!rideCancelled && !rideCompleted && (
         <>
           <div id="ride-accepted-map"></div>
           <button
             onClick={() => {
-              console.log("interval stopped");
-              clearInterval(intervalRef.current);
+              cancelRideHandler();
             }}
           >
-            stop interval
+            Cancel Ride
           </button>
         </>
       )}

@@ -29,6 +29,7 @@ function Home() {
 
   const [passengerPickedUp, setPassengerPickedUp] = useState(false);
   const [rideCompleted, setRideComopleted] = useState(false);
+  const [rideCancelled, setRideCancelled] = useState(false);
 
   // Initialize map
   if (!currentMap.current) {
@@ -38,7 +39,7 @@ function Home() {
   }
 
   function updateDriverPassengerMarkers() {
-    const passengerUrl = `${proxy}/api/ride-request/findById?id=${rideRequest.id}`;
+    const passengerUrl = `${proxy}/api/ride-request/findById?id=8`; //${rideRequest.id}`;
     const fetchPassengerCoords = fetch(passengerUrl, {
       method: "GET",
       headers: {
@@ -48,6 +49,7 @@ function Home() {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         destinationLocation.current = { lat: data.curLat, lng: data.curLong };
         return { lat: data.curLat, lng: data.curLong };
       });
@@ -68,8 +70,8 @@ function Home() {
       .then((response) => response.text())
       .then((data) => data);
 
-    Promise.all([fetchPassengerCoords, updateDriverCoords]).then(
-      ([passengerResponse, driverResponse]) => {
+    Promise.all([fetchPassengerCoords, updateDriverCoords])
+      .then(([passengerResponse, driverResponse]) => {
         // update markers
         driverMarker.current.setPosition(driverLocation.current);
         destinationMarker.current.setPosition(destinationLocation.current);
@@ -88,11 +90,33 @@ function Home() {
           intervalRef.current = null;
           setPassengerPickedUp(true);
         }
-      }
-    );
+      })
+      .catch((error) => {
+        clearInterval(intervalRef.current);
+        setRideCancelled(true);
+      });
   }
 
   function updateDriverMarkerOnly() {
+    // check for ride cancellation
+    const rideRecordUrl = `${proxy}/api/ride-request/findById?id=${rideRequest.id}`;
+    fetch(rideRecordUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + cookie.token,
+      },
+    })
+      .then((response) => response.json())
+      .catch((error) => {
+        clearInterval(intervalRef.current);
+        setRideCancelled(true);
+      });
+
+    // if ride cancelled, exit out of function
+    if (rideCancelled) return;
+
+    // update driver marker
     userLocation.then((location) => {
       driverLocation.current = location;
       driverMarker.current.setPosition(driverLocation.current);
@@ -114,8 +138,12 @@ function Home() {
     });
   }
 
+  // RIDE CANCELLED
+  if (rideCancelled) {
+    console.log("ride has been cancelled by passenger");
+  }
   // --------------------------- PHASE 1 ---------------------------
-  if (!passengerPickedUp) {
+  else if (!passengerPickedUp) {
     // Render directions to pickup passenger
     userLocation
       .then((location) => {
@@ -150,10 +178,6 @@ function Home() {
           updateDriverPassengerMarkers();
         }, 3000);
       });
-    // DELETE THIS <----------------------------
-    setTimeout(() => {
-      clearInterval(intervalRef.current);
-    }, 15000);
   }
 
   // --------------------------- PHASE 2 ---------------------------
@@ -183,10 +207,54 @@ function Home() {
     }, 15000);
   }
 
+  function cancelRideHandler() {
+    clearInterval(intervalRef.current);
+    const url = `${proxy}/api/ride-request/deleteDriverIdById?id=${rideRequest.id}`;
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + cookie.token,
+      },
+    })
+      .then((response) => response.text())
+      .then((data) => {
+        if (data !== "SUCCESS")
+          console.log("driver could not be removed from request");
+      })
+      .catch((error) => {
+        console.log("error while removing driver from request: ", error);
+      });
+    setRideCancelled(true);
+  }
+
   return (
     <>
       <h1>Driver Ride Page</h1>
-      {!rideCompleted && <div id="driver-ride-map" />}
+      {rideCancelled && (
+        <>
+          <h2>Ride has been cancelled </h2>
+          <button
+            onClick={() => {
+              navigate("/driver", { state: { tokenObject: cookie } });
+            }}
+          >
+            Return to home page
+          </button>
+        </>
+      )}
+      {!rideCancelled && !rideCompleted && (
+        <>
+          <div id="driver-ride-map" />
+          <button
+            onClick={() => {
+              // cancelRideHandler();
+            }}
+          >
+            Cancel Ride
+          </button>
+        </>
+      )}
       {rideCompleted && (
         <>
           <h1>Congratulations, you completed the ride!</h1>

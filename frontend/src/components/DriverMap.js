@@ -163,12 +163,7 @@ function DriverMap({ cookie }) {
 
   requestUpdateInterval.current = setInterval(() => {
     getRideRequestsFromBackend();
-  }, 6000);
-
-  // DELETE THIS LATER <---------------------------------------
-  setTimeout(() => {
-    clearInterval(requestUpdateInterval.current);
-  }, 11000);
+  }, 3000);
 
   function markerCallback(marker, data) {
     const map = marker.getMap();
@@ -180,7 +175,7 @@ function DriverMap({ cookie }) {
     );
     const windowData = {
       date: data.date,
-      time: convertTo12Hour(data.timeRequest),
+      time: data.timeRequest,
       rider: data.passengerId.firstName + " " + data.passengerId.lastName,
       distance: data.distance,
       duration: data.duration,
@@ -241,7 +236,7 @@ function DriverMap({ cookie }) {
     let mins = parseInt(minutes, 10);
     let secs = parseInt(seconds, 10);
 
-    const suffix = hrs >= 12 ? "PM" : "AM";
+    const suffix = hours >= 12 ? "PM" : "AM";
 
     // Convert hours to 12-hour format
     hrs = hrs % 12;
