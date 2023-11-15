@@ -26,4 +26,6 @@ public interface RideRequestService {
     public int getDriverIdOfRideRequest(int passengerId);
 
     public String deleteByPassengerId(int passengerId);
+
+    public String deleteDriverIdById(int id);
 }

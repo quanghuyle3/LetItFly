@@ -98,4 +98,9 @@ public class RideRequestController {
     public int getDriverIdOfRideRequest(@RequestParam("passengerId") int passengerId) {
         return rideRequestService.getDriverIdOfRideRequest(passengerId);
     }
+
+    @GetMapping("/deleteDriverIdById")
+    public String deleteDriverIdById(@RequestParam("id") int id) {
+        return rideRequestService.deleteDriverIdById(id);
+    }
 }
