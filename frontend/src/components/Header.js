@@ -1,54 +1,72 @@
 import React from "react";
-import styled from "styled-components";
-import { Link, useLocation } from "react-router-dom";
-import logo from "../mock_logo.jpg";
-import "../css/Home.css";
+import { Link } from "react-router-dom";
+import { AppBar, Toolbar, Typography, Button } from "@mui/material";
+import logo from "../logo.png";
 
 function Header({ cookie }) {
   return (
-    <header>
-      <Link
-        to={cookie.roleName === "ROLE_DRIVER" ? "/driver" : "/customer"}
-        state={{ tokenObject: cookie }}
-      >
-        <img
-          className="header-left"
-          src={logo}
-          alt="Let It Fly Logo"
-          height={100}
-        />
-      </Link>
-      <div className="header-right">
-        <div className="header-right-top">
-          <p className="header-username">
-            {cookie.email ? `Hi ${cookie.firstName}!` : "Hi username!"}
-          </p>
-        </div>
-
-        <ul className="navbar-home">
+    <AppBar position="static" sx={{ bgcolor: "#fbeddb", overflow: "hidden" }}>
+      <Toolbar>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           <Link
-            to={{
-              pathname: "/customer/settings",
-            }}
-            state={{ cookie: cookie }}
+            to={cookie.roleName === "ROLE_DRIVER" ? "/driver" : "/customer"}
+            state={{ tokenObject: cookie }}
           >
-            <li>Settings</li>
+            <img
+              className="header-left"
+              src={logo}
+              alt="Let It Fly Logo"
+              height="70px"
+              width="auto"
+              maxWidth="30%"
+            />
           </Link>
-          <Link to={"/"}>
-            <li>Logout</li>
-          </Link>
-        </ul>
-      </div>
-    </header>
+        </Typography>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "left",
+            color: "black",
+          }}
+        >
+          <Button
+            color="inherit"
+            component={Link}
+            to="/customer/settings"
+            state={{ cookie: cookie }}
+            sx={{ fontSize: "18px", marginRight: "30px"}}
+            className="Button"
+          >
+            Settings
+          </Button>
+
+          <Button
+            color="inherit"
+            component={Link}
+            to="/"
+            sx={{ fontSize: "18px" }}
+            className="Button"
+          >
+            Logout
+          </Button>
+        </div>
+      </Toolbar>
+      <style jsx>{`
+        @media (max-width: 600px) {
+          div {
+            flex-direction: column;
+            align-items: center;
+          }
+
+          .Button {
+            margin-bottom: 10px;
+            margin-right: 0px;
+          }
+        }
+      `}</style>
+    </AppBar>
   );
 }
-
-const Nav = styled.div`
-  background-color: violet;
-  display: flex;
-  height: 100%;
-  border-bottom: 5px solid blue;
-  /* justify-content: center; */
-`;
 
 export default Header;

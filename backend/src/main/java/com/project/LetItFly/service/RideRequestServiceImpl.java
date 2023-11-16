@@ -164,4 +164,17 @@ public class RideRequestServiceImpl implements RideRequestService {
         }
     }
 
+    @Override
+    public String deleteDriverIdById(int id) {
+
+        RideRequest rideRequest = findRideRequestById(id);
+
+        if (rideRequest == null)
+            return "NOT EXIST";
+
+        rideRequest.setDriverId(null);
+        rideRequestRepository.save(rideRequest);
+        return "SUCCESS";
+    }
+
 }

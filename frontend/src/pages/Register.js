@@ -12,7 +12,6 @@ const RegisterForm = () => {
         console.log("Save");
     }
    console.log(JSON.parse(localStorage.getItem("oldData")));
-    //console.log(basicData)
     const getBasicInfoDataHandler = ( data ) => {
         setBasicData(data)
         setbasicDataRender(false)

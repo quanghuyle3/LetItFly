@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import "../css/Home.css";
-import { createMap } from "./MapUtilities";
+import { createMap, createMarker } from "./MapUtilities";
 
 function Map({ currentMap, userLocation }) {
   useEffect(() => {
@@ -15,6 +15,11 @@ function Map({ currentMap, userLocation }) {
         location
       );
       currentMap.current = map;
+      createMarker({
+        currentMap: currentMap.current,
+        lat: location.lat,
+        lng: location.lng,
+      });
     });
   }
 

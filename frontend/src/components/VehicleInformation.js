@@ -2,7 +2,7 @@ import "../css/Settings.css";
 import Vehicle from "../components/Vehicle";
 import { Fragment, useEffect } from "react";
 import React, { useState } from 'react';
-import { isValidLicensePlate, isValidMake, isValidModel, isValidCarYear } from "../Forms/Valdiation"
+import { isValidLicensePlate, isValidMake, isValidModel, isValidCarYear } from "../Forms/Validation"
 
 function VehicleInformation({cookie}) {
 
