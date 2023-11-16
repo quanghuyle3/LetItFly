@@ -354,7 +354,6 @@ function CustomerRide() {
   return (
     <>
       <Header cookie={cookie} />
-      <h1>Customer Ride Page</h1>
 
       {rideCancelled && (
         <>
@@ -371,10 +370,10 @@ function CustomerRide() {
       )}
 
       {!rideCancelled && !rideAccepted && !rideCompleted ? (
-        <h1>WAITING FOR RIDE ...</h1>
-      ) : !rideCancelled && !rideCompleted ? (
-        <h1>RIDE HAS BEEN ACCEPTED!!!!!</h1>
-      ) : (
+          <p className="texts">Waiting for Ride...</p>
+          ) : !rideCancelled && !rideCompleted ? (
+            <p className="texts">Driver Found</p>
+          ) : (
         <></>
       )}
 

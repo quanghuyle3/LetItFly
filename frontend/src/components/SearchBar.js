@@ -115,6 +115,7 @@ function SearchBar({
           margin: "10px",
           marginLeft: "20px",
           height: "50px",
+          marginRight: "10px",
           backgroundColor: "goldenrod",
           color: "black",
           "&:hover": {

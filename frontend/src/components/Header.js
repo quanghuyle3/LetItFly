@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { AppBar, Toolbar, Typography, Button } from "@mui/material";
 import logo from "../logo.png";
-import { alignProperty } from "@mui/material/styles/cssUtils";
 
 function Header({ cookie }) {
   return (
@@ -17,7 +16,7 @@ function Header({ cookie }) {
               className="header-left"
               src={logo}
               alt="Let It Fly Logo"
-              height="60px"
+              height="70px"
               width="auto"
               maxWidth="30%"
             />
@@ -28,69 +27,46 @@ function Header({ cookie }) {
           style={{
             display: "flex",
             alignItems: "left",
-            color:"black",
-            
+            color: "black",
           }}
         >
           <Button
             color="inherit"
-            
             component={Link}
             to="/customer/settings"
             state={{ cookie: cookie }}
-            sx = {{marginRight: '30px', fontSize: '18px'}}
+            sx={{ fontSize: "18px", marginRight: "30px"}}
+            className="Button"
           >
             Settings
           </Button>
 
-          <Button color="inherit" component={Link} to="/" sx={{ fontSize: '18px'}} >
+          <Button
+            color="inherit"
+            component={Link}
+            to="/"
+            sx={{ fontSize: "18px" }}
+            className="Button"
+          >
             Logout
           </Button>
         </div>
       </Toolbar>
+      <style jsx>{`
+        @media (max-width: 600px) {
+          div {
+            flex-direction: column;
+            align-items: center;
+          }
+
+          .Button {
+            margin-bottom: 10px;
+            margin-right: 0px;
+          }
+        }
+      `}</style>
     </AppBar>
   );
 }
 
 export default Header;
-/*
-
- <div className="header">
-  <nav>
-    <a>
-      <Link
-        to={cookie.roleName === "ROLE_DRIVER" ? "/driver" : "/customer"}
-        state={{ tokenObject: cookie }}
-      >
-        <img
-          className="header-left"
-          src={logo}
-          alt="Let It Fly Logo"
-          height={100}
-        />
-      </Link>
-    </a>
-    <div className="header-right">
-      <p className="header-username">
-        {cookie.email ? `Hi ${cookie.firstName}!` : "Hi username!"}
-      </p>
-      <div class="rightSection">
-       
-        <a class="links">
-          <Link to={"/"}>Logout</Link>
-        </a>
-        <a class="links">
-          <Link
-            to={{
-              pathname: "/customer/settings",
-            }}
-            state={{ cookie: cookie }}
-          >
-            Settings
-          </Link>
-        </a>
-      </div>
-    </div>
-  </nav>
-</div>
-*/
