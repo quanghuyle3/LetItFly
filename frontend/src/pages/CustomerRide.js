@@ -307,11 +307,10 @@ function CustomerRide() {
   return (
     <>
       <Header cookie={cookie} />
-      <h1>Customer Ride Page</h1>
 
       {rideCancelled && (
         <>
-          <h2>The ride has been cancelled!</h2>
+          <p className="texts">The ride has been cancelled!</p>
           <button
             onClick={() => {
               navigate("/customer", { state: { tokenObject: cookie } });
@@ -323,7 +322,7 @@ function CustomerRide() {
       )}
 
       {!rideCancelled && !rideAccepted && !rideCompleted && (
-        <h1>WAITING FOR A DRIVER ...</h1>
+        <p className="texts">WAITING FOR A DRIVER ...</p>
       )}
 
       {!rideCancelled &&
@@ -331,8 +330,8 @@ function CustomerRide() {
         !passengerPickedUp &&
         !rideCompleted && (
           <>
-            <h1>DRIVER ASSIGNED !!</h1>
-            <h2>Driver is on the way to pick you up!</h2>
+            <p className="texts">DRIVER ASSIGNED !!</p>
+            <p className="texts">Driver is on the way to pick you up!</p>
           </>
         )}
 
@@ -341,7 +340,7 @@ function CustomerRide() {
         passengerPickedUp &&
         !rideCompleted && (
           <>
-            <h1>Enroute to destination</h1>
+            <p className="texts">Enroute to destination</p>
           </>
         )}
 
@@ -360,7 +359,7 @@ function CustomerRide() {
 
       {rideCompleted && (
         <>
-          <h1>YOU DID IT!!!</h1>
+          <p className="texts">YOU DID IT!!!</p>
           <button
             onClick={() => {
               navigate("/customer", { state: { tokenObject: cookie } });

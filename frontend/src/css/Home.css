@@ -29,14 +29,13 @@
   height: 60%;
 }
 
-.header-username {
-  padding-top: 12px;
-  text-align: right;
-  padding-right: 5px;
-  margin: 0px;
+.texts {
+  font-family: "Titillium Web", sans-serif;
+  text-align: center;
+  margin: 30px;
   height: 50%;
   font-weight: 700;
-  font-size: 24px;
+  font-size: 35px;
 }
 
 .navbar-home {
@@ -92,7 +91,7 @@
 
 .search-bar-wrapper {
   max-width: 50%;
-  margin: 20px auto 0px auto;
+  margin: 20px auto;
 }
 
 .search-bar {
@@ -102,7 +101,7 @@
   font-weight: 400;
   margin-left: 20px;
   font-size: 20px;
-  width: 77%;
+  width: 76vw;
   border: 2px solid goldenrod;
   transition: border-color 0.3s;
   &:focus {
@@ -144,7 +143,6 @@
 
 .route-details {
   font-family: "Titillium Web", sans-serif;
-
   background-color: bisque;
   width: 49%;
   margin-left: auto;
@@ -154,4 +152,15 @@
   display: flex;
   gap: 10%;
   border-radius: 1rem;
+}
+
+.footer {
+  font-family: "Titillium Web", sans-serif;
+  background-color: #fbeddb;
+  padding-top: 5px;
+  padding-bottom: 10px;
+  color: black;
+  text-align: center;
+  bottom: 0;
+  width: 100%;
 }
