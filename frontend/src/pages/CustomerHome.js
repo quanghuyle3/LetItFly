@@ -6,6 +6,7 @@ import { useLocation } from "react-router-dom";
 import { userLocation } from "../components/MapUtilities";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import Footer from "../components/Footer";
 
 function CustomerHome() {
   const currentRoute = useRef();
@@ -20,8 +21,11 @@ function CustomerHome() {
 
 
   return (
-    <div style={{backgroundColor: 'white'}}>
+    <div style={{backgroundColor: 'white', margin: '0 auto'}}>
       <Header cookie={cookie} />
+      <p className="texts">
+        {cookie.email ? `Welcome ${cookie.firstName}! 👋` : "Welcome username!"}
+      </p>
       <SearchBar
         currentMap={currentMap}
         userLocation={userLocation}
@@ -41,7 +45,7 @@ function CustomerHome() {
             borderRadius: "8px",
             padding: "8px",
             backgroundColor: "white",
-            width: '89vw',
+            minWidth: "89vw",
             margin: "10px auto",
           }}
         >
@@ -58,6 +62,7 @@ function CustomerHome() {
             </Typography>
           </Typography>
         </Box>
+        <Footer></Footer>
       </div>
     </div>
   );

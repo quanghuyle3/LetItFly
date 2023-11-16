@@ -141,7 +141,7 @@ function Login() {
             </Alert>
           </div>
         )}
-        <h2 style={{ textAlign: "center" }}>Let us take care your ride!</h2>
+        <h2 style={{ textAlign: "center" }}>Let us take care of your ride!</h2>
         <form onSubmit={handleSubmit}>
           <TextField
             type="email"

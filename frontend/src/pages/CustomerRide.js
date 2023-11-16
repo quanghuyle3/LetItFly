@@ -7,9 +7,13 @@ import {
   userLocation,
 } from "../components/MapUtilities";
 import { useState, useRef, useEffect } from "react";
+import Map from "../components/Map";
 import pickupIcon from "../person.png";
 import carIcon from "../car.png";
 import Header from "../components/Header";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Footer from "../components/Footer";
 
 
 function CustomerRide() {
@@ -233,14 +237,37 @@ function CustomerRide() {
 
   return (
     <>
-      
+    <div>
       <Header cookie={cookie} />
-      <h1>Customer Ride Page</h1>
+      {!rideAccepted && (
+        <>
+          <p className="texts">Waiting for Ride...</p>
+          <Map currentMap={currentMap} userLocation={userLocation} />
 
-      {!rideAccepted && <h1>WAITING FOR RIDE ...</h1>}
+
+        </>
+      )}
       {!passengerPickedUp && rideAccepted && (
         <>
-          <h1>RIDE HAS BEEN ACCEPTED!!!!!</h1>
+          <p className="texts">Driver Found</p>
+          <div style={{ paddingTop: "20px" }}>
+        <Box
+          className="route-details"
+          sx={{
+            marginTop: "15px",
+            border: "2px solid goldenrod",
+            borderRadius: "8px",
+            padding: "8px",
+            backgroundColor: "white",
+            minWidth: "89vw",
+            margin: "10px auto",
+          }}
+        >
+          <Typography variant="h5" gutterBottom sx={{ textAlign: "center" }}>
+            Driver Details
+          </Typography>
+        </Box>
+      </div>
           <div id="ride-accepted-map"></div>
           <button
             onClick={() => {
@@ -279,7 +306,9 @@ function CustomerRide() {
           </button>
         </>
       )}
+    </div>
     </>
+    
   );
 }
 
