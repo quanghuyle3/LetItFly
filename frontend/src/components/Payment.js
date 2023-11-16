@@ -2,7 +2,7 @@ import "../css/Settings.css";
 import Card from "../components/Card";
 import { Fragment, useEffect } from "react";
 import React, { useState } from 'react';
-import { isValidName, isValidCard, isValidCardType, isValidExpiration,isValidCVV, isValidAddress } from "../Forms/Validation"
+import { isValidCardName, isValidCard, isValidCardType, isValidExpiration,isValidCVV, isValidAddress } from "../Forms/Validation"
 
 function Payment({cookie}) {
 
@@ -79,7 +79,7 @@ function Payment({cookie}) {
         }
 
     const handleAdd = () => {
-        if(isValidName(name) && isValidCard(number) && isValidCardType(type) && isValidExpiration(exp) && isValidCVV(cvv) && isValidAddress(billing)) {
+        if(isValidCardName(name) && isValidCard(number) && isValidCardType(type) && isValidExpiration(exp) && isValidCVV(cvv) && isValidAddress(billing)) {
             var PaymentRequest = {
                 cardNumber: number,
                 expiration: exp,
@@ -112,7 +112,7 @@ function Payment({cookie}) {
         }
         else
         {
-            if(!isValidName(name)) {
+            if(!isValidCardName(name)) {
                 setNameError(true);
             }
             else
@@ -164,17 +164,17 @@ function Payment({cookie}) {
                     {editCard ? (
                         <div>
                             <input type="text" onChange={changeName} placeholder="name"></input>
-                            {nameError && <small>Invalid Name: Only Letters!</small>}
+                            {nameError && <small>Invalid Name: ex.John Smith'</small>}
                             <input type="text" onChange={changeNumber}placeholder="card number"></input>
-                            {numberError && <small>Invalid Number: 16 digit number!</small>}
+                            {numberError && <small>Invalid Card Number: Must have 16 digits</small>}
                             <input type="text" onChange={changeType} placeholder="type"></input>
-                            {typeError && <small>Invalid Type: Only letters!</small>}
+                            {typeError && <small>Invalid Type: ex. Debit</small>}
                             <input type="text" onChange={changeExp} placeholder="expiration"></input>
-                            {expError && <small>Invalid Expiration: month/year: **/****</small>}
+                            {expError && <small>Invalid Expiration: ex. month/year: **/****</small>}
                             <input type="text" onChange={changeCvv} placeholder="cvv"></input>
-                            {cvvError && <small>Invalid CVV: 3 or 4 digits!</small>}
+                            {cvvError && <small>Invalid CVV: Must be 3 or 4 digits</small>}
                             <input type="text" onChange={changeBilling} placeholder="billing address"></input>
-                            {billingError && <small>Invalid Billing Address. No special characters</small>}
+                            {billingError && <small>Invalid Billing Address: No special characters</small>}
                             <button onClick={() => {setEditCard(!editCard); resetBooleans()}}>Cancel</button>
                             <button onClick={() => handleAdd()}>Submit</button>
                         </div>) : (
