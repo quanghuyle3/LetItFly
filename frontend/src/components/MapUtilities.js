@@ -1,7 +1,16 @@
 import { Loader } from "@googlemaps/js-api-loader";
 
 // Haversine formula
-function getDistanceFromLatLngInKm(lat1, lon1, lat2, lon2) {
+/**
+ * @param {Object} start
+ * @param {Object} end
+ * start = {lat: latitude, lng: longitude}
+ * end = {lat: latitude, lng: longitude}
+ */
+function getDistanceFromLatLngInKm(start, end) {
+  const { lat: lat1, lng: lon1 } = start;
+  const { lat: lat2, lng: lon2 } = end;
+
   function deg2rad(deg) {
     return deg * (Math.PI / 180);
   }
@@ -191,6 +200,7 @@ function createMarker(paramObj) {
         const marker = new Marker({
           position: { lat: latitude, lng: longitude },
           map: map,
+          zIndex: 300,
         });
         return marker;
       }

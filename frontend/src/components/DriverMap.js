@@ -6,22 +6,26 @@ import {
   createMap,
   createMarker,
   getDirections,
+  getDistanceFromLatLngInKm,
   userLocation,
 } from "./MapUtilities";
 import carIcon from "../car.png";
 import { useNavigate } from "react-router-dom";
 
 function DriverMap({ cookie }) {
+  const driverLocation = useRef();
   const rideRequestData = useRef();
-  const requestUpdateInterval = useRef();
-  const locationUpdateInterval = useRef();
   const navigate = useNavigate();
   const currentMap = useRef();
   const infoWindowRef = useRef();
+  const intervalRef = useRef();
 
   if (!currentMap.current) {
     initMap();
   }
+
+  const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
+
   function initMap() {
     currentMap.current = userLocation.then((location) => {
       let zoomLevel = 13;
@@ -48,54 +52,67 @@ function DriverMap({ cookie }) {
         }
       });
     });
-    function updateUserLocation() {
-      userLocation.then((location) => {
-        const url = `${proxy}/api/driver-status/updateCoordinatesDriver?driverId=${cookie.id}&curLat=${location.lat}&curLong=${location.lng}`;
-        fetch(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + cookie.token,
-          },
-        })
-          .then((response) => response.text())
-          .then((data) => data)
-          .catch((error) =>
-            console.log(
-              "ERROR: couldn't update current driver location.\n",
-              error
-            )
-          );
-      });
-    }
-
-    locationUpdateInterval.current = setInterval(() => {
-      updateUserLocation();
-    }, 3000);
-
-    // DELETE THIS LATER <-----------------------------------
-    setTimeout(() => {
-      clearInterval(locationUpdateInterval.current);
-    }, 15000);
   }
-  const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
 
-  //fetch ride requests
+  function isRequestDistanceInScope(data) {
+    // Render ride requests up to 35 kilometers to guarantee a 30 min wait time
+    let passengerLocation = {
+      lat: data.curLat,
+      lng: data.curLong,
+    };
+    let distance = getDistanceFromLatLngInKm(
+      driverLocation.current,
+      passengerLocation
+    );
+
+    const ThirtyFiveKilometers = 3.5;
+    if (distance > ThirtyFiveKilometers) return false;
+    return true;
+  }
+
+  //fetch ride requests and update user location
   function getRideRequestsFromBackend() {
-    const url = `${proxy}/api/ride-request/findAll`;
-    fetch(url, {
+    const updateUserLocation = userLocation.then((location) => {
+      driverLocation.current = location;
+      const url = `${proxy}/api/driver-status/updateCoordinatesDriver?driverId=${cookie.id}&curLat=${location.lat}&curLong=${location.lng}`;
+      return fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + cookie.token,
+        },
+      })
+        .then((response) => response.text())
+        .then((data) => data)
+        .catch((error) => {
+          console.log(
+            "ERROR: couldn't update current driver location.\n",
+            error
+          );
+          return error;
+        });
+    });
+
+    const rideRequestUrl = `${proxy}/api/ride-request/findAll`;
+    const getRideRequests = fetch(rideRequestUrl, {
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + cookie.token,
       },
     })
       .then((response) => response.json())
-      .then((data) => {
+      .then((data) => data);
+
+    Promise.all([updateUserLocation, getRideRequests]).then(
+      ([locationUpdateStatus, data]) => {
         // create marker references if first render
         if (!rideRequestData.current) {
           rideRequestData.current = {};
 
           for (let i = 0; i < data.length; i++) {
+            // skip request if not in scope
+            if (!isRequestDistanceInScope(data[i])) continue;
+
             const rideRequestMarker = createMarker({
               currentMap: currentMap.current,
               lat: data[i].curLat,
@@ -120,6 +137,9 @@ function DriverMap({ cookie }) {
         let dataArr = [];
         let dataMap = {};
         for (let i = 0; i < data.length; i++) {
+          // skip request if not in scope
+          if (!isRequestDistanceInScope(data[i])) continue;
+
           dataArr.push(String(data[i].id));
           dataMap[data[i].id] = data[i];
         }
@@ -157,11 +177,11 @@ function DriverMap({ cookie }) {
             marker: newMarker,
           };
         });
-      });
+      }
+    );
   }
   getRideRequestsFromBackend();
-
-  requestUpdateInterval.current = setInterval(() => {
+  intervalRef.current = setInterval(() => {
     getRideRequestsFromBackend();
   }, 3000);
 
