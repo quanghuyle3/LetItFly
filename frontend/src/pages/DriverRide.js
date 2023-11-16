@@ -48,11 +48,7 @@ function Home() {
       },
     })
       .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        destinationLocation.current = { lat: data.curLat, lng: data.curLong };
-        return { lat: data.curLat, lng: data.curLong };
-      });
+      .then((data) => data);
 
     const updateDriverCoords = userLocation
       .then((driverCoords) => {
@@ -72,18 +68,20 @@ function Home() {
 
     Promise.all([fetchPassengerCoords, updateDriverCoords])
       .then(([passengerResponse, driverResponse]) => {
+        destinationLocation.current = {
+          lat: passengerResponse.curLat,
+          lng: passengerResponse.curLong,
+        };
+
         // update markers
         driverMarker.current.setPosition(driverLocation.current);
         destinationMarker.current.setPosition(destinationLocation.current);
 
         // check distance between passenger and driver
         let distance = getDistanceFromLatLngInKm(
-          driverLocation.current.lat,
-          driverLocation.current.lng,
-          destinationLocation.current.lat,
-          destinationLocation.current.lng
+          driverLocation.current,
+          destinationLocation.current
         );
-        console.log("distance: ", distance);
         const FIftyMetersInKm = 0.05;
         if (distance < FIftyMetersInKm) {
           clearInterval(intervalRef.current);
@@ -123,12 +121,11 @@ function Home() {
 
       // check distance between passenger and driver
       let distance = getDistanceFromLatLngInKm(
-        driverLocation.current.lat,
-        driverLocation.current.lng,
-        destinationLocation.current.lat,
-        destinationLocation.current.lng
+        driverLocation.current,
+        destinationLocation.current
       );
-      console.log("distance: ", distance);
+
+      // criteria to see if ride was completed
       const FIftyMetersInKm = 0.05;
       if (distance < FIftyMetersInKm) {
         clearInterval(intervalRef.current);
@@ -140,7 +137,7 @@ function Home() {
 
   // RIDE CANCELLED
   if (rideCancelled) {
-    console.log("ride has been cancelled by passenger");
+    // do nothing here when cancelled, just render the cancel page
   }
   // --------------------------- PHASE 1 ---------------------------
   else if (!passengerPickedUp) {
@@ -194,17 +191,39 @@ function Home() {
     );
     // update markers
     driverMarker.current.setPosition(driverLocation.current);
-    destinationMarker.current.setPosition(destinationLocation.current);
+    destinationMarker.current.setMap(null);
+    destinationMarker.current = null;
+    createMarker({
+      currentMap: currentMap.current,
+      lat: destinationLocation.current.lat,
+      lng: destinationLocation.current.lng,
+    }).then((marker) => (destinationMarker.current = marker));
 
     // update markers in intervals
     intervalRef.current = setInterval(() => {
       updateDriverMarkerOnly();
     }, 3000);
+  }
 
-    // DELETE THIS <----------------------------
-    setTimeout(() => {
-      clearInterval(intervalRef.current);
-    }, 15000);
+  function cancelRideHandler() {
+    clearInterval(intervalRef.current);
+    const url = `${proxy}/api/ride-request/deleteDriverIdById?id=${rideRequest.id}`;
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + cookie.token,
+      },
+    })
+      .then((response) => response.text())
+      .then((data) => {
+        if (data !== "SUCCESS")
+          console.log("driver could not be removed from request");
+      })
+      .catch((error) => {
+        console.log("error while removing driver from request: ", error);
+      });
+    setRideCancelled(true);
   }
 
   function cancelRideHandler() {
@@ -248,7 +267,7 @@ function Home() {
           <div id="driver-ride-map" />
           <button
             onClick={() => {
-              // cancelRideHandler();
+              cancelRideHandler();
             }}
           >
             Cancel Ride

@@ -54,12 +54,27 @@ function CustomerRide() {
   if (!currentMap.current) initMap("ride-accepted-map");
 
   if (rideCancelled) {
-    console.log("ride request cancelled!");
+    clearInterval(intervalRef.current);
+    const url = `${proxy}/api/ride-request/delete?id=${rideRequestId}`;
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((response) => response.text())
+      .then((data) => {
+        if (data !== "SUCCESS")
+          console.log("ride request delete operation failed");
+      })
+      .catch((error) => {
+        console.log("error while deleting: ", error);
+      });
   }
   // --------------------------------- PHASE 1 ---------------------------------
   else if (!rideAccepted) {
     function checkRideAccepted() {
-      console.log("checking");
       const url = `${proxy}/api/ride-request/findById?id=${rideRequestId}`;
       return fetch(url, {
         method: "GET",
@@ -79,8 +94,8 @@ function CustomerRide() {
               lat: data.destLat,
               lng: data.destLong,
             };
-            setRideAccepted(true);
             rideRecord.current = data;
+            setRideAccepted(true);
           }
         });
     }
@@ -92,7 +107,6 @@ function CustomerRide() {
   }
   // --------------------------------- PHASE 2 ---------------------------------
   else if (!passengerPickedUp) {
-    var c1 = 1;
     function updatePassengerDriverLocation() {
       const updatePassengerCoords = userLocation.then((passengerCoords) => {
         passengerLocation.current = passengerCoords;
@@ -120,7 +134,7 @@ function CustomerRide() {
         .then((data) => data);
 
       const checkRideCancelUrl = `${proxy}/api/ride-request/findById?id=${rideRequestId}`;
-      const checkRideCancel = fetch(checkRideCancelUrl, {
+      const checkRideStatus = fetch(checkRideCancelUrl, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -128,71 +142,50 @@ function CustomerRide() {
         },
       })
         .then((response) => response.json())
-        .then((data) => {
-          if (!data.driverId.id) {
-            console.log(data.driverId.id);
-            setRideAccepted(false);
-            return data;
-          }
-        })
-        .catch((error) => {
-          clearInterval(intervalRef.current);
-          setRideCancelled(true);
-          return "RIDE CANCELLED";
-        });
+        .then((data) => data)
+        .catch((error) => error);
 
-      Promise.all([
-        updatePassengerCoords,
-        getDriverCoords,
-        checkRideCancel,
-      ]).then(
-        ([
-          passengerCoordsResponse,
-          DriverCoordsResponse,
-          checkRideCancelResponse,
-        ]) => {
-          // exit function if ride cancelled
-          if (!rideAccepted || rideCancelled) return;
+      Promise.all([updatePassengerCoords, getDriverCoords, checkRideStatus])
+        .then(
+          ([
+            passengerCoordsResponse,
+            DriverCoordsResponse,
+            checkRideStatusResponse,
+          ]) => {
+            if (!checkRideStatusResponse.driverId.id) {
+              clearInterval(intervalRef.current);
+              setRideCancelled(true);
+              return;
+            }
 
-          if (c1 < 2) {
+            // update driver location
             driverLocation.current = {
               lat: DriverCoordsResponse.curLat,
               lng: DriverCoordsResponse.curLong,
             };
-          } else if (c1 < 3) {
-            driverLocation.current = {
-              lat: 37.342430731542294,
-              lng: -121.85440702637351,
-            };
-          } else {
-            driverLocation.current = {
-              lat: 37.33045462745464,
-              lng: -121.88346056553847,
-            };
+
+            // update marker locations
+            passengerMarker.current.setPosition(passengerLocation.current);
+            driverMarker.current.setPosition(driverLocation.current);
+
+            // check distance between driver and passenger
+            let distance = getDistanceFromLatLngInKm(
+              passengerLocation.current,
+              driverLocation.current
+            );
+
+            // criteria to check if passenger has been picked up
+            const FiftyMetersInKm = 0.05;
+            if (distance < FiftyMetersInKm) {
+              clearInterval(intervalRef.current);
+              setPassengerPickedUp(true);
+            }
           }
-          c1++;
-
-          // update marker locations
-          passengerMarker.current.setPosition(passengerLocation.current);
-          driverMarker.current.setPosition(driverLocation.current);
-
-          // check distance between driver and passenger
-          let distance = getDistanceFromLatLngInKm(
-            passengerLocation.current.lat,
-            passengerLocation.current.lng,
-            driverLocation.current.lat,
-            driverLocation.current.lng
-          );
-          console.log("distance: ", distance, "km");
-
-          // criteria to check if passenger has been picked up
-          const FiftyMetersInKm = 0.5;
-          if (distance < FiftyMetersInKm) {
-            clearInterval(intervalRef.current);
-            setPassengerPickedUp(true);
-          }
-        }
-      );
+        )
+        .catch((error) => {
+          clearInterval(intervalRef.current);
+          setRideCancelled(true);
+        });
     }
 
     // get driver location
@@ -245,11 +238,10 @@ function CustomerRide() {
 
   // --------------------------------- PHASE 3 ---------------------------------
   else if (!rideCompleted) {
-    var c2 = 1;
     function updatePassengerMarkerOnly() {
       // check if ride cancelled
       const checkRideCancelUrl = `${proxy}/api/ride-request/findById?id=${rideRequestId}`;
-      fetch(checkRideCancelUrl, {
+      const checkRideStatus = fetch(checkRideCancelUrl, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -257,56 +249,38 @@ function CustomerRide() {
         },
       })
         .then((response) => response.json())
-        .then((data) => {
-          if (!data.driverId.id) {
-            console.log(data.driverId.id);
-            setPassengerPickedUp(false);
-            setRideAccepted(false);
-            return data;
+        .then((data) => data)
+        .catch((error) => error);
+
+      Promise.all([checkRideStatus, userLocation])
+        .then(([rideStatus, location]) => {
+          if (!rideStatus.driverId.id) {
+            clearInterval(intervalRef.current);
+            setRideCancelled(true);
+            return;
+          }
+
+          // update passenger location
+          passengerLocation.current = location;
+          passengerMarker.current.setPosition(passengerLocation.current);
+
+          // check distance between passenger and driver
+          let distance = getDistanceFromLatLngInKm(
+            passengerLocation.current,
+            destinationLocation.current
+          );
+
+          // criteria to check if passenger has been picked up
+          const FiftyMetersInKm = 0.05;
+          if (distance < FiftyMetersInKm) {
+            clearInterval(intervalRef.current);
+            setRideCompleted(true);
           }
         })
         .catch((error) => {
           clearInterval(intervalRef.current);
           setRideCancelled(true);
-          return "RIDE CANCELLED";
         });
-
-      // exit function if ride cancelled
-      if (!rideAccepted || rideCancelled) return;
-
-      userLocation.then((location) => {
-        if (c2 < 2) passengerLocation.current = location;
-        else if (c2 < 3)
-          passengerLocation.current = {
-            lat: 37.476584650800355,
-            lng: -122.17503098766385,
-          };
-        else
-          passengerLocation.current = {
-            lat: 37.615352393734575,
-            lng: -122.38988933765685,
-          };
-        c2++;
-
-        passengerMarker.current.setPosition(passengerLocation.current);
-
-        // check distance between passenger and driver
-        let distance = getDistanceFromLatLngInKm(
-          passengerLocation.current.lat,
-          passengerLocation.current.lng,
-          destinationLocation.current.lat,
-          destinationLocation.current.lng
-        );
-        console.log("destination distance: ", distance, "km");
-
-        // criteria to check if passenger has been picked up
-        const FiftyMetersInKm = 0.6;
-        if (distance < FiftyMetersInKm) {
-          console.log("ride complete!!");
-          clearInterval(intervalRef.current);
-          setRideCompleted(true);
-        }
-      });
     }
 
     // update route to final destination
@@ -330,37 +304,15 @@ function CustomerRide() {
     }, 3000);
   }
 
-  function cancelRideHandler() {
-    clearInterval(intervalRef.current);
-    const url = `${proxy}/api/ride-request/delete?id=${rideRequestId}`;
-    fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-    })
-      .then((response) => response.text())
-      .then((data) => {
-        if (data !== "SUCCESS")
-          console.log("ride request delete operation failed");
-      })
-      .catch((error) => {
-        console.log("error while deleting: ", error);
-      });
-    setRideCancelled(true);
-  }
-
   return (
     <>
       <Header cookie={cookie} />
 
       {rideCancelled && (
         <>
-          <h2>The ride has been cancelled!</h2>
+          <p className="texts">The ride has been cancelled!</p>
           <button
             onClick={() => {
-              console.log("returned to home page");
               navigate("/customer", { state: { tokenObject: cookie } });
             }}
           >
@@ -369,20 +321,35 @@ function CustomerRide() {
         </>
       )}
 
-      {!rideCancelled && !rideAccepted && !rideCompleted ? (
-          <p className="texts">Waiting for Ride...</p>
-          ) : !rideCancelled && !rideCompleted ? (
-            <p className="texts">Driver Found</p>
-          ) : (
-        <></>
+      {!rideCancelled && !rideAccepted && !rideCompleted && (
+        <p className="texts">WAITING FOR A DRIVER ...</p>
       )}
+
+      {!rideCancelled &&
+        rideAccepted &&
+        !passengerPickedUp &&
+        !rideCompleted && (
+          <>
+            <p className="texts">DRIVER ASSIGNED !!</p>
+            <p className="texts">Driver is on the way to pick you up!</p>
+          </>
+        )}
+
+      {!rideCancelled &&
+        rideAccepted &&
+        passengerPickedUp &&
+        !rideCompleted && (
+          <>
+            <p className="texts">Enroute to destination</p>
+          </>
+        )}
 
       {!rideCancelled && !rideCompleted && (
         <>
           <div id="ride-accepted-map"></div>
           <button
             onClick={() => {
-              cancelRideHandler();
+              setRideCancelled(true);
             }}
           >
             Cancel Ride
@@ -392,10 +359,9 @@ function CustomerRide() {
 
       {rideCompleted && (
         <>
-          <h1>YOU DID IT!!!</h1>
+          <p className="texts">YOU DID IT!!!</p>
           <button
             onClick={() => {
-              console.log("returned to home page");
               navigate("/customer", { state: { tokenObject: cookie } });
             }}
           >
