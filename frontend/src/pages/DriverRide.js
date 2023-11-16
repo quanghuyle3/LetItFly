@@ -39,7 +39,7 @@ function Home() {
   }
 
   function updateDriverPassengerMarkers() {
-    const passengerUrl = `${proxy}/api/ride-request/findById?id=${rideRequest.id}`;
+    const passengerUrl = `${proxy}/api/ride-request/findById?id=8`; //${rideRequest.id}`;
     const fetchPassengerCoords = fetch(passengerUrl, {
       method: "GET",
       headers: {
@@ -90,7 +90,6 @@ function Home() {
         }
       })
       .catch((error) => {
-        console.log(error);
         clearInterval(intervalRef.current);
         setRideCancelled(true);
       });
@@ -204,6 +203,27 @@ function Home() {
     intervalRef.current = setInterval(() => {
       updateDriverMarkerOnly();
     }, 3000);
+  }
+
+  function cancelRideHandler() {
+    clearInterval(intervalRef.current);
+    const url = `${proxy}/api/ride-request/deleteDriverIdById?id=${rideRequest.id}`;
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + cookie.token,
+      },
+    })
+      .then((response) => response.text())
+      .then((data) => {
+        if (data !== "SUCCESS")
+          console.log("driver could not be removed from request");
+      })
+      .catch((error) => {
+        console.log("error while removing driver from request: ", error);
+      });
+    setRideCancelled(true);
   }
 
   function cancelRideHandler() {
