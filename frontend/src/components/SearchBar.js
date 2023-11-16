@@ -40,11 +40,27 @@ function SearchBar({
       });
     }
   }
+  function addPadding(number) {
+    number = String(number);
+    if (number.length < 2) number = "0" + number;
+
+    return number;
+  }
 
   function goButtonClickHandler() {
     if (!currentRoute.current) {
       return alert("Please choose a destination!");
     }
+    const date = new Date();
+    const dateStr = `${date.getFullYear()}-${addPadding(
+      date.getMonth() + 1
+    )}-${addPadding(date.getDate())}`;
+    const timeStr = `${addPadding(date.getHours())}:${addPadding(
+      date.getMinutes()
+    )}:${addPadding(date.getSeconds())}`;
+
+    currentRoute.current.date = dateStr;
+    currentRoute.current.time = timeStr;
 
     const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
 
@@ -62,6 +78,11 @@ function SearchBar({
         destLat: currentRoute.current.endLat,
         destLong: currentRoute.current.endLng,
         passengerId: location.state.tokenObject.id,
+        distance: currentRoute.current.distance,
+        duration: currentRoute.current.duration,
+        cost: currentRoute.current.cost,
+        date: currentRoute.current.date,
+        timeRequest: currentRoute.current.time,
       }),
     })
       .then((response) => {
