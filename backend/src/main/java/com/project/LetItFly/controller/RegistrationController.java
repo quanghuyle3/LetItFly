@@ -30,9 +30,6 @@ import com.project.LetItFly.service.VehicleService;
 public class RegistrationController {
 
     private final UserService userService;
-    private final JwtService jwtService;
-    private final PaymentService paymentService;
-    private final VehicleService vehicleService;
 
     @PostMapping("/user")
     public ResponseEntity<String> registration(@RequestBody RegistrationRequest registrationRequest) {
@@ -51,25 +48,4 @@ public class RegistrationController {
 
         return new ResponseEntity<String>("SUCCESS", HttpStatusCode.valueOf(200));
     }
-
-    // @PostMapping("/user")
-    // public ResponseEntity<String> registration(@RequestBody UserRequest
-    // userRequest) {
-    // User user = userService.saveUser(userRequest);
-    // // String jwt = jwtService.generateToken(user);
-    // return ResponseEntity.ok("CREATED");
-    // // return new ResponseEntity(HttpStatusCode.valueOf(200));
-    // }
-
-    // @PostMapping("/payment")
-    // public Payment registerPayment(@RequestBody PaymentRequest paymentRequest) {
-    // return paymentService.savePayment(paymentRequest);
-
-    // }
-
-    // @PostMapping("/vehicle")
-    // public Vehicle registerVehicle(@RequestBody VehicleRequest vehicleRequest) {
-    // return vehicleService.saveVehicle(vehicleRequest);
-
-    // }
 }

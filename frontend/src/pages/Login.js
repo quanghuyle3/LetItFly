@@ -1,14 +1,12 @@
 import React from "react";
-import logo from "../mock_logo.jpg";
+import logo from "../logo.png";
 import { useState, useEffect } from "react";
-import { TextField, Button, Container, Stack } from "@mui/material";
+import { TextField, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
-import { isValidEmail, isValidPassword } from "../Forms/Valdiation";
+import { isValidEmail, isValidPassword } from "../Forms/Validation";
 import Alert from "@mui/material/Alert";
 import { Link } from "react-router-dom";
-import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
 import bg from "../mock-bg.jpg";
 import { styled } from '@mui/system';
 
@@ -143,7 +141,7 @@ function Login() {
             </Alert>
           </div>
         )}
-        <h2 style={{ textAlign: "center" }}>Let us take care your ride!</h2>
+        <h2 style={{ textAlign: "center" }}>Let us take care of your ride!</h2>
         <form onSubmit={handleSubmit}>
           <TextField
             type="email"

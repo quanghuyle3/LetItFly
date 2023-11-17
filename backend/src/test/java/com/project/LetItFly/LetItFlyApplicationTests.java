@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class LetItFlyApplicationTests {
 
 	@Test
-	void contextLoads() {
+	void context() {
 	}
 
 }

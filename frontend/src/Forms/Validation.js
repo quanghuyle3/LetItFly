@@ -92,8 +92,25 @@ export function isValidCardType(CardType) {
   return cardTypeRegex.test(CardType);
 }
 
+export function isValidCardName(name) {
+  const nameRegex = /^[A-Z][a-zA-Z]*(?:\s[A-Z][a-zA-Z]*)*$/;
+  return nameRegex.test(name);
+}
+
 export function isValidExpiration(exp) {
   const expRegex = /^\d{2}\/\d{4}$/
-  return expRegex.test(exp);
+  if (!expRegex.test(exp)) {
+    // Invalid format
+    return false;
+  }
+
+  // Extract month and year from the expiration date
+  const [month, year] = exp.split('/').map(num => parseInt(num, 10));
+
+  // Check if the expiration date is in the future
+  const currentDate = new Date();
+  const expirationDate = new Date(year, month - 1); // Month is 0-indexed in JavaScript
+
+  return expirationDate > currentDate;
 }
 

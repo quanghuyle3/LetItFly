@@ -1,7 +1,16 @@
 import { Loader } from "@googlemaps/js-api-loader";
 
 // Haversine formula
-function getDistanceFromLatLngInKm(lat1, lon1, lat2, lon2) {
+/**
+ * @param {Object} start
+ * @param {Object} end
+ * start = {lat: latitude, lng: longitude}
+ * end = {lat: latitude, lng: longitude}
+ */
+function getDistanceFromLatLngInKm(start, end) {
+  const { lat: lat1, lng: lon1 } = start;
+  const { lat: lat2, lng: lon2 } = end;
+
   function deg2rad(deg) {
     return deg * (Math.PI / 180);
   }
@@ -77,16 +86,18 @@ function autocomplete(inputElement, callback) {
   });
 }
 
-/**
- *
- * @param {lat: current_latitude, lng: current_longitude} currentLocation
- * @param {lat: destination_latitude, lng: destination_longitude} destinationLocation
- * @param {Promise} currentMap
- * @param {useRef} currentRoute
- * @returns
- */
 var directionsRenderer;
 var directionsService;
+/**
+ * - currentLocation: {lat: latitude, lng: longitude}
+ * - destinationLocation: {lat: latitude, lng: longitude}
+ * - currentMap: promise function
+ * - currentRoute: useRef hook
+ * @param {Object} currentLocation
+ * @param {Object} destinationLocation
+ * @param {Promise} currentMap
+ * @param {Object} currentRoute
+ */
 function getDirections(
   currentLocation,
   destinationLocation,
@@ -168,7 +179,7 @@ function createMap(mapContainer, centerCoords, zoomLevel) {
 /**
  * Returns a google map marker
  * @param {Object} paramObj with 4 fields
- *  - currentMap: map object to display marker on [REQUIRED]
+ *  - currentMap: map promise to display marker on [REQUIRED]
  *  - imageUrl: image to be used as marker icon [optional]
  *  - lat: latitude [REQUIRED]
  *  - lng: longitude [REQUIRED]
@@ -182,12 +193,14 @@ function createMarker(paramObj) {
           position: { lat: latitude, lng: longitude },
           map: map,
           icon: imageUrl,
+          zIndex: 300,
         });
         return marker;
       } else {
         const marker = new Marker({
           position: { lat: latitude, lng: longitude },
           map: map,
+          zIndex: 300,
         });
         return marker;
       }

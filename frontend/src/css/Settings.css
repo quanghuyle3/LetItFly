@@ -1,14 +1,55 @@
-label {
-    display: block; 
-    margin-bottom: 5px; 
+.row {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+  }
+  
+  /* Header styling */
+  h1 {
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  /* Label styling */
+  label {
+    display: block;
+    margin-top: 10px;
     font-weight: bold;
-}
-
-input {
-    width: 300px;
-}
-
-.row{
-    width: 50%;
-    margin: 0 auto;
-}
+  }
+  
+  /* Input and paragraph styling */
+  input,
+  p {
+    margin: 8px 0;
+    padding: 8px;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  /* Button styling */
+  button {
+    margin-right: 10px;
+    margin-top: 10px;
+    padding: 10px 15px;
+    cursor: pointer;
+    background-color: rgb(231, 175, 35);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  /* Small error message styling */
+  small {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+  }

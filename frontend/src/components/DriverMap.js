@@ -6,19 +6,26 @@ import {
   createMap,
   createMarker,
   getDirections,
+  getDistanceFromLatLngInKm,
   userLocation,
 } from "./MapUtilities";
-import carIcon from "../driver-icon.png";
+import carIcon from "../car.png";
 import { useNavigate } from "react-router-dom";
 
 function DriverMap({ cookie }) {
+  const driverLocation = useRef();
+  const rideRequestData = useRef();
   const navigate = useNavigate();
   const currentMap = useRef();
   const infoWindowRef = useRef();
+  const intervalRef = useRef();
 
   if (!currentMap.current) {
     initMap();
   }
+
+  const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
+
   function initMap() {
     currentMap.current = userLocation.then((location) => {
       let zoomLevel = 13;
@@ -47,29 +54,136 @@ function DriverMap({ cookie }) {
     });
   }
 
-  //fetch ride requests
-  const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
-  const url = `${proxy}/api/ride-request/findAll`;
+  function isRequestDistanceInScope(data) {
+    // Render ride requests up to 35 kilometers to guarantee a 30 min wait time
+    let passengerLocation = {
+      lat: data.curLat,
+      lng: data.curLong,
+    };
+    let distance = getDistanceFromLatLngInKm(
+      driverLocation.current,
+      passengerLocation
+    );
 
-  fetch(url, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + cookie.token,
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      for (let i = 0; i < data.length; i++) {
-        const rideRequestMarker = createMarker({
-          currentMap: currentMap.current,
-          lat: data[i].curLat,
-          lng: data[i].curLong,
+    const ThirtyFiveKilometers = 3.5;
+    if (distance > ThirtyFiveKilometers) return false;
+    return true;
+  }
+
+  //fetch ride requests and update user location
+  function getRideRequestsFromBackend() {
+    const updateUserLocation = userLocation.then((location) => {
+      driverLocation.current = location;
+      const url = `${proxy}/api/driver-status/updateCoordinatesDriver?driverId=${cookie.id}&curLat=${location.lat}&curLong=${location.lng}`;
+      return fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + cookie.token,
+        },
+      })
+        .then((response) => response.text())
+        .then((data) => data)
+        .catch((error) => {
+          console.log(
+            "ERROR: couldn't update current driver location.\n",
+            error
+          );
+          return error;
         });
-        rideRequestMarker.then((marker) => {
-          marker.addListener("click", () => markerCallback(marker, data[i]));
+    });
+
+    const rideRequestUrl = `${proxy}/api/ride-request/findAll`;
+    const getRideRequests = fetch(rideRequestUrl, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + cookie.token,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => data);
+
+    Promise.all([updateUserLocation, getRideRequests]).then(
+      ([locationUpdateStatus, data]) => {
+        // create marker references if first render
+        if (!rideRequestData.current) {
+          rideRequestData.current = {};
+
+          for (let i = 0; i < data.length; i++) {
+            // skip request if not in scope
+            if (!isRequestDistanceInScope(data[i])) continue;
+
+            const rideRequestMarker = createMarker({
+              currentMap: currentMap.current,
+              lat: data[i].curLat,
+              lng: data[i].curLong,
+            });
+            rideRequestMarker.then((marker) => {
+              marker.addListener("click", () =>
+                markerCallback(marker, data[i])
+              );
+            });
+
+            rideRequestData.current[data[i].id] = {
+              data: data[i],
+              marker: rideRequestMarker,
+            };
+          }
+          return;
+        }
+
+        // compare incoming data with rendered markers
+        let markerArr = Object.keys(rideRequestData.current);
+        let dataArr = [];
+        let dataMap = {};
+        for (let i = 0; i < data.length; i++) {
+          // skip request if not in scope
+          if (!isRequestDistanceInScope(data[i])) continue;
+
+          dataArr.push(String(data[i].id));
+          dataMap[data[i].id] = data[i];
+        }
+        let rmMarker = [];
+        rmMarker = markerArr.filter((element) => !dataArr.includes(element));
+        let addMarker = [];
+        addMarker = dataArr.filter((element) => !markerArr.includes(element));
+
+        // delete markers from map
+        rmMarker.forEach((i) => {
+          i = Number(i);
+          rideRequestData.current[i].marker.then((marker) =>
+            marker.setMap(null)
+          );
+          delete rideRequestData.current[i];
+        });
+
+        // add markers to map
+        addMarker.forEach((i) => {
+          i = Number(i);
+          const newMarker = createMarker({
+            currentMap: currentMap.current,
+            lat: dataMap[i].curLat,
+            lng: dataMap[i].curLong,
+          });
+
+          newMarker.then((marker) => {
+            marker.addListener("click", () =>
+              markerCallback(marker, dataMap[i])
+            );
+          });
+
+          rideRequestData.current[i] = {
+            data: dataMap[i],
+            marker: newMarker,
+          };
         });
       }
-    });
+    );
+  }
+  getRideRequestsFromBackend();
+  intervalRef.current = setInterval(() => {
+    getRideRequestsFromBackend();
+  }, 3000);
 
   function markerCallback(marker, data) {
     const map = marker.getMap();
@@ -81,7 +195,7 @@ function DriverMap({ cookie }) {
     );
     const windowData = {
       date: data.date,
-      time: convertTo12Hour(data.timeRequest),
+      time: data.timeRequest,
       rider: data.passengerId.firstName + " " + data.passengerId.lastName,
       distance: data.distance,
       duration: data.duration,
@@ -93,12 +207,29 @@ function DriverMap({ cookie }) {
       infoWindow.open(map, marker);
       infoWindow.addListener("domready", () => {
         document.getElementById("infoButton").addEventListener("click", () => {
-          navigate("/driver/ride", {
-            state: { cookie: cookie, rideRequest: data },
+          updateDatabaseToAcceptRide(data).then((databaseUpdatedResponse) => {
+            if (databaseUpdatedResponse !== "SUCCESS")
+              console.error("ERROR: database did not get updated");
+            navigate("/driver/ride", {
+              state: { cookie: cookie, rideRequest: data },
+            });
           });
         });
       });
     });
+  }
+
+  function updateDatabaseToAcceptRide(rideRequest) {
+    const url = `${proxy}/api/ride-request/setDriverToRideRequest?driverId=${cookie.id}&rideId=${rideRequest.id}`;
+    return fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + cookie.token,
+      },
+    })
+      .then((response) => response.text())
+      .then((data) => data);
   }
 
   function createInfoWindowContent(data) {
@@ -110,8 +241,9 @@ function DriverMap({ cookie }) {
         <p><strong>Rider:</strong> ${data.rider}</p>
         <p><strong>Distance:</strong> ${data.distance}</p>
         <p><strong>Duration:</strong> ${data.duration}</p>
-        <p><strong>Profit:</strong> <span style="color: green;">${data.profit
-      }</span></p>
+        <p><strong>Profit:</strong> <span style="color: green;">${
+          data.profit
+        }</span></p>
         <button id="infoButton" style="cursor: pointer;">Accept</button>
       </div>
     `;
@@ -124,7 +256,7 @@ function DriverMap({ cookie }) {
     let mins = parseInt(minutes, 10);
     let secs = parseInt(seconds, 10);
 
-    const suffix = hrs >= 12 ? "PM" : "AM";
+    const suffix = hours >= 12 ? "PM" : "AM";
 
     // Convert hours to 12-hour format
     hrs = hrs % 12;
