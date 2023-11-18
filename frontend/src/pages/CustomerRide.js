@@ -205,6 +205,11 @@ function CustomerRide() {
         };
       })
 
+      // update passenger coords
+      .then(() => {
+        userLocation.then((location) => (passengerLocation.current = location));
+      })
+
       // render route between driver and passenger
       .then(() => {
         getDirections(
@@ -283,25 +288,33 @@ function CustomerRide() {
         });
     }
 
-    // update route to final destination
-    getDirections(
-      passengerLocation.current,
-      destinationLocation.current,
-      currentMap.current,
-      currentRoute
-    );
-    // update markers
-    driverMarker.current.setMap(null);
-    passengerMarker.current.setPosition(passengerLocation.current);
-    createMarker({
-      currentMap: currentMap.current,
-      lat: destinationLocation.current.lat,
-      lng: destinationLocation.current.lng,
-    });
+    // update pasenger location
+    userLocation
+      .then((location) => (passengerLocation.current = location))
 
-    intervalRef.current = setInterval(() => {
-      updatePassengerMarkerOnly();
-    }, 3000);
+      // update route to final destination
+      .then(() => {
+        getDirections(
+          passengerLocation.current,
+          destinationLocation.current,
+          currentMap.current,
+          currentRoute
+        );
+        // update markers
+        driverMarker.current.setMap(null);
+        passengerMarker.current.setPosition(passengerLocation.current);
+        createMarker({
+          currentMap: currentMap.current,
+          lat: destinationLocation.current.lat,
+          lng: destinationLocation.current.lng,
+        });
+      })
+      .catch((error) => console.error(error))
+      .then(() => {
+        intervalRef.current = setInterval(() => {
+          updatePassengerMarkerOnly();
+        }, 3000);
+      });
   }
 
   return (
