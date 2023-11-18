@@ -90,14 +90,14 @@ function Account({cookie}) {
             {userInfo !== null ? ( 
                 <div>
                     <h1>Account: </h1> 
-                    <label for="fname">First Name:</label>
-                    <p id="fname">{userInfo.firstName}</p>
-                    <label for="lname">Last Name:</label>
+                    <label for="fname" className="label-settings">First Name:</label>
+                    <p id="fname" >{userInfo.firstName}</p>
+                    <label for="lname" className="label-settings">Last Name:</label>
                     <p id="lname">{userInfo.lastName}</p>
-                    <label for="email">Email:</label>
+                    <label for="email" className="label-settings">Email:</label>
                     <p id="email">{userInfo.email}</p>
 
-                    <label for="phone">Phone:</label>
+                    <label for="phone" className="label-settings">Phone:</label>
                     {editPhone ? (
                         <div>
                             <input type="text" onChange={handleChangePhone} placeholder={userInfo.phone}></input>
@@ -111,7 +111,7 @@ function Account({cookie}) {
                         </div>)
                     }
     
-                    <label for="address">Address:</label>
+                    <label for="address" className="label-settings">Address:</label>
                     {editAddress ? (
                         <div>
                             <input type="text" onChange={handleChangeAddress} placeholder={userInfo.address}></input>

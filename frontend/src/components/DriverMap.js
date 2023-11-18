@@ -65,7 +65,7 @@ function DriverMap({ cookie }) {
       passengerLocation
     );
 
-    const ThirtyFiveKilometers = 3.5;
+    const ThirtyFiveKilometers = 100;
     if (distance > ThirtyFiveKilometers) return false;
     return true;
   }

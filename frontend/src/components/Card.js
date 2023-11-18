@@ -44,15 +44,15 @@ function Card(param) {
             {userInfo !== null && userInfo[num].inUse == true ? ( 
                 <div>
                     <h3>Card: {num+1} </h3> 
-                    <label for="name">Name:</label> 
+                    <label className="label-settings" for="name">Name:</label> 
                     <p id="name">{userInfo[num].name}</p>
-                    <label for="number">Number:</label> 
+                    <label  className="label-settings" for="number">Number:</label> 
                     <p id="number">{"************" + userInfo[num].cardNumber.substring(12,16)}</p>
-                    <label for="type">Type:</label> 
+                    <label  className="label-settings" for="type">Type:</label> 
                     <p id="type">{userInfo[num].type}</p>
-                    <label for="exp">Expiration:</label> 
+                    <label className="label-settings" for="exp">Expiration:</label> 
                     <p id="exp">{userInfo[num].expiration}</p>
-                    <label for="address">Billing Address:</label> 
+                    <label  className="label-settings" for="address">Billing Address:</label> 
                     <p id="address">{userInfo[num].billingAddress}</p>
                     <button onClick={handleDel}>Delete Card</button>
                 </div>
