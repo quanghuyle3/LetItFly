@@ -16,4 +16,4 @@ mvn clean install
 docker build -t lif-backend-img .
 
 # command to create a docker container from image
-docker create --name lif-backend -p 8080:8080 lif-backend-img
+docker create --name lif-backend --network lif -p 8080:8080 lif-backend-img
