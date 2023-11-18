@@ -270,6 +270,9 @@ function DriverMap({ cookie }) {
 
   return (
     <>
+      <p className="texts">
+        {cookie.email ? `Welcome ${cookie.firstName}! 👋` : "Welcome username!"}
+      </p>
       <div id="driver-map-container" />
     </>
   );

@@ -10,6 +10,11 @@ import {
 } from "../components/MapUtilities";
 import carIcon from "../car.png";
 import personIcon from "../person.png";
+import Header from "../components/Header";
+import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 function Home() {
   const currentMap = useRef(null);
@@ -192,7 +197,8 @@ function Home() {
         getDirections(
           driverLocation.current,
           destinationLocation.current,
-          currentMap.current
+          currentMap.current,
+          currentRoute
         );
         // update markers
         driverMarker.current.setPosition(driverLocation.current);
@@ -235,41 +241,151 @@ function Home() {
 
   return (
     <>
-      <h1>Driver Ride Page</h1>
+      <Header cookie={cookie} />
+
       {rideCancelled && (
         <>
-          <h2>Ride has been cancelled </h2>
-          <button
-            onClick={() => {
-              navigate("/driver", { state: { tokenObject: cookie } });
+          <Alert variant="filled" severity="error" sx={{ margin: "20px" }}>
+            Ride has been cancelled!
+          </Alert>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
+            }}
+          ></div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
             }}
           >
-            Return to home page
-          </button>
+            <Button
+              variant="contained"
+              sx={{
+                margin: "10px auto",
+                height: "40px",
+                backgroundColor: "goldenrod",
+                color: "black",
+                "&:hover": {
+                  backgroundColor: "goldenrod",
+                },
+              }}
+              onClick={() => {
+                navigate("/driver", { state: { tokenObject: cookie } });
+              }}
+            >
+              RETURN TO HOME PAGE
+            </Button>
+          </div>
         </>
       )}
+      {!rideCancelled && !rideCompleted && !passengerPickedUp && (
+        <p className="texts">ROUTING TO PASSENGER</p>
+      )}
+
+      {!rideCancelled && !rideCompleted && passengerPickedUp && (
+        <p className="texts">ENROUTE TO DESTINATION</p>
+      )}
+
       {!rideCancelled && !rideCompleted && (
         <>
           <div id="driver-ride-map" />
-          <button
-            onClick={() => {
-              cancelRideHandler();
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
             }}
           >
-            Cancel Ride
-          </button>
+            <Button
+              variant="contained"
+              sx={{
+                margin: "10px auto",
+                height: "40px",
+                backgroundColor: "goldenrod",
+                color: "black",
+                "&:hover": {
+                  backgroundColor: "goldenrod",
+                },
+              }}
+              onClick={() => {
+                cancelRideHandler();
+              }}
+            >
+              Cancel Ride
+            </Button>
+          </div>
         </>
       )}
       {rideCompleted && (
         <>
-          <h1>Congratulations, you completed the ride!</h1>
-          <button
-            onClick={() => {
-              navigate("/driver", { state: { tokenObject: cookie } });
+          <p className="texts">RIDE COMPLETED</p>
+          <div>
+            <Box
+              className="route-details"
+              sx={{
+                border: "2px solid goldenrod",
+                borderRadius: "8px",
+                padding: "8px",
+                backgroundColor: "#fbeddb",
+                minWidth: "89vw",
+                margin: "5px auto",
+              }}
+            >
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{ textAlign: "center" }}
+              >
+                <u>Ride Summary</u>
+                <Typography
+                  variant="h3"
+                  sx={{ fontWeight: "bold" }}
+                ></Typography>
+                <Typography variant="body1" sx={{ marginTop: "8px" }}>
+                  <b>Total Cost: </b> ${currentRoute.current.cost}
+                </Typography>
+                <Typography variant="body1">
+                  <b>Ride Duration:</b> {currentRoute.current.duration}
+                </Typography>
+                <Typography variant="body1">
+                  <b>Total Distance:</b> {currentRoute.current.distance}
+                </Typography>
+              </Typography>
+            </Box>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
             }}
           >
-            Return to home page
-          </button>
+            <Button
+              variant="contained"
+              sx={{
+                margin: "10px auto",
+                height: "40px",
+                backgroundColor: "goldenrod",
+                color: "black",
+                "&:hover": {
+                  backgroundColor: "goldenrod",
+                },
+              }}
+              onClick={() => {
+                navigate("/driver", { state: { tokenObject: cookie } });
+              }}
+            >
+              RETURN TO HOME PAGE
+            </Button>
+          </div>
         </>
       )}
     </>
