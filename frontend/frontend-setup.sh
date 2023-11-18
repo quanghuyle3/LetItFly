@@ -13,4 +13,4 @@ docker rmi lif-frontend-img
 docker build -t lif-frontend-img .
 
 # command to create a docker container from image
-docker create --name lif-frontend -p 3000:3000 lif-frontend-img
+docker create --name lif-frontend --network lif -p 3000:3000 lif-frontend-img
