@@ -183,26 +183,33 @@ function Home() {
       lat: rideRequest.destLat,
       lng: rideRequest.destLong,
     };
-    // Render route to final destination
-    getDirections(
-      driverLocation.current,
-      destinationLocation.current,
-      currentMap.current
-    );
-    // update markers
-    driverMarker.current.setPosition(driverLocation.current);
-    destinationMarker.current.setMap(null);
-    destinationMarker.current = null;
-    createMarker({
-      currentMap: currentMap.current,
-      lat: destinationLocation.current.lat,
-      lng: destinationLocation.current.lng,
-    }).then((marker) => (destinationMarker.current = marker));
 
-    // update markers in intervals
-    intervalRef.current = setInterval(() => {
-      updateDriverMarkerOnly();
-    }, 3000);
+    userLocation
+      .then((location) => (driverLocation.current = location))
+
+      // Render route to final destination
+      .then(() => {
+        getDirections(
+          driverLocation.current,
+          destinationLocation.current,
+          currentMap.current
+        );
+        // update markers
+        driverMarker.current.setPosition(driverLocation.current);
+        destinationMarker.current.setMap(null);
+        destinationMarker.current = null;
+        createMarker({
+          currentMap: currentMap.current,
+          lat: destinationLocation.current.lat,
+          lng: destinationLocation.current.lng,
+        }).then((marker) => (destinationMarker.current = marker));
+      })
+      .then(() => {
+        // update markers in intervals
+        intervalRef.current = setInterval(() => {
+          updateDriverMarkerOnly();
+        }, 3000);
+      });
   }
 
   function cancelRideHandler() {
