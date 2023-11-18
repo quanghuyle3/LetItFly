@@ -6,7 +6,6 @@ import { useLocation } from "react-router-dom";
 import { userLocation } from "../components/MapUtilities";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Footer from "../components/Footer";
 
 function CustomerHome() {
   const currentRoute = useRef();
@@ -19,9 +18,8 @@ function CustomerHome() {
   const [duration, setDuration] = useState("0 mins");
   const [cost, setCost] = useState("0");
 
-
   return (
-    <div style={{backgroundColor: 'white', margin: '0 auto'}}>
+    <div style={{ backgroundColor: "white", margin: "0 auto" }}>
       <Header cookie={cookie} />
       <p className="texts">
         {cookie.email ? `Welcome ${cookie.firstName}! 👋` : "Welcome username!"}
@@ -44,7 +42,7 @@ function CustomerHome() {
             border: "2px solid goldenrod",
             borderRadius: "8px",
             padding: "8px",
-            backgroundColor: "white",
+            backgroundColor: "#fbeddb",
             minWidth: "89vw",
             margin: "10px auto",
           }}
@@ -62,7 +60,6 @@ function CustomerHome() {
             </Typography>
           </Typography>
         </Box>
-        <Footer></Footer>
       </div>
     </div>
   );

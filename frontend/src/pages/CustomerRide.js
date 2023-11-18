@@ -11,7 +11,6 @@ import pickupIcon from "../person.png";
 import carIcon from "../car.png";
 import Header from "../components/Header";
 import Button from "@mui/material/Button";
-import Footer from "../components/Footer";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -116,8 +115,10 @@ function CustomerRide() {
               })
               .then((data) => {
                 rideRecord.current.vehicle = data;
+              })
+              .then(() => {
+                setRideAccepted(true);
               });
-            setRideAccepted(true);
           }
         });
     }
@@ -129,7 +130,6 @@ function CustomerRide() {
   }
   // --------------------------------- PHASE 2 ---------------------------------
   else if (!passengerPickedUp) {
-    console.log(rideRecord.current.driverId);
     function updatePassengerDriverLocation() {
       const updatePassengerCoords = userLocation.then((passengerCoords) => {
         passengerLocation.current = passengerCoords;
@@ -181,12 +181,11 @@ function CustomerRide() {
               return;
             }
 
-            // // update driver location
-            // driverLocation.current = {
-            //   lat: DriverCoordsResponse.curLat,
-            //   lng: DriverCoordsResponse.curLong,
-            // };
-            driverLocation.current = passengerLocation.current;
+            // update driver location
+            driverLocation.current = {
+              lat: DriverCoordsResponse.curLat,
+              lng: DriverCoordsResponse.curLong,
+            };
             // update marker locations
             passengerMarker.current.setPosition(passengerLocation.current);
             driverMarker.current.setPosition(driverLocation.current);
@@ -230,7 +229,9 @@ function CustomerRide() {
 
       // update passenger coords
       .then(() => {
-        userLocation.then((location) => (passengerLocation.current = location));
+        return userLocation.then((location) => {
+          passengerLocation.current = location;
+        });
       })
 
       // render route between driver and passenger
@@ -372,7 +373,7 @@ function CustomerRide() {
                 navigate("/customer", { state: { tokenObject: cookie } });
               }}
             >
-              GO HOME
+              RETURN TO HOME PAGE
             </Button>
           </div>
         </>
@@ -395,7 +396,7 @@ function CustomerRide() {
                   border: "2px solid goldenrod",
                   borderRadius: "8px",
                   padding: "8px",
-                  backgroundColor: "white",
+                  backgroundColor: "#fbeddb",
                   minWidth: "89vw",
                   margin: "5px auto",
                 }}
@@ -411,13 +412,13 @@ function CustomerRide() {
                     sx={{ fontWeight: "bold" }}
                   ></Typography>
                   <Typography variant="body1" sx={{ marginTop: "8px" }}>
-                    <b>Driver Name:</b>
+                    <b>Driver Name:</b>{" "}
                     {rideRecord.current.driverId.firstName +
                       " " +
                       rideRecord.current.driverId.lastName}
                   </Typography>
                   <Typography variant="body1">
-                    <b>License Plate:</b>
+                    <b>License Plate:</b>{" "}
                     {rideRecord.current.vehicle[0].licensePlate}
                   </Typography>
                   <Typography variant="body1">
@@ -479,17 +480,69 @@ function CustomerRide() {
 
       {rideCompleted && (
         <>
-          <p className="texts">YOU DID IT!!!</p>
-          <button
-            onClick={() => {
-              navigate("/customer", { state: { tokenObject: cookie } });
+          <p className="texts">RIDE COMPLETED</p>
+          <div>
+            <Box
+              className="route-details"
+              sx={{
+                border: "2px solid goldenrod",
+                borderRadius: "8px",
+                padding: "8px",
+                backgroundColor: "#fbeddb",
+                minWidth: "89vw",
+                margin: "5px auto",
+              }}
+            >
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{ textAlign: "center" }}
+              >
+                <u>Ride Summary</u>
+                <Typography
+                  variant="h3"
+                  sx={{ fontWeight: "bold" }}
+                ></Typography>
+                <Typography variant="body1" sx={{ marginTop: "8px" }}>
+                  <b>Total Cost: </b> ${rideRecord.current.cost}
+                </Typography>
+                <Typography variant="body1">
+                  <b>Ride Duration:</b> {rideRecord.current.duration}
+                </Typography>
+                <Typography variant="body1">
+                  <b>Total Distance:</b> {rideRecord.current.distance}
+                </Typography>
+              </Typography>
+            </Box>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
             }}
           >
-            Go to home page
-          </button>
+            <Button
+              variant="contained"
+              sx={{
+                margin: "10px auto",
+                height: "40px",
+                backgroundColor: "goldenrod",
+                color: "black",
+                "&:hover": {
+                  backgroundColor: "goldenrod",
+                },
+              }}
+              onClick={() => {
+                navigate("/customer", { state: { tokenObject: cookie } });
+              }}
+            >
+              RETURN TO HOME PAGE
+            </Button>
+          </div>
         </>
       )}
-      <footer></footer>
     </>
   );
 }
