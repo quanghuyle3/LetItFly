@@ -17,7 +17,7 @@
   }
   
   /* Label styling */
-  label {
+  .label-settings {
     display: block;
     margin-top: 10px;
     font-weight: bold;
@@ -25,7 +25,7 @@
   
   /* Input and paragraph styling */
   input,
-  p {
+  .row p {
     margin: 8px 0;
     padding: 8px;
     width: 100%;

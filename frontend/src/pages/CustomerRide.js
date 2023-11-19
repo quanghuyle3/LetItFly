@@ -10,6 +10,10 @@ import { useState, useRef } from "react";
 import pickupIcon from "../person.png";
 import carIcon from "../car.png";
 import Header from "../components/Header";
+import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 function CustomerRide() {
   const {
@@ -95,7 +99,26 @@ function CustomerRide() {
               lng: data.destLong,
             };
             rideRecord.current = data;
-            setRideAccepted(true);
+
+            fetch(
+              `${proxy}/api/vehicle/findByUserId?userId=${driverId.current}`,
+              {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "Bearer " + token,
+                },
+              }
+            )
+              .then((response) => {
+                return response.json();
+              })
+              .then((data) => {
+                rideRecord.current.vehicle = data;
+              })
+              .then(() => {
+                setRideAccepted(true);
+              });
           }
         });
     }
@@ -163,7 +186,6 @@ function CustomerRide() {
               lat: DriverCoordsResponse.curLat,
               lng: DriverCoordsResponse.curLong,
             };
-
             // update marker locations
             passengerMarker.current.setPosition(passengerLocation.current);
             driverMarker.current.setPosition(driverLocation.current);
@@ -203,6 +225,13 @@ function CustomerRide() {
           lat: driverRecord.curLat,
           lng: driverRecord.curLong,
         };
+      })
+
+      // update passenger coords
+      .then(() => {
+        return userLocation.then((location) => {
+          passengerLocation.current = location;
+        });
       })
 
       // render route between driver and passenger
@@ -283,25 +312,33 @@ function CustomerRide() {
         });
     }
 
-    // update route to final destination
-    getDirections(
-      passengerLocation.current,
-      destinationLocation.current,
-      currentMap.current,
-      currentRoute
-    );
-    // update markers
-    driverMarker.current.setMap(null);
-    passengerMarker.current.setPosition(passengerLocation.current);
-    createMarker({
-      currentMap: currentMap.current,
-      lat: destinationLocation.current.lat,
-      lng: destinationLocation.current.lng,
-    });
+    // update pasenger location
+    userLocation
+      .then((location) => (passengerLocation.current = location))
 
-    intervalRef.current = setInterval(() => {
-      updatePassengerMarkerOnly();
-    }, 3000);
+      // update route to final destination
+      .then(() => {
+        getDirections(
+          passengerLocation.current,
+          destinationLocation.current,
+          currentMap.current,
+          currentRoute
+        );
+        // update markers
+        driverMarker.current.setMap(null);
+        passengerMarker.current.setPosition(passengerLocation.current);
+        createMarker({
+          currentMap: currentMap.current,
+          lat: destinationLocation.current.lat,
+          lng: destinationLocation.current.lng,
+        });
+      })
+      .catch((error) => console.error(error))
+      .then(() => {
+        intervalRef.current = setInterval(() => {
+          updatePassengerMarkerOnly();
+        }, 3000);
+      });
   }
 
   return (
@@ -310,19 +347,40 @@ function CustomerRide() {
 
       {rideCancelled && (
         <>
-          <p className="texts">The ride has been cancelled!</p>
-          <button
-            onClick={() => {
-              navigate("/customer", { state: { tokenObject: cookie } });
+          <Alert variant="filled" severity="error" sx={{ margin: "20px" }}>
+            Ride has been cancelled!
+          </Alert>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
             }}
           >
-            Go to home page
-          </button>
+            <Button
+              variant="contained"
+              sx={{
+                margin: "10px auto",
+                height: "40px",
+                backgroundColor: "goldenrod",
+                color: "black",
+                "&:hover": {
+                  backgroundColor: "goldenrod",
+                },
+              }}
+              onClick={() => {
+                navigate("/customer", { state: { tokenObject: cookie } });
+              }}
+            >
+              RETURN TO HOME PAGE
+            </Button>
+          </div>
         </>
       )}
 
       {!rideCancelled && !rideAccepted && !rideCompleted && (
-        <p className="texts">WAITING FOR A DRIVER ...</p>
+        <p className="texts">WAITING FOR A DRIVER...</p>
       )}
 
       {!rideCancelled &&
@@ -330,8 +388,52 @@ function CustomerRide() {
         !passengerPickedUp &&
         !rideCompleted && (
           <>
-            <p className="texts">DRIVER ASSIGNED !!</p>
-            <p className="texts">Driver is on the way to pick you up!</p>
+            <p className="texts">DRIVER FOUND</p>
+            <div>
+              <Box
+                className="route-details"
+                sx={{
+                  border: "2px solid goldenrod",
+                  borderRadius: "8px",
+                  padding: "8px",
+                  backgroundColor: "#fbeddb",
+                  minWidth: "89vw",
+                  margin: "5px auto",
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  gutterBottom
+                  sx={{ textAlign: "center" }}
+                >
+                  Driver Information
+                  <Typography
+                    variant="h3"
+                    sx={{ fontWeight: "bold" }}
+                  ></Typography>
+                  <Typography variant="body1" sx={{ marginTop: "8px" }}>
+                    <b>Driver Name:</b>{" "}
+                    {rideRecord.current.driverId.firstName +
+                      " " +
+                      rideRecord.current.driverId.lastName}
+                  </Typography>
+                  <Typography variant="body1">
+                    <b>License Plate:</b>{" "}
+                    {rideRecord.current.vehicle[0].licensePlate}
+                  </Typography>
+                  <Typography variant="body1">
+                    <b>Car:</b>{" "}
+                    {rideRecord.current.vehicle[0].year +
+                      " " +
+                      rideRecord.current.vehicle[0].make[0].toUpperCase() +
+                      rideRecord.current.vehicle[0].make.slice(1) +
+                      " " +
+                      rideRecord.current.vehicle[0].model[0].toUpperCase() +
+                      rideRecord.current.vehicle[0].model.slice(1)}
+                  </Typography>
+                </Typography>
+              </Box>
+            </div>
           </>
         )}
 
@@ -340,33 +442,105 @@ function CustomerRide() {
         passengerPickedUp &&
         !rideCompleted && (
           <>
-            <p className="texts">Enroute to destination</p>
+            <p className="texts">ENROUTE TO DESTINATION</p>
           </>
         )}
 
       {!rideCancelled && !rideCompleted && (
         <>
           <div id="ride-accepted-map"></div>
-          <button
-            onClick={() => {
-              setRideCancelled(true);
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
             }}
           >
-            Cancel Ride
-          </button>
+            <Button
+              variant="contained"
+              sx={{
+                margin: "10px auto",
+                height: "40px",
+                backgroundColor: "goldenrod",
+                color: "black",
+                "&:hover": {
+                  backgroundColor: "goldenrod",
+                },
+              }}
+              onClick={() => {
+                setRideCancelled(true);
+              }}
+            >
+              Cancel Ride
+            </Button>
+          </div>
         </>
       )}
 
       {rideCompleted && (
         <>
-          <p className="texts">YOU DID IT!!!</p>
-          <button
-            onClick={() => {
-              navigate("/customer", { state: { tokenObject: cookie } });
+          <p className="texts">RIDE COMPLETED</p>
+          <div>
+            <Box
+              className="route-details"
+              sx={{
+                border: "2px solid goldenrod",
+                borderRadius: "8px",
+                padding: "8px",
+                backgroundColor: "#fbeddb",
+                minWidth: "89vw",
+                margin: "5px auto",
+              }}
+            >
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{ textAlign: "center" }}
+              >
+                <u>Ride Summary</u>
+                <Typography
+                  variant="h3"
+                  sx={{ fontWeight: "bold" }}
+                ></Typography>
+                <Typography variant="body1" sx={{ marginTop: "8px" }}>
+                  <b>Total Cost: </b> ${rideRecord.current.cost}
+                </Typography>
+                <Typography variant="body1">
+                  <b>Ride Duration:</b> {rideRecord.current.duration}
+                </Typography>
+                <Typography variant="body1">
+                  <b>Total Distance:</b> {rideRecord.current.distance}
+                </Typography>
+              </Typography>
+            </Box>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
             }}
           >
-            Go to home page
-          </button>
+            <Button
+              variant="contained"
+              sx={{
+                margin: "10px auto",
+                height: "40px",
+                backgroundColor: "goldenrod",
+                color: "black",
+                "&:hover": {
+                  backgroundColor: "goldenrod",
+                },
+              }}
+              onClick={() => {
+                navigate("/customer", { state: { tokenObject: cookie } });
+              }}
+            >
+              RETURN TO HOME PAGE
+            </Button>
+          </div>
         </>
       )}
     </>

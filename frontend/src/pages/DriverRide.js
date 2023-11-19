@@ -10,6 +10,11 @@ import {
 } from "../components/MapUtilities";
 import carIcon from "../car.png";
 import personIcon from "../person.png";
+import Header from "../components/Header";
+import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 function Home() {
   const currentMap = useRef(null);
@@ -39,7 +44,7 @@ function Home() {
   }
 
   function updateDriverPassengerMarkers() {
-    const passengerUrl = `${proxy}/api/ride-request/findById?id=8`; //${rideRequest.id}`;
+    const passengerUrl = `${proxy}/api/ride-request/findById?id=${rideRequest.id}`;
     const fetchPassengerCoords = fetch(passengerUrl, {
       method: "GET",
       headers: {
@@ -183,47 +188,34 @@ function Home() {
       lat: rideRequest.destLat,
       lng: rideRequest.destLong,
     };
-    // Render route to final destination
-    getDirections(
-      driverLocation.current,
-      destinationLocation.current,
-      currentMap.current
-    );
-    // update markers
-    driverMarker.current.setPosition(driverLocation.current);
-    destinationMarker.current.setMap(null);
-    destinationMarker.current = null;
-    createMarker({
-      currentMap: currentMap.current,
-      lat: destinationLocation.current.lat,
-      lng: destinationLocation.current.lng,
-    }).then((marker) => (destinationMarker.current = marker));
 
-    // update markers in intervals
-    intervalRef.current = setInterval(() => {
-      updateDriverMarkerOnly();
-    }, 3000);
-  }
+    userLocation
+      .then((location) => (driverLocation.current = location))
 
-  function cancelRideHandler() {
-    clearInterval(intervalRef.current);
-    const url = `${proxy}/api/ride-request/deleteDriverIdById?id=${rideRequest.id}`;
-    fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + cookie.token,
-      },
-    })
-      .then((response) => response.text())
-      .then((data) => {
-        if (data !== "SUCCESS")
-          console.log("driver could not be removed from request");
+      // Render route to final destination
+      .then(() => {
+        getDirections(
+          driverLocation.current,
+          destinationLocation.current,
+          currentMap.current,
+          currentRoute
+        );
+        // update markers
+        driverMarker.current.setPosition(driverLocation.current);
+        destinationMarker.current.setMap(null);
+        destinationMarker.current = null;
+        createMarker({
+          currentMap: currentMap.current,
+          lat: destinationLocation.current.lat,
+          lng: destinationLocation.current.lng,
+        }).then((marker) => (destinationMarker.current = marker));
       })
-      .catch((error) => {
-        console.log("error while removing driver from request: ", error);
+      .then(() => {
+        // update markers in intervals
+        intervalRef.current = setInterval(() => {
+          updateDriverMarkerOnly();
+        }, 3000);
       });
-    setRideCancelled(true);
   }
 
   function cancelRideHandler() {
@@ -249,41 +241,151 @@ function Home() {
 
   return (
     <>
-      <h1>Driver Ride Page</h1>
+      <Header cookie={cookie} />
+
       {rideCancelled && (
         <>
-          <h2>Ride has been cancelled </h2>
-          <button
-            onClick={() => {
-              navigate("/driver", { state: { tokenObject: cookie } });
+          <Alert variant="filled" severity="error" sx={{ margin: "20px" }}>
+            Ride has been cancelled!
+          </Alert>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
+            }}
+          ></div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
             }}
           >
-            Return to home page
-          </button>
+            <Button
+              variant="contained"
+              sx={{
+                margin: "10px auto",
+                height: "40px",
+                backgroundColor: "goldenrod",
+                color: "black",
+                "&:hover": {
+                  backgroundColor: "goldenrod",
+                },
+              }}
+              onClick={() => {
+                navigate("/driver", { state: { tokenObject: cookie } });
+              }}
+            >
+              RETURN TO HOME PAGE
+            </Button>
+          </div>
         </>
       )}
+      {!rideCancelled && !rideCompleted && !passengerPickedUp && (
+        <p className="texts">ROUTING TO PASSENGER</p>
+      )}
+
+      {!rideCancelled && !rideCompleted && passengerPickedUp && (
+        <p className="texts">ENROUTE TO DESTINATION</p>
+      )}
+
       {!rideCancelled && !rideCompleted && (
         <>
           <div id="driver-ride-map" />
-          <button
-            onClick={() => {
-              cancelRideHandler();
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
             }}
           >
-            Cancel Ride
-          </button>
+            <Button
+              variant="contained"
+              sx={{
+                margin: "10px auto",
+                height: "40px",
+                backgroundColor: "goldenrod",
+                color: "black",
+                "&:hover": {
+                  backgroundColor: "goldenrod",
+                },
+              }}
+              onClick={() => {
+                cancelRideHandler();
+              }}
+            >
+              Cancel Ride
+            </Button>
+          </div>
         </>
       )}
       {rideCompleted && (
         <>
-          <h1>Congratulations, you completed the ride!</h1>
-          <button
-            onClick={() => {
-              navigate("/driver", { state: { tokenObject: cookie } });
+          <p className="texts">RIDE COMPLETED</p>
+          <div>
+            <Box
+              className="route-details"
+              sx={{
+                border: "2px solid goldenrod",
+                borderRadius: "8px",
+                padding: "8px",
+                backgroundColor: "#fbeddb",
+                minWidth: "89vw",
+                margin: "5px auto",
+              }}
+            >
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{ textAlign: "center" }}
+              >
+                <u>Ride Summary</u>
+                <Typography
+                  variant="h3"
+                  sx={{ fontWeight: "bold" }}
+                ></Typography>
+                <Typography variant="body1" sx={{ marginTop: "8px" }}>
+                  <b>Total Cost: </b> ${currentRoute.current.cost}
+                </Typography>
+                <Typography variant="body1">
+                  <b>Ride Duration:</b> {currentRoute.current.duration}
+                </Typography>
+                <Typography variant="body1">
+                  <b>Total Distance:</b> {currentRoute.current.distance}
+                </Typography>
+              </Typography>
+            </Box>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
             }}
           >
-            Return to home page
-          </button>
+            <Button
+              variant="contained"
+              sx={{
+                margin: "10px auto",
+                height: "40px",
+                backgroundColor: "goldenrod",
+                color: "black",
+                "&:hover": {
+                  backgroundColor: "goldenrod",
+                },
+              }}
+              onClick={() => {
+                navigate("/driver", { state: { tokenObject: cookie } });
+              }}
+            >
+              RETURN TO HOME PAGE
+            </Button>
+          </div>
         </>
       )}
     </>
