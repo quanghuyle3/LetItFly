@@ -35,6 +35,8 @@ function CustomerRide() {
   const passengerMarker = useRef(null);
   const driverMarker = useRef(null);
   const rideRecord = useRef(null);
+  const statusCheckCount = useRef(0);
+  const routeStep = useRef(0);
 
   const [rideAccepted, setRideAccepted] = useState(false);
   const [passengerPickedUp, setPassengerPickedUp] = useState(false);
@@ -119,6 +121,36 @@ function CustomerRide() {
               .then(() => {
                 setRideAccepted(true);
               });
+          } else if (statusCheckCount.current > 1) {
+            const randomDriverUrl = `${proxy}/api/driver-status/findAll`;
+            fetch(randomDriverUrl, {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token,
+              },
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                let driverIndex = Math.floor(Math.random() * data.length);
+                return data[driverIndex].userId.id;
+              })
+              .then((driverId) => {
+                const url = `${proxy}/api/ride-request/setDriverToRideRequest?driverId=${driverId}&rideId=${rideRequestId}`;
+                fetch(url, {
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token,
+                  },
+                })
+                  .then((response) => response.text())
+                  .then((data) => {
+                    if (data !== "SUCCESS")
+                      console.log("random driver assignment failed");
+                  })
+                  .catch((error) => console.log(error));
+              });
+          } else {
+            statusCheckCount.current++;
           }
         });
     }
@@ -181,11 +213,21 @@ function CustomerRide() {
               return;
             }
 
-            // update driver location
+            let maxStep =
+              currentRoute.current.path.routes[0].overview_path.length - 1;
+            if (routeStep.current > maxStep) routeStep.current = maxStep;
+
+            // overwrite actual coords with route step array
+            let driverCoords =
+              currentRoute.current.path.routes[0].overview_path[
+                routeStep.current
+              ];
+
             driverLocation.current = {
-              lat: DriverCoordsResponse.curLat,
-              lng: DriverCoordsResponse.curLong,
+              lat: driverCoords.lat(),
+              lng: driverCoords.lng(),
             };
+
             // update marker locations
             passengerMarker.current.setPosition(passengerLocation.current);
             driverMarker.current.setPosition(driverLocation.current);
@@ -198,13 +240,16 @@ function CustomerRide() {
 
             // criteria to check if passenger has been picked up
             const FiftyMetersInKm = 0.05;
-            if (distance < FiftyMetersInKm) {
+            if (distance < FiftyMetersInKm || routeStep.current >= maxStep) {
+              routeStep.current = 0;
               clearInterval(intervalRef.current);
               setPassengerPickedUp(true);
             }
+            routeStep.current++;
           }
         )
         .catch((error) => {
+          console.log(error);
           clearInterval(intervalRef.current);
           setRideCancelled(true);
         });
