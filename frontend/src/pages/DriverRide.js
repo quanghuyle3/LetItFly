@@ -142,7 +142,23 @@ function Home() {
 
   // RIDE CANCELLED
   if (rideCancelled) {
-    // do nothing here when cancelled, just render the cancel page
+    clearInterval(intervalRef.current);
+    const url = `${proxy}/api/ride-request/deleteDriverIdById?id=${rideRequest.id}`;
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + cookie.token,
+      },
+    })
+      .then((response) => response.text())
+      .then((data) => {
+        if (data !== "SUCCESS")
+          console.log("driver could not be removed from request");
+      })
+      .catch((error) => {
+        console.log("error while removing driver from request: ", error);
+      });
   }
   // --------------------------- PHASE 1 ---------------------------
   else if (!passengerPickedUp) {
@@ -219,29 +235,13 @@ function Home() {
   }
 
   function cancelRideHandler() {
-    clearInterval(intervalRef.current);
-    const url = `${proxy}/api/ride-request/deleteDriverIdById?id=${rideRequest.id}`;
-    fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + cookie.token,
-      },
-    })
-      .then((response) => response.text())
-      .then((data) => {
-        if (data !== "SUCCESS")
-          console.log("driver could not be removed from request");
-      })
-      .catch((error) => {
-        console.log("error while removing driver from request: ", error);
-      });
+   
     setRideCancelled(true);
   }
 
   return (
     <>
-      <Header cookie={cookie} />
+      <Header cookie={cookie} requestId={rideRequest.id} interval={intervalRef}/>
 
       {rideCancelled && (
         <>
