@@ -343,7 +343,11 @@ function CustomerRide() {
 
   return (
     <>
-      <Header cookie={cookie} requestId={rideRequestId} interval={intervalRef}/>
+      <Header
+        cookie={cookie}
+        requestId={rideRequestId}
+        interval={intervalRef}
+      />
 
       {rideCancelled && (
         <>

@@ -25,6 +25,8 @@ function Home() {
   const destinationMarker = useRef(null);
   const intervalRef = useRef(null);
   const navigate = useNavigate();
+  const routeStep = useRef(0);
+  const routeMaxStep = useRef(0);
 
   const {
     state: { cookie, rideRequest },
@@ -43,6 +45,7 @@ function Home() {
     });
   }
 
+  var driverCoordIndex = 0;
   function updateDriverPassengerMarkers() {
     const passengerUrl = `${proxy}/api/ride-request/findById?id=${rideRequest.id}`;
     const fetchPassengerCoords = fetch(passengerUrl, {
@@ -57,7 +60,12 @@ function Home() {
 
     const updateDriverCoords = userLocation
       .then((driverCoords) => {
-        driverLocation.current = driverCoords;
+        let coords =
+          currentRoute.current.path.routes[0].overview_path[driverCoordIndex];
+        console.log("current route: ", coords, "index: ", driverCoordIndex);
+        driverCoordIndex++;
+
+        driverLocation.current = { lat: coords.lat(), lng: coords.lng() };
         const driverUrl = `${proxy}/api/driver-status/updateCoordinatesDriver?driverId=${cookie.id}&curLat=${driverCoords.lat}&curLong=${driverCoords.lng}`;
 
         return fetch(driverUrl, {
@@ -192,9 +200,12 @@ function Home() {
       })
       // Update markers after rendering markers
       .then(() => {
+        routeMaxStep.current = currentRoute.current;
+        console.log(routeMaxStep.current);
+        console.log(routeStep.current);
         intervalRef.current = setInterval(() => {
           updateDriverPassengerMarkers();
-        }, 3000);
+        }, 500);
       });
   }
 
@@ -235,13 +246,16 @@ function Home() {
   }
 
   function cancelRideHandler() {
-   
     setRideCancelled(true);
   }
 
   return (
     <>
-      <Header cookie={cookie} requestId={rideRequest.id} interval={intervalRef}/>
+      <Header
+        cookie={cookie}
+        requestId={rideRequest.id}
+        interval={intervalRef}
+      />
 
       {rideCancelled && (
         <>
