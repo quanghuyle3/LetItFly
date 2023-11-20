@@ -6,10 +6,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.project.LetItFly.model.DriverStatus;
 import com.project.LetItFly.model.Payment;
 import com.project.LetItFly.model.Role;
 import com.project.LetItFly.model.User;
 import com.project.LetItFly.model.Vehicle;
+import com.project.LetItFly.repository.DriverStatusRepository;
 import com.project.LetItFly.repository.PaymentRepository;
 import com.project.LetItFly.repository.RoleRepository;
 import com.project.LetItFly.repository.UserRepository;
@@ -28,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final PaymentRepository paymentRepository;
     private final VehicleRepository vehicleRepository;
+    private final DriverStatusRepository driverStatusRepository;
 
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -54,7 +57,14 @@ public class UserServiceImpl implements UserService {
         }
 
         // save to db
-        return userRepository.save(user);
+        user = userRepository.save(user);
+
+        if (userRequest.getRoleName().equalsIgnoreCase("ROLE_DRIVER")) {
+            // insert to driver-status table
+            DriverStatus ds = new DriverStatus().builder().userId(user).build();
+            driverStatusRepository.save(ds);
+        }
+        return user;
     }
 
     @Override
@@ -152,6 +162,13 @@ public class UserServiceImpl implements UserService {
 
             // save vehicle to database
             vehicle = vehicleRepository.save(vehicle);
+            // System.out.println("Vehicle: " + vehicle);
+
+            // insert to driver-status table
+            DriverStatus ds = new DriverStatus().builder().userId(user).build();
+            driverStatusRepository.save(ds);
+
+            return user;
         }
 
         return user;
