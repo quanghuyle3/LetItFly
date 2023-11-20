@@ -276,6 +276,7 @@ const BasicInfo = (props) => {
           driverLicense: driverL,
           licensePlate: licensePlate,
           make: make,
+          model: model,
           year: year,
           vehicleType: type,
         };
