@@ -1,0 +1,53 @@
+version: "3"
+services:
+  lif-sql-server:
+    container_name: lif-sql-server
+    build:
+      context: ./sqldb
+      dockerfile: Dockerfile
+    ports:
+      - 3306:3306
+    networks:
+      - lif
+    environment:
+      MYSQL_DATABASE: let_it_fly
+      MYSQL_ROOT_PASSWORD: f23cs160frankbutt
+    healthcheck:
+      test:
+        ["CMD", "mysql", "-p", "f23cs160frankbutt", "-e", "show", "databases;"]
+      interval: 20s
+      timeout: 40s
+      retries: 5
+      start_period: 30s
+
+  lif-backend:
+    container_name: lif-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    networks:
+      - lif
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://24.144.83.210:4000/let_it_fly
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: f23cs160frankbutt
+    depends_on:
+      - lif-sql-server
+
+  lif-frontend:
+    container_name: lif-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    networks:
+      - lif
+    depends_on:
+      - lif-backend
+
+networks:
+  lif:
+    driver: bridge
