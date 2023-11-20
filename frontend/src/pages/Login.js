@@ -8,7 +8,7 @@ import { isValidEmail, isValidPassword } from "../Forms/Validation";
 import Alert from "@mui/material/Alert";
 import { Link } from "react-router-dom";
 import bg from "../mock-bg.jpg";
-import { styled } from '@mui/system';
+import { styled } from "@mui/system";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -56,7 +56,6 @@ function Login() {
       return;
     }
     const loginInfo = { email, password };
-    console.log(loginInfo);
     const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
 
     try {
@@ -69,9 +68,6 @@ function Login() {
       if (response.ok) {
         setFailed(0);
         const tokenObject = await response.json();
-        console.log(tokenObject);
-        const authenticationObject = tokenObject;
-        console.log(authenticationObject.token);
         if (tokenObject.roleName === "ROLE_DRIVER") {
           navigate("/driver", { state: { tokenObject } });
         } else {
@@ -90,21 +86,21 @@ function Login() {
   }
 
   const LoginButton = styled(Button)({
-    backgroundColor: 'orange',
-    color: 'white', // Set text color to white
-    '&:hover': {
-      backgroundColor: '#ed9b02', // Change hover color if needed
-      color: 'white', // Set text color to black
-      border: '1px solid orange',
+    backgroundColor: "orange",
+    color: "white", // Set text color to white
+    "&:hover": {
+      backgroundColor: "#ed9b02", // Change hover color if needed
+      color: "white", // Set text color to black
+      border: "1px solid orange",
     },
   });
 
   const SignUpButton = styled(Button)({
-    backgroundColor: 'limegreen',
-    color: 'white', // Set text color to white
-    '&:hover': {
-      backgroundColor: 'darkgreen', // Change hover color if needed
-      color: 'white', // Set text color to black
+    backgroundColor: "limegreen",
+    color: "white", // Set text color to white
+    "&:hover": {
+      backgroundColor: "darkgreen", // Change hover color if needed
+      color: "white", // Set text color to black
       // border: '1px solid orange',
     },
   });
@@ -130,9 +126,10 @@ function Login() {
           minWidth: "30vw",
         }}
       >
-
-
-        <img src={logo} style={{ maxWidth: '100%', height: 'auto', display: 'block' }} />
+        <img
+          src={logo}
+          style={{ maxWidth: "100%", height: "auto", display: "block" }}
+        />
 
         {regSuccess === true && (
           <div>
@@ -185,8 +182,10 @@ function Login() {
 
           <br></br>
           <hr></hr>
-          <h5 style={{ textAlign: "center", marginBottom: "10px" }}>Don't have an account?</h5>
-          <Link to="/register" style={{ textDecoration: 'none' }}>
+          <h5 style={{ textAlign: "center", marginBottom: "10px" }}>
+            Don't have an account?
+          </h5>
+          <Link to="/register" style={{ textDecoration: "none" }}>
             <SignUpButton
               type="button"
               style={{ display: "block", margin: "0 auto", width: "200px" }}
