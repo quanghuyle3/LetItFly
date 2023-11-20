@@ -65,7 +65,7 @@ function DriverMap({ cookie }) {
       passengerLocation
     );
 
-    const ThirtyFiveKilometers = 3.5;
+    const ThirtyFiveKilometers = 35;
     if (distance > ThirtyFiveKilometers) return false;
     return true;
   }
@@ -241,9 +241,8 @@ function DriverMap({ cookie }) {
         <p><strong>Rider:</strong> ${data.rider}</p>
         <p><strong>Distance:</strong> ${data.distance}</p>
         <p><strong>Duration:</strong> ${data.duration}</p>
-        <p><strong>Profit:</strong> <span style="color: green;">${
-          data.profit
-        }</span></p>
+        <p><strong>Profit:</strong> <span style="color: green;">${data.profit
+      }</span></p>
         <button id="infoButton" style="cursor: pointer;">Accept</button>
       </div>
     `;
