@@ -26,7 +26,6 @@ function Home() {
   const intervalRef = useRef(null);
   const navigate = useNavigate();
   const routeStep = useRef(0);
-  const routeMaxStep = useRef(0);
 
   const {
     state: { cookie, rideRequest },
@@ -45,7 +44,6 @@ function Home() {
     });
   }
 
-  var driverCoordIndex = 0;
   function updateDriverPassengerMarkers() {
     const passengerUrl = `${proxy}/api/ride-request/findById?id=${rideRequest.id}`;
     const fetchPassengerCoords = fetch(passengerUrl, {
@@ -60,13 +58,20 @@ function Home() {
 
     const updateDriverCoords = userLocation
       .then((driverCoords) => {
-        let coords =
-          currentRoute.current.path.routes[0].overview_path[driverCoordIndex];
-        console.log("current route: ", coords, "index: ", driverCoordIndex);
-        driverCoordIndex++;
+        // define max step index
+        let maxStep =
+          currentRoute.current.path.routes[0].overview_path.length - 1;
+        if (routeStep.current > maxStep) routeStep.current = maxStep;
 
-        driverLocation.current = { lat: coords.lat(), lng: coords.lng() };
-        const driverUrl = `${proxy}/api/driver-status/updateCoordinatesDriver?driverId=${cookie.id}&curLat=${driverCoords.lat}&curLong=${driverCoords.lng}`;
+        // overwrite actual coords with route step array
+        driverCoords =
+          currentRoute.current.path.routes[0].overview_path[routeStep.current];
+
+        driverLocation.current = {
+          lat: driverCoords.lat(),
+          lng: driverCoords.lng(),
+        };
+        const driverUrl = `${proxy}/api/driver-status/updateCoordinatesDriver?driverId=${cookie.id}&curLat=${driverLocation.current.lat}&curLong=${driverLocation.current.lng}`;
 
         return fetch(driverUrl, {
           method: "GET",
@@ -96,13 +101,21 @@ function Home() {
           destinationLocation.current
         );
         const FIftyMetersInKm = 0.05;
-        if (distance < FIftyMetersInKm) {
+
+        // passenger picked up if the final coordinate has been arrived
+        let maxStep =
+          currentRoute.current.path.routes[0].overview_path.length - 1;
+
+        if (distance < FIftyMetersInKm || routeStep.current >= maxStep) {
           clearInterval(intervalRef.current);
+          routeStep.current = 0;
           intervalRef.current = null;
           setPassengerPickedUp(true);
         }
+        routeStep.current++;
       })
       .catch((error) => {
+        console.log(error);
         clearInterval(intervalRef.current);
         setRideCancelled(true);
       });
@@ -129,7 +142,19 @@ function Home() {
 
     // update driver marker
     userLocation.then((location) => {
-      driverLocation.current = location;
+      let maxStep =
+        currentRoute.current.path.routes[0].overview_path.length - 1;
+      if (routeStep.current > maxStep) routeStep.current = maxStep;
+
+      // overwrite actual coords with route step array
+      location =
+        currentRoute.current.path.routes[0].overview_path[routeStep.current];
+
+      driverLocation.current = {
+        lat: location.lat(),
+        lng: location.lng(),
+      };
+
       driverMarker.current.setPosition(driverLocation.current);
 
       // check distance between passenger and driver
@@ -140,11 +165,14 @@ function Home() {
 
       // criteria to see if ride was completed
       const FIftyMetersInKm = 0.05;
-      if (distance < FIftyMetersInKm) {
+      if (distance < FIftyMetersInKm || routeStep.current >= maxStep) {
+        routeStep.current = 0;
         clearInterval(intervalRef.current);
         intervalRef.current = null;
         setRideComopleted(true);
       }
+
+      routeStep.current++;
     });
   }
 
@@ -200,9 +228,6 @@ function Home() {
       })
       // Update markers after rendering markers
       .then(() => {
-        routeMaxStep.current = currentRoute.current;
-        console.log(routeMaxStep.current);
-        console.log(routeStep.current);
         intervalRef.current = setInterval(() => {
           updateDriverPassengerMarkers();
         }, 500);
@@ -241,7 +266,7 @@ function Home() {
         // update markers in intervals
         intervalRef.current = setInterval(() => {
           updateDriverMarkerOnly();
-        }, 3000);
+        }, 500);
       });
   }
 

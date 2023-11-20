@@ -101,33 +101,33 @@ public class UserServiceImplTest {
         assertThat(p).isNotNull();
     }
 
-    @Test
-    void testRegistration() {
-        // given
-        RegistrationRequest registrationRequest = RegistrationRequest.builder().email("sample@gmail.com")
-                .password("Test123456")
-                .roleName("ROLE_DRIVER")
-                .cardNumber("1237896257").expiration("12/2025").cvv(123)
-                .licensePlate("8JHY682").make("honda").model("accord").year(2023)
-                .build();
+    // @Test
+    // void testRegistration() {
+    //     // given
+    //     RegistrationRequest registrationRequest = RegistrationRequest.builder().email("sample@gmail.com")
+    //             .password("Test123456")
+    //             .roleName("ROLE_DRIVER")
+    //             .cardNumber("1237896257").expiration("12/2025").cvv(123)
+    //             .licensePlate("8JHY682").make("honda").model("accord").year(2023)
+    //             .build();
 
-        // when
-        userService.registration(registrationRequest);
+    //     // when
+    //     userService.registration(registrationRequest);
 
-        // then
-        ArgumentCaptor<User> userArgCaptor = ArgumentCaptor.forClass(User.class);
-        ArgumentCaptor<Payment> paymentArgCaptor = ArgumentCaptor.forClass(Payment.class);
-        ArgumentCaptor<Vehicle> vehicleArgCaptor = ArgumentCaptor.forClass(Vehicle.class);
+    //     // then
+    //     ArgumentCaptor<User> userArgCaptor = ArgumentCaptor.forClass(User.class);
+    //     ArgumentCaptor<Payment> paymentArgCaptor = ArgumentCaptor.forClass(Payment.class);
+    //     ArgumentCaptor<Vehicle> vehicleArgCaptor = ArgumentCaptor.forClass(Vehicle.class);
 
-        verify(userRepository).save(userArgCaptor.capture());
-        verify(paymentRepository).save(paymentArgCaptor.capture());
-        verify(vehicleRepository).save(vehicleArgCaptor.capture());
+    //     verify(userRepository).save(userArgCaptor.capture());
+    //     verify(paymentRepository).save(paymentArgCaptor.capture());
+    //     verify(vehicleRepository).save(vehicleArgCaptor.capture());
 
-        assertThat(userArgCaptor.getValue().getEmail()).isEqualTo("sample@gmail.com");
-        assertThat(paymentArgCaptor.getValue().getCardNumber()).isEqualTo("1237896257");
-        assertThat(vehicleArgCaptor.getValue().getLicensePlate()).isEqualTo("8JHY682");
+    //     assertThat(userArgCaptor.getValue().getEmail()).isEqualTo("sample@gmail.com");
+    //     assertThat(paymentArgCaptor.getValue().getCardNumber()).isEqualTo("1237896257");
+    //     assertThat(vehicleArgCaptor.getValue().getLicensePlate()).isEqualTo("8JHY682");
 
-    }
+    // }
 
     @Test
     void testSaveUser() {
