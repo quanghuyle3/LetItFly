@@ -121,7 +121,7 @@ function CustomerRide() {
               .then(() => {
                 setRideAccepted(true);
               });
-          } else if (statusCheckCount.current > 1) {
+          } else if (statusCheckCount.current > 2) {
             const randomDriverUrl = `${proxy}/api/driver-status/findAll`;
             return fetch(randomDriverUrl, {
               headers: {
@@ -307,7 +307,7 @@ function CustomerRide() {
           .then(() => {
             intervalRef.current = setInterval(() => {
               updatePassengerDriverLocation();
-            }, 500);
+            }, 300);
           });
       });
   }

@@ -136,7 +136,6 @@ function getDirections(
         if (status === "OK") {
           directionsRenderer.setDirections(results);
         } else console.log("Directions Failed: ", status);
-        console.log(results);
         if (currentRoute) {
           function calcCost(distance) {
             let cost = 15;

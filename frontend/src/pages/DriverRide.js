@@ -230,7 +230,7 @@ function Home() {
       .then(() => {
         intervalRef.current = setInterval(() => {
           updateDriverPassengerMarkers();
-        }, 500);
+        }, 300);
       });
   }
 
@@ -266,7 +266,7 @@ function Home() {
         // update markers in intervals
         intervalRef.current = setInterval(() => {
           updateDriverMarkerOnly();
-        }, 500);
+        }, 200);
       });
   }
 
