@@ -102,7 +102,7 @@ function CustomerRide() {
             };
             rideRecord.current = data;
 
-            fetch(
+            return fetch(
               `${proxy}/api/vehicle/findByUserId?userId=${driverId.current}`,
               {
                 method: "GET",
@@ -123,7 +123,7 @@ function CustomerRide() {
               });
           } else if (statusCheckCount.current > 1) {
             const randomDriverUrl = `${proxy}/api/driver-status/findAll`;
-            fetch(randomDriverUrl, {
+            return fetch(randomDriverUrl, {
               headers: {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + token,
@@ -282,8 +282,8 @@ function CustomerRide() {
       // render route between driver and passenger
       .then(() => {
         getDirections(
-          passengerLocation.current,
           driverLocation.current,
+          passengerLocation.current,
           currentMap.current,
           currentRoute
         );
@@ -302,11 +302,13 @@ function CustomerRide() {
           lat: driverLocation.current.lat,
           lng: driverLocation.current.lng,
           imageUrl: carIcon,
-        }).then((marker) => (driverMarker.current = marker));
-
-        intervalRef.current = setInterval(() => {
-          updatePassengerDriverLocation();
-        }, 3000);
+        })
+          .then((marker) => (driverMarker.current = marker))
+          .then(() => {
+            intervalRef.current = setInterval(() => {
+              updatePassengerDriverLocation();
+            }, 500);
+          });
       });
   }
 
@@ -334,8 +336,22 @@ function CustomerRide() {
             return;
           }
 
+          let maxStep =
+            currentRoute.current.path.routes[0].overview_path.length - 1;
+          if (routeStep.current > maxStep) routeStep.current = maxStep;
+
+          // overwrite actual coords with route step array
+          location =
+            currentRoute.current.path.routes[0].overview_path[
+              routeStep.current
+            ];
+
+          passengerLocation.current = {
+            lat: location.lat(),
+            lng: location.lng(),
+          };
+
           // update passenger location
-          passengerLocation.current = location;
           passengerMarker.current.setPosition(passengerLocation.current);
 
           // check distance between passenger and driver
@@ -346,10 +362,12 @@ function CustomerRide() {
 
           // criteria to check if passenger has been picked up
           const FiftyMetersInKm = 0.05;
-          if (distance < FiftyMetersInKm) {
+          if (distance < FiftyMetersInKm || routeStep.current >= maxStep) {
             clearInterval(intervalRef.current);
+            routeStep.current = 0;
             setRideCompleted(true);
           }
+          routeStep.current++;
         })
         .catch((error) => {
           clearInterval(intervalRef.current);
@@ -382,7 +400,7 @@ function CustomerRide() {
       .then(() => {
         intervalRef.current = setInterval(() => {
           updatePassengerMarkerOnly();
-        }, 3000);
+        }, 200);
       });
   }
 
