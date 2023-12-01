@@ -135,40 +135,46 @@ function getDirections(
       directionsService.route(request, (results, status) => {
         if (status === "OK") {
           directionsRenderer.setDirections(results);
-        } else console.log("Directions Failed: ", status);
-        if (currentRoute) {
-          function calcCost(distance) {
-            let cost = 15;
-            const mile = 1609.34;
-            distance = distance / mile; // convert meters to miles
-            if (distance < 2) return cost.toFixed(2);
-            distance = distance - 2; // first two miles are free
-            if (distance <= 10) {
-              cost += 0.25 * distance;
+          if (currentRoute) {
+            function calcCost(distance) {
+              let cost = 15;
+              const mile = 1609.34;
+              distance = distance / mile; // convert meters to miles
+              if (distance < 2) return cost.toFixed(2);
+              distance = distance - 2; // first two miles are free
+              if (distance <= 10) {
+                cost += 0.25 * distance;
+                return cost.toFixed(2);
+              }
+              cost += 0.25 * 5;
+              cost += 1.1 * (distance - 5);
               return cost.toFixed(2);
             }
-            cost += 0.25 * 5;
-            cost += 1.1 * (distance - 5);
-            return cost.toFixed(2);
+            currentRoute.current = {
+              zero_results: false,
+              distance: results.routes[0].legs[0].distance.text,
+              duration: results.routes[0].legs[0].duration.text,
+              cost: calcCost(results.routes[0].legs[0].distance.value),
+              startLat: results.routes[0].legs[0].start_location.lat(),
+              startLng: results.routes[0].legs[0].start_location.lng(),
+              endLat: results.routes[0].legs[0].end_location.lat(),
+              endLng: results.routes[0].legs[0].end_location.lng(),
+              path: results,
+            };
           }
-          currentRoute.current = {
-            distance: results.routes[0].legs[0].distance.text,
-            duration: results.routes[0].legs[0].duration.text,
-            cost: calcCost(results.routes[0].legs[0].distance.value),
-            startLat: results.routes[0].legs[0].start_location.lat(),
-            startLng: results.routes[0].legs[0].start_location.lng(),
-            endLat: results.routes[0].legs[0].end_location.lat(),
-            endLng: results.routes[0].legs[0].end_location.lng(),
-            path: results,
-          };
-        }
-        if (setDistance) setDistance(currentRoute.current.distance);
-        if (setDuration) setDuration(currentRoute.current.duration);
-        if (setCost) setCost(currentRoute.current.cost);
+          if (setDistance) setDistance(currentRoute.current.distance);
+          if (setDuration) setDuration(currentRoute.current.duration);
+          if (setCost) setCost(currentRoute.current.cost);
+        } else if (status === "ZERO_RESULTS") {
+          clearDirections();
+          if (currentRoute) currentRoute.current = { zero_results: true };
+          if (setDistance) setDistance(0);
+          if (setDuration) setDuration(0);
+          if (setCost) setCost(0);
+        } else console.log("Directions Failed: ", status);
       });
     });
 }
-
 function clearDirections() {
   if (directionsRenderer) directionsRenderer.set("directions", null);
 }

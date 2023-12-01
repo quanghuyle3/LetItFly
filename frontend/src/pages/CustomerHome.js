@@ -6,6 +6,7 @@ import { useLocation } from "react-router-dom";
 import { userLocation } from "../components/MapUtilities";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
 
 function CustomerHome() {
   const currentRoute = useRef();
@@ -21,6 +22,11 @@ function CustomerHome() {
   return (
     <div style={{ backgroundColor: "white", margin: "0 auto" }}>
       <Header cookie={cookie} />
+      {currentRoute.current && currentRoute.current.zero_results && (
+        <Alert variant="filled" severity="error" sx={{ margin: "20px" }}>
+          No route available for selected destination
+        </Alert>
+      )}
       <p className="texts">
         {cookie.email ? `Welcome ${cookie.firstName}! 👋` : "Welcome username!"}
       </p>
