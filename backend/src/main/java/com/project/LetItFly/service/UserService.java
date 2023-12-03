@@ -26,4 +26,8 @@ public interface UserService {
     public User findUserByDriverLicense(String driverLicense);
 
     public User registration(RegistrationRequest registrationRequest);
+
+    public void updateActive(User user);
+
+    public void updateActive(String email, boolean active);
 }

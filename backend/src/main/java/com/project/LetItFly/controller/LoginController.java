@@ -11,8 +11,10 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.LetItFly.configuration.JwtService;
@@ -42,6 +44,16 @@ public class LoginController {
 
             User user = userService.findUserByEmail(authRequest.getEmail());
 
+            // conflict, user already logs in
+            if (user.isActive()) {
+                return ResponseEntity.status(HttpStatusCode.valueOf(409))
+                        .body(new AuthenticationResponse());
+            }
+
+            // otherwise, set active to true to indicate already logs in
+            user.setActive(true);
+            userService.updateActive(user);
+
             List<Role> roles = user.getRoles();
 
             String jwt = jwtService.generateToken(user);
@@ -60,5 +72,11 @@ public class LoginController {
             return ResponseEntity.status(HttpStatusCode.valueOf(423)) // locked
                     .body(new AuthenticationResponse());
         }
+    }
+
+    @GetMapping("/logout-active")
+    public ResponseEntity<String> logout(@RequestParam("email") String email) {
+        userService.updateActive(email, false);
+        return ResponseEntity.ok().body("SUCCESS");
     }
 }

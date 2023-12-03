@@ -34,7 +34,7 @@ public class RegistrationRequest {
 
     private String driverLicense;
 
-    private boolean active = true;
+    private boolean active = false;
 
     private boolean verified;
 

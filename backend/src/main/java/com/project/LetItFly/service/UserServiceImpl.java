@@ -174,4 +174,16 @@ public class UserServiceImpl implements UserService {
         return user;
 
     }
+
+    @Override
+    public void updateActive(User user) {
+        userRepository.save(user);
+    }
+
+    @Override
+    public void updateActive(String email, boolean active) {
+        User user = userRepository.findUserByEmail(email);
+        user.setActive(active);
+        userRepository.save(user);
+    }
 }
