@@ -70,7 +70,7 @@ public class User implements UserDetails {
     private String driverLicense;
 
     @Column(name = "active")
-    private boolean active = true;
+    private boolean active = false;
 
     @Column(name = "verified")
     private boolean verified;
