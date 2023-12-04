@@ -12,7 +12,7 @@ import CustomerRide from "./pages/CustomerRide";
 import DriverHome from "./pages/DriverHome";
 import DriverSettings from "./pages/DriverSettings";
 import DriverRide from "./pages/DriverRide";
-
+import NotFound from "./pages/NotFound";
 /**
  * ISSUES:
  *  - Change hardcoded urls to use base url from .env.local
@@ -40,12 +40,13 @@ function App() {
           <Route path="settings" element={<DriverSettings />} />
           <Route path="ride" element={<DriverRide />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Route>
     )
   );
   return (
     <div>
-      <RouterProvider router={router}></RouterProvider>
+        <RouterProvider router={router}></RouterProvider>
     </div>
   );
 }

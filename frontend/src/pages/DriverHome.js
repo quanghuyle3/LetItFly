@@ -1,12 +1,17 @@
 import Header from "../components/Header";
 import DriverMap from "../components/DriverMap";
-import { useLocation } from "react-router-dom";
+import { useLocation, Navigate } from "react-router-dom";
+import ErrorFallback from "./ErrorFallback";
 
 function DriverHome() {
-  const {
-    state: { tokenObject: cookie },
-  } = useLocation();
+  const location = useLocation();
+  const { state = {} } = location;
+  const { tokenObject: cookie } = state || {};
 
+  if (!cookie) {
+    return <ErrorFallback />;
+  }
+  
   return (
     <>
       <Header cookie={cookie} />
