@@ -1,9 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const ErrorFallback = () => {
   return (
-    <div style={{ textAlign: 'center', padding: '20px' }}>
+    <div style={{ textAlign: "center", padding: "20px" }}>
       <h2>Oops! Something went wrong.</h2>
       <p>We're sorry, but an unexpected error occurred.</p>
       <Link to="/">

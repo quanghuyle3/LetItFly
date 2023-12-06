@@ -1,15 +1,20 @@
 import Header from "../components/Header";
 import Map from "../components/Map";
 import SearchBar from "../components/SearchBar";
-import { useRef, useState, useEffect } from "react";
-import { useLocation, Navigate } from "react-router-dom";
-import { userLocation } from "../components/MapUtilities";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  checkIfJwtExpired,
+  logout,
+  userLocation,
+} from "../components/MapUtilities";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
 import ErrorFallback from "./ErrorFallback";
 
 function CustomerHome() {
+  const navigate = useNavigate();
   const currentRoute = useRef();
   const currentMap = useRef();
   const location = useLocation();
@@ -21,8 +26,26 @@ function CustomerHome() {
   const [duration, setDuration] = useState("0 mins");
   const [cost, setCost] = useState("0");
 
+  useEffect(() => {
+    window.addEventListener("beforeunload", () => {
+      window.history.pushState(null, null, "/");
+      logout(cookie.email, cookie.token);
+    });
+    return () => {
+      window.removeEventListener("beforeunload", () => {
+        logout(cookie.email, cookie.token);
+      });
+    };
+  }, []);
+
   if (!cookie) {
     return <ErrorFallback />;
+  }
+
+  // check if token is expired
+  if (checkIfJwtExpired(cookie.token)) {
+    logout(cookie.email, cookie.token);
+    navigate("/");
   }
 
   return (

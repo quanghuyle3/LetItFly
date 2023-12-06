@@ -86,6 +86,36 @@ function autocomplete(inputElement, callback) {
   });
 }
 
+/**
+ * logout user
+ * @param {string} email
+ * @param {string} token
+ */
+function logout(email, token) {
+  const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
+  const url = `${proxy}/logout-active?email=${email}`;
+  fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+  })
+    .then((response) => response.text())
+    .then((data) => {
+      if (data !== "SUCCESS") throw new Error(`Logout failed for ${email}`);
+    })
+    .catch((error) => console.log(error));
+}
+
+// verify jwt token, expired if less than 10 minutes remaining
+function checkIfJwtExpired(jwt) {
+  const payload = jwt.split(".")[1];
+  const { exp: jwtExpiration } = JSON.parse(window.atob(payload));
+  const oneMinute = 60 * 1000;
+  return Date.now() >= jwtExpiration * 1000 - oneMinute;
+}
+
 var directionsRenderer;
 var directionsService;
 /**
@@ -245,4 +275,6 @@ export {
   createMarker,
   createInfowindow,
   clearDirections,
+  logout,
+  checkIfJwtExpired,
 };

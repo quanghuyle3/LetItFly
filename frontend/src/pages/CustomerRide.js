@@ -1,12 +1,14 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import {
+  checkIfJwtExpired,
   createMap,
   createMarker,
   getDirections,
   getDistanceFromLatLngInKm,
+  logout,
   userLocation,
 } from "../components/MapUtilities";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import pickupIcon from "../person.png";
 import carIcon from "../car.png";
 import Header from "../components/Header";
@@ -14,15 +16,10 @@ import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import ErrorFallback from "./ErrorFallback";
 
 function CustomerRide() {
-  const {
-    state: {
-      rideRequestId,
-      cookie,
-      cookie: { token },
-    },
-  } = useLocation();
+  const location = useLocation();
   const navigate = useNavigate();
 
   const intervalRef = useRef(null);
@@ -44,6 +41,36 @@ function CustomerRide() {
   const [rideCancelled, setRideCancelled] = useState(false);
 
   const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
+
+  useEffect(() => {
+    window.addEventListener("beforeunload", () => {
+      window.history.pushState(null, null, "/");
+      logout(cookie.email, cookie.token);
+    });
+    return () => {
+      window.removeEventListener("beforeunload", () => {
+        logout(cookie.email, cookie.token);
+      });
+    };
+  }, []);
+
+  if (!location.state) {
+    return <ErrorFallback />;
+  }
+
+  const {
+    state: {
+      rideRequestId,
+      cookie,
+      cookie: { token },
+    },
+  } = location;
+
+  // check if token is expired
+  if (checkIfJwtExpired(cookie.token)) {
+    logout(cookie.email, cookie.token);
+    navigate("/");
+  }
 
   function initMap(mapElementId) {
     currentMap.current = userLocation.then((location) => {
