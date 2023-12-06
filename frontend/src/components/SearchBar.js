@@ -19,7 +19,7 @@ function SearchBar({
     autocomplete(inputElement, () => {
       geocode(inputElement.value, geocodeCallback);
     });
-  });
+  }, []);
 
   function geocodeCallback(results, status) {
     if (status === "OK") {

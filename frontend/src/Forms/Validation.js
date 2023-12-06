@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 
 export function isValidName(name) {
-  const nameRegex = /^[A-Z][a-z]*$/;
+  const nameRegex = /^[A-Za-z]{1,25}$/;
   return nameRegex.test(name);
 }
 
@@ -37,13 +37,12 @@ export function isValidBirthday(date) {
   if (date === null) {
     return false;
   } else {
-    const age = dayjs().diff(dayjs(date), 'year');
+    const age = dayjs().diff(dayjs(date), "year");
     if (age > 18 || age < 115) {
       return true;
     }
     return false;
   }
- 
 }
 
 export function isValidDriverLicense(driverLicense) {
@@ -51,8 +50,9 @@ export function isValidDriverLicense(driverLicense) {
   return driverLicenseRegex.test(driverLicense);
 }
 
+// vanity license plates can be anywhere from 2-7 chars long
 export function isValidLicensePlate(licensePlate) {
-  return licensePlate.length == 7; 
+  return licensePlate.length > 1 && licensePlate.length <= 8;
 }
 
 export function isValidMake(make) {
@@ -98,14 +98,14 @@ export function isValidCardName(name) {
 }
 
 export function isValidExpiration(exp) {
-  const expRegex = /^\d{2}\/\d{4}$/
+  const expRegex = /^\d{2}\/\d{4}$/;
   if (!expRegex.test(exp)) {
     // Invalid format
     return false;
   }
 
   // Extract month and year from the expiration date
-  const [month, year] = exp.split('/').map(num => parseInt(num, 10));
+  const [month, year] = exp.split("/").map((num) => parseInt(num, 10));
 
   // Check if the expiration date is in the future
   const currentDate = new Date();
@@ -113,4 +113,3 @@ export function isValidExpiration(exp) {
 
   return expirationDate > currentDate;
 }
-

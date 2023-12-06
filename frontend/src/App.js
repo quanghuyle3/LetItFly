@@ -13,14 +13,9 @@ import DriverHome from "./pages/DriverHome";
 import DriverSettings from "./pages/DriverSettings";
 import DriverRide from "./pages/DriverRide";
 import NotFound from "./pages/NotFound";
-/**
- * ISSUES:
- *  - Change hardcoded urls to use base url from .env.local
- */
 
 function App() {
   const pathname = window.location.pathname;
-  // console.log(pathname)
   if (!pathname.includes("register")) {
     localStorage.removeItem("oldData");
   }
@@ -46,7 +41,7 @@ function App() {
   );
   return (
     <div>
-        <RouterProvider router={router}></RouterProvider>
+      <RouterProvider router={router}></RouterProvider>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AppBar, Toolbar, Typography, Button } from "@mui/material";
 import logo from "../logo.png";
+import { logout } from "./MapUtilities";
 
 function Header({ cookie, requestId, interval }) {
   const location = useLocation();
@@ -45,7 +46,7 @@ function Header({ cookie, requestId, interval }) {
       .catch((error) => {
         console.log("error while removing driver from request: ", error);
       });
-  }
+  };
 
   const handleCustomerRideSettings = () => {
     if (
@@ -76,6 +77,7 @@ function Header({ cookie, requestId, interval }) {
       )
     ) {
       cookie.roleName === "ROLE_DRIVER" ? driverDelete() : customerRideDelete();
+      logout(cookie.email, cookie.token);
       navigate("/");
     }
   };
@@ -93,41 +95,41 @@ function Header({ cookie, requestId, interval }) {
   return (
     <AppBar position="static" sx={{ bgcolor: "#fbeddb", overflow: "hidden" }}>
       <Toolbar>
-      {!location.pathname.includes("ride") && (
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          <Link
-            to={cookie.roleName === "ROLE_DRIVER" ? "/driver" : "/customer"}
-            state={{ tokenObject: cookie }}
-          >
-            <img
-              className="header-left"
-              src={logo}
-              alt="Let It Fly Logo"
-              height="70px"
-              width="auto"
-              maxWidth="30%"
-            />
-          </Link>
-        </Typography>
-      )}
-      {location.pathname.includes("ride") && (
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          <Link
-            onClick={handleRideLogo}
-            to={cookie.roleName === "ROLE_DRIVER" ? "/driver" : "/customer"}
-            state={{ tokenObject: cookie }}
-          >
-            <img
-              className="header-left"
-              src={logo}
-              alt="Let It Fly Logo"
-              height="70px"
-              width="auto"
-              maxWidth="30%"
-            />
-          </Link>
-        </Typography>
-      )}
+        {!location.pathname.includes("ride") && (
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <Link
+              to={cookie.roleName === "ROLE_DRIVER" ? "/driver" : "/customer"}
+              state={{ tokenObject: cookie }}
+            >
+              <img
+                className="header-left"
+                src={logo}
+                alt="Let It Fly Logo"
+                height="70px"
+                width="auto"
+                maxWidth="30%"
+              />
+            </Link>
+          </Typography>
+        )}
+        {location.pathname.includes("ride") && (
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <Link
+              onClick={handleRideLogo}
+              to={cookie.roleName === "ROLE_DRIVER" ? "/driver" : "/customer"}
+              state={{ tokenObject: cookie }}
+            >
+              <img
+                className="header-left"
+                src={logo}
+                alt="Let It Fly Logo"
+                height="70px"
+                width="auto"
+                maxWidth="30%"
+              />
+            </Link>
+          </Typography>
+        )}
 
         <div
           style={{
@@ -155,6 +157,9 @@ function Header({ cookie, requestId, interval }) {
               <Button
                 color="inherit"
                 component={Link}
+                onClick={() => {
+                  logout(cookie.email, cookie.token);
+                }}
                 to="/"
                 sx={{ fontSize: "18px" }}
                 className="Button"
