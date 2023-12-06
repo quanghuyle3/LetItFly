@@ -12,7 +12,7 @@ CREATE TABLE user(
         phone VARCHAR(50),
         date_join DATE,
         driver_license VARCHAR(50),
-        active BOOLEAN DEFAULT TRUE,
+        active BOOLEAN DEFAULT FALSE,
         verified BOOLEAN DEFAULT FALSE
         )AUTO_INCREMENT = 10000;
 
