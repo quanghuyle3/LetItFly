@@ -1,23 +1,29 @@
 import Header from "../components/Header";
 import Map from "../components/Map";
 import SearchBar from "../components/SearchBar";
-import { useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useRef, useState, useEffect } from "react";
+import { useLocation, Navigate } from "react-router-dom";
 import { userLocation } from "../components/MapUtilities";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import ErrorFallback from "./ErrorFallback";
 
 function CustomerHome() {
   const currentRoute = useRef();
   const currentMap = useRef();
-  const {
-    state: { tokenObject: cookie },
-  } = useLocation();
+  const location = useLocation();
+
+  const { state = {} } = location;
+  const { tokenObject: cookie } = state || {};
 
   const [distance, setDistance] = useState("0 mi");
   const [duration, setDuration] = useState("0 mins");
   const [cost, setCost] = useState("0");
 
+  if (!cookie) {
+    return <ErrorFallback />;
+  }
+  
   return (
     <div style={{ backgroundColor: "white", margin: "0 auto" }}>
       <Header cookie={cookie} />
