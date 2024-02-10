@@ -27,7 +27,7 @@ import {
 } from "./Validation";
 import { roles, roleDB, genders, types, stateAcronyms } from "./Categories";
 import bg from "../mock-bg.jpg";
-import { styled } from '@mui/system';
+import { styled } from "@mui/system";
 
 const BasicInfo = (props) => {
   const [firstName, setFirstName] = useState("");
@@ -84,12 +84,12 @@ const BasicInfo = (props) => {
   }, [dateError]);
 
   const NextButton = styled(Button)({
-    backgroundColor: 'orange',
-    color: 'white', // Set text color to white
-    '&:hover': {
-      backgroundColor: '#white', // Change hover color if needed
-      color: 'orange', // Set text color to black
-      border: '1px solid orange',
+    backgroundColor: "orange",
+    color: "white", // Set text color to white
+    "&:hover": {
+      backgroundColor: "#white", // Change hover color if needed
+      color: "orange", // Set text color to black
+      border: "1px solid orange",
     },
   });
 
@@ -471,7 +471,7 @@ const BasicInfo = (props) => {
 
           {roleInDB === roleDB[1] && (
             <div>
-              <h3>Driver and Vechile Information:</h3>
+              <h3>Driver and Vehicle Information:</h3>
               <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
                 <TextField
                   type="text"
@@ -567,7 +567,7 @@ const BasicInfo = (props) => {
           {failed === 1 && (
             <div>
               <Alert
-                onClose={() => { }}
+                onClose={() => {}}
                 variant="filled"
                 severity="error"
                 sx={{ mb: 2, mt: 2 }}
@@ -579,7 +579,7 @@ const BasicInfo = (props) => {
           {failed === 2 && (
             <div>
               <Alert
-                onClose={() => { }}
+                onClose={() => {}}
                 variant="filled"
                 severity="error"
                 sx={{ mb: 2, mt: 2 }}
@@ -591,7 +591,7 @@ const BasicInfo = (props) => {
           {failed === 3 && (
             <div>
               <Alert
-                onClose={() => { }}
+                onClose={() => {}}
                 variant="filled"
                 severity="error"
                 sx={{ mb: 2, mt: 2 }}

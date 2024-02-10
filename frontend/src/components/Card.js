@@ -2,7 +2,7 @@ import "../css/Settings.css";
 import { Fragment, useEffect } from "react";
 import React, { useState } from "react";
 import Alert from "@mui/material/Alert";
-
+import dayjs from "dayjs";
 
 function Card(param) {
   const [userInfo, setUserInfo] = useState(null);
@@ -84,7 +84,7 @@ function Card(param) {
           <label className="label-settings" for="exp">
             Expiration:
           </label>
-          <p id="exp">{userInfo[num].expiration}</p>
+          <p id="exp">day{dayjs(userInfo[num].expiration).format("MM/YYYY")}</p>
           <label className="label-settings" for="address">
             Billing Address:
           </label>
