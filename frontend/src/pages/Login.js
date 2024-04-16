@@ -59,7 +59,7 @@ function Login() {
     const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
 
     try {
-      const response = await fetch(`${proxy}/login`, {
+      const response = await fetch(`http://${proxy}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginInfo),
@@ -79,6 +79,8 @@ function Login() {
         setFailed(2);
       } else if (response.status === 423) {
         setFailed(3);
+      } else if (response.status === 409) {
+        setFailed(4);
       }
     } catch (error) {
       console.error("Login failed:", error);
@@ -211,6 +213,13 @@ function Login() {
             <div>
               <Alert variant="filled" severity="error" sx={{ mb: 2, mt: 2 }}>
                 Login Failed - Account is locked!
+              </Alert>
+            </div>
+          )}
+          {failed === 4 && (
+            <div>
+              <Alert variant="filled" severity="error" sx={{ mb: 2, mt: 2 }}>
+                You already logged in! Please check other tabs on your browser.
               </Alert>
             </div>
           )}

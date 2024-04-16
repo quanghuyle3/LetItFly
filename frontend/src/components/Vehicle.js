@@ -3,6 +3,8 @@ import { Fragment, useEffect } from "react";
 import React, { useState } from "react";
 import Alert from "@mui/material/Alert";
 
+const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
+
 function Vehicle(param) {
   const [userInfo, setUserInfo] = useState(null);
   const [noDelete, setNoDelete] = useState(null);
@@ -11,7 +13,7 @@ function Vehicle(param) {
 
   useEffect(() => {
     fetch(
-      `http://localhost:8080/api/vehicle/findByUserId?userId=${cookie.id}`,
+      `http://${proxy}/api/vehicle/findByUserId?userId=${cookie.id}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -34,7 +36,7 @@ function Vehicle(param) {
       }, 5000);
     } else {
       fetch(
-        `http://localhost:8080/api/vehicle/setToNotUse?id=${userInfo[num].id}`,
+        `http://${proxy}/api/vehicle/setToNotUse?id=${userInfo[num].id}`,
         {
           method: "GET",
           headers: {

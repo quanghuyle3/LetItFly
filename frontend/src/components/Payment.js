@@ -2,9 +2,11 @@ import "../css/Settings.css";
 import Card from "../components/Card";
 import { Fragment, useEffect } from "react";
 import React, { useState } from 'react';
-import { isValidCardName, isValidCard, isValidCardType, isValidExpiration,isValidCVV, isValidAddress } from "../Forms/Validation"
+import { isValidCardName, isValidCard, isValidCardType, isValidExpiration, isValidCVV, isValidAddress } from "../Forms/Validation"
 
-function Payment({cookie}) {
+const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
+
+function Payment({ cookie }) {
 
     const [userInfo, setUserInfo] = useState(null);
     const [editCard, setEditCard] = useState(false);
@@ -20,12 +22,14 @@ function Payment({cookie}) {
     const [expError, setExpError] = useState(false);
     const [cvvError, setCvvError] = useState(false);
     const [billingError, setBillingError] = useState(false);
-    const cards = []; 
+    const cards = [];
 
     useEffect(() => {
-        fetch(`http://localhost:8080/api/payment/findByUserId?userId=${cookie.id}`, {
-        headers: { "Content-Type": "application/json",
-        "Authorization": "Bearer " + cookie.token}
+        fetch(`http://${proxy}/api/payment/findByUserId?userId=${cookie.id}`, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + cookie.token
+            }
         }).then((response) => {
             response.json().then((jsonObject) => {
                 setUserInfo(jsonObject);
@@ -34,31 +38,31 @@ function Payment({cookie}) {
     }, []);
 
     const changeName = (event) => {
-        setName(event.target.value); 
+        setName(event.target.value);
     }
 
     const changeNumber = (event) => {
-        setNumber(event.target.value); 
+        setNumber(event.target.value);
     }
 
     const changeType = (event) => {
-        setType(event.target.value); 
+        setType(event.target.value);
     }
 
     const changeExp = (event) => {
-        setExp(event.target.value); 
+        setExp(event.target.value);
     }
 
     const changeCvv = (event) => {
-        setCvv(event.target.value); 
+        setCvv(event.target.value);
     }
 
     const changeBilling = (event) => {
-        setBilling(event.target.value); 
+        setBilling(event.target.value);
     }
 
-    if(userInfo !== null) {
-        for(let i = 0; i < userInfo.length; i++) {
+    if (userInfo !== null) {
+        for (let i = 0; i < userInfo.length; i++) {
             cards.push(i);
         }
     }
@@ -76,81 +80,77 @@ function Payment({cookie}) {
         setExp('');
         setCvv('');
         setBilling('');
-        }
+    }
 
     const handleAdd = () => {
-        if(isValidCardName(name) && isValidCard(number) && isValidCardType(type) && isValidExpiration(exp) && isValidCVV(cvv) && isValidAddress(billing)) {
+        if (isValidCardName(name) && isValidCard(number) && isValidCardType(type) && isValidExpiration(exp) && isValidCVV(cvv) && isValidAddress(billing)) {
             var PaymentRequest = {
                 cardNumber: number,
                 expiration: exp,
                 cvv: cvv,
                 type: type,
                 userId: cookie.id,
-                name: name, 
-                billingAddress: billing, 
+                name: name,
+                billingAddress: billing,
             };
 
-            fetch("http://localhost:8080/api/payment/save", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", 
-            "Authorization": "Bearer " + cookie.token},
-            body: JSON.stringify(PaymentRequest)
+            fetch(`http://${proxy}/api/payment/save`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + cookie.token
+                },
+                body: JSON.stringify(PaymentRequest)
             }).then((response) => {
                 return response.status;
             }).then((result) => {
-                if(result == 200) {
+                if (result == 200) {
                     window.location.reload();
                     alert("Update Successfull");
                 }
-                else{
+                else {
                     window.location.reload();
                     alert("Duplicate Card! Unsuccessfull");
                 }
             }).catch((error) => {
                 console.error("Update failed:", error);
-            }); 
+            });
         }
-        else
-        {
-            if(!isValidCardName(name)) {
+        else {
+            if (!isValidCardName(name)) {
                 setNameError(true);
             }
-            else
-            {
+            else {
                 setNameError(false);
             }
-            if(!isValidCard(number)) {
+            if (!isValidCard(number)) {
                 setNumberError(true);
             }
-            else{
+            else {
                 setNumberError(false);
             }
-            if(!isValidCardType(type)) {
+            if (!isValidCardType(type)) {
                 setTypeError(true);
             }
-            else
-            {
+            else {
                 setTypeError(false);
             }
-            if(!isValidExpiration(exp)) {
+            if (!isValidExpiration(exp)) {
                 setExpError(true);
             }
-            else
-            {
+            else {
                 setExpError(false);
             }
-            if(!isValidCVV(cvv)) {
+            if (!isValidCVV(cvv)) {
                 setCvvError(true);
             }
-            else
-            {
+            else {
                 setCvvError(false);
             }
-            if(!isValidAddress(billing)) {
+            if (!isValidAddress(billing)) {
                 setBillingError(true);
             }
-            else
-            {
+            else {
                 setBillingError(false);
             }
         }
@@ -158,14 +158,14 @@ function Payment({cookie}) {
 
     return (
         <div className="row">
-            {userInfo !== null ? ( 
+            {userInfo !== null ? (
                 <div>
                     <h1>Payment Information: </h1>
                     {editCard ? (
                         <div>
                             <input type="text" onChange={changeName} placeholder="name"></input>
                             {nameError && <small>Invalid Name: ex.John Smith'</small>}
-                            <input type="text" onChange={changeNumber}placeholder="card number"></input>
+                            <input type="text" onChange={changeNumber} placeholder="card number"></input>
                             {numberError && <small>Invalid Card Number: Must have 16 digits</small>}
                             <input type="text" onChange={changeType} placeholder="type"></input>
                             {typeError && <small>Invalid Type: ex. Debit</small>}
@@ -175,17 +175,17 @@ function Payment({cookie}) {
                             {cvvError && <small>Invalid CVV: Must be 3 or 4 digits</small>}
                             <input type="text" onChange={changeBilling} placeholder="billing address"></input>
                             {billingError && <small>Invalid Billing Address: No special characters</small>}
-                            <button onClick={() => {setEditCard(!editCard); resetBooleans()}}>Cancel</button>
+                            <button onClick={() => { setEditCard(!editCard); resetBooleans() }}>Cancel</button>
                             <button onClick={() => handleAdd()}>Submit</button>
                         </div>) : (
-                            <button onClick={() => setEditCard(!editCard)}>Add Card</button>
-                        )
+                        <button onClick={() => setEditCard(!editCard)}>Add Card</button>
+                    )
                     }
-                    {cards.map((number) => (<Card key={number} number={number} cookie={cookie}/>))}
+                    {cards.map((number) => (<Card key={number} number={number} cookie={cookie} />))}
                 </div>
             ) : (
                 <p>Loading...</p>
-            )}  
+            )}
         </div>
     );
 }

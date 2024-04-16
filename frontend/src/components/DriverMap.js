@@ -74,7 +74,7 @@ function DriverMap({ cookie }) {
   function getRideRequestsFromBackend() {
     const updateUserLocation = userLocation.then((location) => {
       driverLocation.current = location;
-      const url = `${proxy}/api/driver-status/updateCoordinatesDriver?driverId=${cookie.id}&curLat=${location.lat}&curLong=${location.lng}`;
+      const url = `http://${proxy}/api/driver-status/updateCoordinatesDriver?driverId=${cookie.id}&curLat=${location.lat}&curLong=${location.lng}`;
       return fetch(url, {
         method: "GET",
         headers: {
@@ -93,7 +93,7 @@ function DriverMap({ cookie }) {
         });
     });
 
-    const rideRequestUrl = `${proxy}/api/ride-request/findAll`;
+    const rideRequestUrl = `http://${proxy}/api/ride-request/findAll`;
     const getRideRequests = fetch(rideRequestUrl, {
       headers: {
         "Content-Type": "application/json",
@@ -220,7 +220,7 @@ function DriverMap({ cookie }) {
   }
 
   function updateDatabaseToAcceptRide(rideRequest) {
-    const url = `${proxy}/api/ride-request/setDriverToRideRequest?driverId=${cookie.id}&rideId=${rideRequest.id}`;
+    const url = `http://${proxy}/api/ride-request/setDriverToRideRequest?driverId=${cookie.id}&rideId=${rideRequest.id}`;
     return fetch(url, {
       method: "GET",
       headers: {

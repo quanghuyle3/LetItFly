@@ -9,7 +9,7 @@ function Header({ cookie, requestId, interval }) {
   const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
   const customerRideDelete = () => {
     clearInterval(interval.current);
-    const url = `${proxy}/api/ride-request/delete?id=${requestId}`;
+    const url = `http://${proxy}/api/ride-request/delete?id=${requestId}`;
     fetch(url, {
       method: "GET",
       headers: {
@@ -29,7 +29,7 @@ function Header({ cookie, requestId, interval }) {
 
   const driverDelete = () => {
     clearInterval(interval.current);
-    const url = `${proxy}/api/ride-request/deleteDriverIdById?id=${requestId}`;
+    const url = `http://${proxy}/api/ride-request/deleteDriverIdById?id=${requestId}`;
     fetch(url, {
       method: "GET",
       headers: {
@@ -93,41 +93,41 @@ function Header({ cookie, requestId, interval }) {
   return (
     <AppBar position="static" sx={{ bgcolor: "#fbeddb", overflow: "hidden" }}>
       <Toolbar>
-      {!location.pathname.includes("ride") && (
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          <Link
-            to={cookie.roleName === "ROLE_DRIVER" ? "/driver" : "/customer"}
-            state={{ tokenObject: cookie }}
-          >
-            <img
-              className="header-left"
-              src={logo}
-              alt="Let It Fly Logo"
-              height="70px"
-              width="auto"
-              maxWidth="30%"
-            />
-          </Link>
-        </Typography>
-      )}
-      {location.pathname.includes("ride") && (
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          <Link
-            onClick={handleRideLogo}
-            to={cookie.roleName === "ROLE_DRIVER" ? "/driver" : "/customer"}
-            state={{ tokenObject: cookie }}
-          >
-            <img
-              className="header-left"
-              src={logo}
-              alt="Let It Fly Logo"
-              height="70px"
-              width="auto"
-              maxWidth="30%"
-            />
-          </Link>
-        </Typography>
-      )}
+        {!location.pathname.includes("ride") && (
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <Link
+              to={cookie.roleName === "ROLE_DRIVER" ? "/driver" : "/customer"}
+              state={{ tokenObject: cookie }}
+            >
+              <img
+                className="header-left"
+                src={logo}
+                alt="Let It Fly Logo"
+                height="70px"
+                width="auto"
+                maxWidth="30%"
+              />
+            </Link>
+          </Typography>
+        )}
+        {location.pathname.includes("ride") && (
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <Link
+              onClick={handleRideLogo}
+              to={cookie.roleName === "ROLE_DRIVER" ? "/driver" : "/customer"}
+              state={{ tokenObject: cookie }}
+            >
+              <img
+                className="header-left"
+                src={logo}
+                alt="Let It Fly Logo"
+                height="70px"
+                width="auto"
+                maxWidth="30%"
+              />
+            </Link>
+          </Typography>
+        )}
 
         <div
           style={{

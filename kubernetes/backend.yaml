@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend-con
+          image: quanghuyle3/letitfly-backend:4.0-url
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MYSQL_USER
+              value: "root"
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-root-password
+            - name: MYSQL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-config
+                  key: mysql-url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  labels:
+    app: backend
+spec:
+  type: LoadBalancer # external service
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 80 #8080
+      targetPort: 8080
+      # nodePort: 30000 # local only

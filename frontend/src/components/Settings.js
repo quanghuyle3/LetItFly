@@ -5,17 +5,21 @@ import { Fragment, useEffect } from "react";
 import React, { useState } from 'react';
 import "../css/Settings.css";
 
-function Settings({cookie}) {
+const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
+
+function Settings({ cookie }) {
 
     const [userData, setUserData] = useState([]);
     const [activeTab, setActiveTab] = useState('tab1');
-  
-    var shouldShowTab = true; 
-    
+
+    var shouldShowTab = true;
+
     useEffect(() => {
-        fetch(`http://localhost:8080/api/user/findByEmail?email=${cookie.email}`, {
-        headers: { "Content-Type": "application/json",
-        "Authorization": "Bearer " + cookie.token}
+        fetch(`http://${proxy}/api/user/findByEmail?email=${cookie.email}`, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + cookie.token
+            }
         }).then((response) => {
             response.json().then((jsonData) => {
                 const dataArray = jsonData.roles;
@@ -23,48 +27,48 @@ function Settings({cookie}) {
             })
         })
     }, []);
-    
+
     userData.map((item) => {
-        if(item.name == "ROLE_PASSENGER") {
-            shouldShowTab = false; 
+        if (item.name == "ROLE_PASSENGER") {
+            shouldShowTab = false;
         }
     })
 
     const handleTabClick = (tabName) => {
         setActiveTab(tabName);
     }
-    
+
     return (
         <div className="row">
             <div className="tab-bar">
                 <button
-                className={activeTab === 'tab1' ? 'active' : ''}
-                onClick={() => handleTabClick('tab1')}
+                    className={activeTab === 'tab1' ? 'active' : ''}
+                    onClick={() => handleTabClick('tab1')}
                 >
-                Account
+                    Account
                 </button>
                 <button
-                className={activeTab === 'tab2' ? 'active' : ''}
-                onClick={() => handleTabClick('tab2')}
+                    className={activeTab === 'tab2' ? 'active' : ''}
+                    onClick={() => handleTabClick('tab2')}
                 >
-                Payment Information
+                    Payment Information
                 </button>
                 {shouldShowTab && (
-                <button
-                    className={`tab-button ${activeTab === 'tab3' ? 'active' : ''}`}
-                    onClick={() => handleTabClick('tab3')}
-                >
-                    Vehicle Information 
-                </button>
-            )}
+                    <button
+                        className={`tab-button ${activeTab === 'tab3' ? 'active' : ''}`}
+                        onClick={() => handleTabClick('tab3')}
+                    >
+                        Vehicle Information
+                    </button>
+                )}
 
             </div>
             <div className="tab-content">
-                {activeTab === 'tab1' && <Account cookie={cookie}/>}
-                {activeTab === 'tab2' && <Payment cookie={cookie}/>}
-                {activeTab === 'tab3' && <VehicleInformation cookie={cookie}/>}
+                {activeTab === 'tab1' && <Account cookie={cookie} />}
+                {activeTab === 'tab2' && <Payment cookie={cookie} />}
+                {activeTab === 'tab3' && <VehicleInformation cookie={cookie} />}
             </div>
-     </div>
+        </div>
     );
 }
 export default Settings;

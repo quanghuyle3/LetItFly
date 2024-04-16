@@ -93,6 +93,8 @@ const BasicInfo = (props) => {
     },
   });
 
+  const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
+
   useEffect(() => {
     if (localStorage.getItem("oldData") != null) {
       const oldData = JSON.parse(localStorage.getItem("oldData"));
@@ -225,7 +227,7 @@ const BasicInfo = (props) => {
       return;
     }
     if (email != "") {
-      fetch(`http://localhost:8080/api/check/email?email=${email}`, {
+      fetch(`http://${proxy}/api/check/email?email=${email}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       }).then((response) => {
@@ -239,7 +241,7 @@ const BasicInfo = (props) => {
     }
     if (role == roleDB[1]) {
       fetch(
-        `http://localhost:8080/api/check/driverLicense?driverLicense=${driverL}`,
+        `http://${proxy}/api/check/driverLicense?driverLicense=${driverL}`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
