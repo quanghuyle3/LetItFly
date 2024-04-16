@@ -17,7 +17,10 @@ This web application provides functionalities to support on-demand airport shutt
 - React
 - Material UI
 - MySQL
-- Docker containerization
+- Docker
+- Kubernetes
+- AWS EKS, EC2, Application Load Balancer
+- Azure AKS
 - Google Maps API
 
 ## User Manual & Demo
@@ -34,6 +37,30 @@ https://drive.google.com/drive/u/2/folders/1HSuQG_8eE8F-DJDqTrXpL6OthIVQx4bL
   <img width="782" alt="Screen Shot 2024-01-05 at 3 40 43 PM" src="https://github.com/quanghuyle3/LetItFly/assets/65510865/f537b167-9d17-47db-882c-208fce5e9241">
   <img width="782" alt="Screen Shot 2024-01-05 at 3 40 57 PM" src="https://github.com/quanghuyle3/LetItFly/assets/65510865/df4126b8-3a2c-40e6-b4a6-ff3f043cf61d">
 </p>
+
+## Kubernetes Cluster in cloud
+### Architecture
+<p align="center">
+  <img width="643" alt="Kubernetes Architecture" src="https://github.com/quanghuyle3/LetItFly/assets/65510865/f90cbc0e-d8eb-4269-a7f2-c22ba2a508fd">
+</p>
+
+### Amazon Web Services - EKS, EC2, and Application Load Balancer
+<p align="center">
+  <img width="813" alt="Access AWS ALB" src="https://github.com/quanghuyle3/LetItFly/assets/65510865/aa8573f9-33d9-48c7-8ed5-4e5b15421523">
+  <img width="1604" alt="AWS Load Balancer" src="https://github.com/quanghuyle3/LetItFly/assets/65510865/3d2cc5e0-c824-4d61-a084-4fe8f058876f">
+  <img width="1032" alt="domain name to load balancer" src="https://github.com/quanghuyle3/LetItFly/assets/65510865/85be2cac-a3e0-4860-b27b-b9470fba54fd">
+</p>
+
+### Azure AKS
+<p align="center">
+  <img width="813" alt="Access AKS service" src="https://github.com/quanghuyle3/LetItFly/assets/65510865/ffe65396-f72a-419a-91f6-cfbd4836d8cd">
+  <img width="1438" alt="Azure AKS" src="https://github.com/quanghuyle3/LetItFly/assets/65510865/351fa3aa-ca55-4b9a-aff8-09779f92bf47">
+</p>
+
+
+
+
+
 
 
 
