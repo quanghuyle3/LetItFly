@@ -1,4 +1,4 @@
-### mysql-server-setup
+### mysql-server-setup & entity-relationship-diagram
 
 ## How to Start and Enter Docker Container
 
@@ -29,3 +29,7 @@
 1. The docker container is setup to run the scripts under 'sql-init-scripts' folder
 2. Feel free to add/remove/edit the init scripts
 3. Script #05. has been commented out by default as it is the drop table script
+
+## Entity Relationship Diagram (ERD)
+<img width="645" alt="Screen Shot 2024-01-05 at 3 01 27 PM" src="https://github.com/quanghuyle3/LetItFly/assets/65510865/01833be2-3267-4e0b-8aed-81b1cfc21323">
+
