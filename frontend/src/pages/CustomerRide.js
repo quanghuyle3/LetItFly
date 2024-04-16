@@ -61,7 +61,7 @@ function CustomerRide() {
 
   if (rideCancelled) {
     clearInterval(intervalRef.current);
-    const url = `${proxy}/api/ride-request/delete?id=${rideRequestId}`;
+    const url = `http://${proxy}/api/ride-request/delete?id=${rideRequestId}`;
     fetch(url, {
       method: "GET",
       headers: {
@@ -81,7 +81,7 @@ function CustomerRide() {
   // --------------------------------- PHASE 1 ---------------------------------
   else if (!rideAccepted) {
     function checkRideAccepted() {
-      const url = `${proxy}/api/ride-request/findById?id=${rideRequestId}`;
+      const url = `http://${proxy}/api/ride-request/findById?id=${rideRequestId}`;
       return fetch(url, {
         method: "GET",
         headers: {
@@ -103,7 +103,7 @@ function CustomerRide() {
             rideRecord.current = data;
 
             return fetch(
-              `${proxy}/api/vehicle/findByUserId?userId=${driverId.current}`,
+              `http://${proxy}/api/vehicle/findByUserId?userId=${driverId.current}`,
               {
                 method: "GET",
                 headers: {
@@ -122,7 +122,7 @@ function CustomerRide() {
                 setRideAccepted(true);
               });
           } else if (statusCheckCount.current > 1) {
-            const randomDriverUrl = `${proxy}/api/driver-status/findAll`;
+            const randomDriverUrl = `http://${proxy}/api/driver-status/findAll`;
             return fetch(randomDriverUrl, {
               headers: {
                 "Content-Type": "application/json",
@@ -135,7 +135,7 @@ function CustomerRide() {
                 return data[driverIndex].userId.id;
               })
               .then((driverId) => {
-                const url = `${proxy}/api/ride-request/setDriverToRideRequest?driverId=${driverId}&rideId=${rideRequestId}`;
+                const url = `http://${proxy}/api/ride-request/setDriverToRideRequest?driverId=${driverId}&rideId=${rideRequestId}`;
                 fetch(url, {
                   headers: {
                     "Content-Type": "application/json",
@@ -165,7 +165,7 @@ function CustomerRide() {
     function updatePassengerDriverLocation() {
       const updatePassengerCoords = userLocation.then((passengerCoords) => {
         passengerLocation.current = passengerCoords;
-        const passengerUrl = `${proxy}/api/ride-request/updateCoordinatesPassenger?rideRequestId=${rideRequestId}&curLat=${passengerCoords.lat}&curLong=${passengerCoords.lng}`;
+        const passengerUrl = `http://${proxy}/api/ride-request/updateCoordinatesPassenger?rideRequestId=${rideRequestId}&curLat=${passengerCoords.lat}&curLong=${passengerCoords.lng}`;
         return fetch(passengerUrl, {
           method: "GET",
           headers: {
@@ -177,7 +177,7 @@ function CustomerRide() {
           .then((data) => data);
       });
 
-      const driverUrl = `${proxy}/api/driver-status/findByDriverId?driverId=${driverId.current}`;
+      const driverUrl = `http://${proxy}/api/driver-status/findByDriverId?driverId=${driverId.current}`;
       const getDriverCoords = fetch(driverUrl, {
         method: "GET",
         headers: {
@@ -188,7 +188,7 @@ function CustomerRide() {
         .then((response) => response.json())
         .then((data) => data);
 
-      const checkRideCancelUrl = `${proxy}/api/ride-request/findById?id=${rideRequestId}`;
+      const checkRideCancelUrl = `http://${proxy}/api/ride-request/findById?id=${rideRequestId}`;
       const checkRideStatus = fetch(checkRideCancelUrl, {
         method: "GET",
         headers: {
@@ -220,7 +220,7 @@ function CustomerRide() {
             // overwrite actual coords with route step array
             let driverCoords =
               currentRoute.current.path.routes[0].overview_path[
-                routeStep.current
+              routeStep.current
               ];
 
             driverLocation.current = {
@@ -256,7 +256,7 @@ function CustomerRide() {
     }
 
     // get driver location
-    const driverUrl = `${proxy}/api/driver-status/findByDriverId?driverId=${driverId.current}`;
+    const driverUrl = `http://${proxy}/api/driver-status/findByDriverId?driverId=${driverId.current}`;
     fetch(driverUrl, {
       method: "GET",
       headers: {
@@ -316,7 +316,7 @@ function CustomerRide() {
   else if (!rideCompleted) {
     function updatePassengerMarkerOnly() {
       // check if ride cancelled
-      const checkRideCancelUrl = `${proxy}/api/ride-request/findById?id=${rideRequestId}`;
+      const checkRideCancelUrl = `http://${proxy}/api/ride-request/findById?id=${rideRequestId}`;
       const checkRideStatus = fetch(checkRideCancelUrl, {
         method: "GET",
         headers: {
@@ -343,7 +343,7 @@ function CustomerRide() {
           // overwrite actual coords with route step array
           location =
             currentRoute.current.path.routes[0].overview_path[
-              routeStep.current
+            routeStep.current
             ];
 
           passengerLocation.current = {

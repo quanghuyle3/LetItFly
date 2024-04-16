@@ -45,7 +45,7 @@ function Home() {
   }
 
   function updateDriverPassengerMarkers() {
-    const passengerUrl = `${proxy}/api/ride-request/findById?id=${rideRequest.id}`;
+    const passengerUrl = `http://${proxy}/api/ride-request/findById?id=${rideRequest.id}`;
     const fetchPassengerCoords = fetch(passengerUrl, {
       method: "GET",
       headers: {
@@ -71,7 +71,7 @@ function Home() {
           lat: driverCoords.lat(),
           lng: driverCoords.lng(),
         };
-        const driverUrl = `${proxy}/api/driver-status/updateCoordinatesDriver?driverId=${cookie.id}&curLat=${driverLocation.current.lat}&curLong=${driverLocation.current.lng}`;
+        const driverUrl = `http://${proxy}/api/driver-status/updateCoordinatesDriver?driverId=${cookie.id}&curLat=${driverLocation.current.lat}&curLong=${driverLocation.current.lng}`;
 
         return fetch(driverUrl, {
           method: "GET",
@@ -123,7 +123,7 @@ function Home() {
 
   function updateDriverMarkerOnly() {
     // check for ride cancellation
-    const rideRecordUrl = `${proxy}/api/ride-request/findById?id=${rideRequest.id}`;
+    const rideRecordUrl = `http://${proxy}/api/ride-request/findById?id=${rideRequest.id}`;
     fetch(rideRecordUrl, {
       method: "GET",
       headers: {
@@ -179,7 +179,7 @@ function Home() {
   // RIDE CANCELLED
   if (rideCancelled) {
     clearInterval(intervalRef.current);
-    const url = `${proxy}/api/ride-request/deleteDriverIdById?id=${rideRequest.id}`;
+    const url = `http://${proxy}/api/ride-request/deleteDriverIdById?id=${rideRequest.id}`;
     fetch(url, {
       method: "GET",
       headers: {

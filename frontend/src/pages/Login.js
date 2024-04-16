@@ -59,7 +59,7 @@ function Login() {
     const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
 
     try {
-      const response = await fetch(`${proxy}/login`, {
+      const response = await fetch(`http://${proxy}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginInfo),

@@ -65,7 +65,7 @@ function SearchBar({
     const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
 
     // send a POST request to backend
-    const url = `${proxy}/api/ride-request/save`;
+    const url = `http://${proxy}/api/ride-request/save`;
     fetch(url, {
       method: "POST",
       headers: {
