@@ -45,10 +45,10 @@ public class LoginController {
             User user = userService.findUserByEmail(authRequest.getEmail());
 
             // conflict, user already logs in
-            if (user.isActive()) {
-                return ResponseEntity.status(HttpStatusCode.valueOf(409))
-                        .body(new AuthenticationResponse());
-            }
+            // if (user.isActive()) {
+            // return ResponseEntity.status(HttpStatusCode.valueOf(409))
+            // .body(new AuthenticationResponse());
+            // }
 
             // otherwise, set active to true to indicate already logs in
             user.setActive(true);
