@@ -98,6 +98,8 @@ const CardInfo = (props) => {
     },
   });
 
+  const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
+
   function handlePrevious(event) {
     setGoPrev(true);
     props.prev();
@@ -143,8 +145,8 @@ const CardInfo = (props) => {
     } else if ((dayjs(exprDate, 'MM/YYYY')).isBefore(dayjs)) {
       isfailed = true;
       setExpDateError("minDate");
-    } 
-   
+    }
+
     if (!isValidCVV(CVV)) {
       isfailed = true;
       setCVVError(CVV);
@@ -190,7 +192,7 @@ const CardInfo = (props) => {
         vehicleType: basicInfo.vehicleType,
       };
       console.log(newAccount);
-      fetch("http://localhost:8080/registration/user", {
+      fetch(`http://${proxy}/registration/user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newAccount),

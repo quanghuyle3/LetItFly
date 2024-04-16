@@ -3,6 +3,8 @@ import { Fragment, useEffect } from "react";
 import React, { useState } from "react";
 import Alert from "@mui/material/Alert";
 
+const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
+
 
 function Card(param) {
   const [userInfo, setUserInfo] = useState(null);
@@ -12,7 +14,7 @@ function Card(param) {
 
   useEffect(() => {
     fetch(
-      `http://localhost:8080/api/payment/findByUserId?userId=${cookie.id}`,
+      `http://${proxy}/api/payment/findByUserId?userId=${cookie.id}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -35,7 +37,7 @@ function Card(param) {
       }, 5000);
     } else {
       fetch(
-        `http://localhost:8080/api/payment/setToNotUse?id=${userInfo[num].id}`,
+        `http://${proxy}/api/payment/setToNotUse?id=${userInfo[num].id}`,
         {
           method: "GET",
           headers: {

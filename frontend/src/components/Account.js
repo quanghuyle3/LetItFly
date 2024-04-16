@@ -4,7 +4,9 @@ import { Fragment, useEffect } from "react";
 import React, { useState } from 'react';
 import { isValidPhoneNumber, isValidAddress } from "../Forms/Validation"
 
-function Account({cookie}) {
+const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
+
+function Account({ cookie }) {
 
     const [userInfo, setUserInfo] = useState(null);
     const [editPhone, setEditPhone] = useState(false);
@@ -13,11 +15,13 @@ function Account({cookie}) {
     const [inputValuePhone, setInputValuePhone] = useState('');
     const [phoneError, setPhoneError] = useState(false);
     const [addressError, setAddressError] = useState(false);
-    
+
     useEffect(() => {
-        fetch(`http://localhost:8080/api/user/findByEmail?email=${cookie.email}`, {
-        headers: { "Content-Type": "application/json",
-        "Authorization": "Bearer " + cookie.token }
+        fetch(`http://${proxy}/api/user/findByEmail?email=${cookie.email}`, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + cookie.token
+            }
         }).then((response) => {
             response.json().then((jsonObject) => {
                 setUserInfo(JSON.parse(JSON.stringify(jsonObject)));
@@ -26,70 +30,72 @@ function Account({cookie}) {
     }, []);
 
     const handleChangePhone = (event) => {
-        setInputValuePhone(event.target.value); 
+        setInputValuePhone(event.target.value);
     }
 
     const handleChangeAddress = (event) => {
-        setInputValueAddress(event.target.value); 
+        setInputValueAddress(event.target.value);
     }
 
     const handlePhone = () => {
-        if(isValidPhoneNumber(inputValuePhone)) {
+        if (isValidPhoneNumber(inputValuePhone)) {
             var UserRequest = {
                 email: userInfo.email,
                 phone: inputValuePhone,
                 address: userInfo.address
             };
-    
-            fetch("http://localhost:8080/api/user/update", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", 
-            "Authorization": "Bearer " + cookie.token},
-            body: JSON.stringify(UserRequest)
+
+            fetch(`http://${proxy}/api/user/update`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + cookie.token
+                },
+                body: JSON.stringify(UserRequest)
             }).then((response) => {
                 alert("Update Successful");
-                window.location.reload(); 
+                window.location.reload();
             }).catch((error) => {
                 console.error("Update failed:", error);
-            });  
+            });
         }
-        else
-        {
+        else {
             setPhoneError(true);
         }
     };
 
     const handleAddress = () => {
-        if(isValidAddress(inputValueAddress)) { 
+        if (isValidAddress(inputValueAddress)) {
             var UserRequest = {
                 email: userInfo.email,
                 phone: userInfo.phone,
                 address: inputValueAddress
             };
 
-            fetch("http://localhost:8080/api/user/update", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", 
-            "Authorization": "Bearer " + cookie.token},
-            body: JSON.stringify(UserRequest)
+            fetch(`http://${proxy}/api/user/update`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + cookie.token
+                },
+                body: JSON.stringify(UserRequest)
             }).then((response) => {
                 window.location.reload();
                 alert("Update Successfull");
             }).catch((error) => {
                 console.error("Update failed:", error);
-            }); 
+            });
         }
-        else
-        {
+        else {
             setAddressError(true);
         }
     };
 
     return (
         <div className="row">
-            {userInfo !== null ? ( 
+            {userInfo !== null ? (
                 <div>
-                    <h1>Account: </h1> 
+                    <h1>Account: </h1>
                     <label for="fname" className="label-settings">First Name:</label>
                     <p id="fname" >{userInfo.firstName}</p>
                     <label for="lname" className="label-settings">Last Name:</label>
@@ -101,24 +107,24 @@ function Account({cookie}) {
                     {editPhone ? (
                         <div>
                             <input type="text" onChange={handleChangePhone} placeholder={userInfo.phone}></input>
-                            <button onClick={() => {setEditPhone(!editPhone); setPhoneError(false); setInputValuePhone('')}}>Cancel</button>
+                            <button onClick={() => { setEditPhone(!editPhone); setPhoneError(false); setInputValuePhone('') }}>Cancel</button>
                             <button onClick={() => handlePhone()}>Submit</button>
                             {phoneError && <small>Invalid Phone</small>}
-                        </div>): (
+                        </div>) : (
                         <div>
                             <p id="phone">{userInfo.phone}</p>
                             <button onClick={() => setEditPhone(!editPhone)}>Edit</button>
                         </div>)
                     }
-    
+
                     <label for="address" className="label-settings">Address:</label>
                     {editAddress ? (
                         <div>
                             <input type="text" onChange={handleChangeAddress} placeholder={userInfo.address}></input>
-                            <button onClick={() => {setEditAddress(!editAddress); setAddressError(false); setInputValueAddress('')}}>Cancel</button>
+                            <button onClick={() => { setEditAddress(!editAddress); setAddressError(false); setInputValueAddress('') }}>Cancel</button>
                             <button onClick={() => handleAddress()}>Submit</button>
                             {addressError && <small>Invalid Address</small>}
-                        </div>): (
+                        </div>) : (
                         <div>
                             <p id="address">{userInfo.address}</p>
                             <button onClick={() => setEditAddress(!editAddress)}>Edit</button>
@@ -127,7 +133,7 @@ function Account({cookie}) {
                 </div>
             ) : (
                 <p>Loading...</p>
-            )}  
+            )}
         </div>
     );
 }

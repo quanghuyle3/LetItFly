@@ -4,7 +4,9 @@ import { Fragment, useEffect } from "react";
 import React, { useState } from 'react';
 import { isValidLicensePlate, isValidMake, isValidModel, isValidCarYear } from "../Forms/Validation"
 
-function VehicleInformation({cookie}) {
+const proxy = process.env.REACT_APP_BACKEND_BASE_URL;
+
+function VehicleInformation({ cookie }) {
 
     const [userInfo, setUserInfo] = useState(null);
     const [editCar, setEditCar] = useState(false);
@@ -24,9 +26,11 @@ function VehicleInformation({cookie}) {
 
 
     useEffect(() => {
-        fetch(`http://localhost:8080/api/vehicle/findByUserId?userId=${cookie.id}`, {
-        headers: { "Content-Type": "application/json",
-        "Authorization": "Bearer " + cookie.token}
+        fetch(`http://${proxy}/api/vehicle/findByUserId?userId=${cookie.id}`, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + cookie.token
+            }
         }).then((response) => {
             response.json().then((jsonObject) => {
                 setUserInfo(JSON.parse(JSON.stringify(jsonObject)));
@@ -34,30 +38,30 @@ function VehicleInformation({cookie}) {
         })
     }, []);
 
-    if(userInfo !== null) {
-        for(let i = 0; i < userInfo.length; i++) {
+    if (userInfo !== null) {
+        for (let i = 0; i < userInfo.length; i++) {
             vehics.push(i);
         }
     }
 
     const changePlate = (event) => {
-        setPlate(event.target.value); 
+        setPlate(event.target.value);
     }
 
     const changeMake = (event) => {
-        setMake(event.target.value); 
+        setMake(event.target.value);
     }
 
     const changeModel = (event) => {
-        setModel(event.target.value); 
+        setModel(event.target.value);
     }
 
     const changeYear = (event) => {
-        setYear(event.target.value); 
+        setYear(event.target.value);
     }
 
     const changeType = (event) => {
-        setType(event.target.value); 
+        setType(event.target.value);
     }
 
     function resetBooleans() {
@@ -74,7 +78,7 @@ function VehicleInformation({cookie}) {
     }
 
     const handleAdd = () => {
-        if(isValidLicensePlate(plate) && isValidMake(make) && isValidModel(model) && isValidCarYear(year) && isValidMake(type)) {
+        if (isValidLicensePlate(plate) && isValidMake(make) && isValidModel(model) && isValidCarYear(year) && isValidMake(type)) {
             var VehicleRequest = {
                 licensePlate: plate,
                 make: make,
@@ -84,60 +88,57 @@ function VehicleInformation({cookie}) {
                 userId: cookie.id
             };
 
-            fetch("http://localhost:8080/api/vehicle/save", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", 
-            "Authorization": "Bearer " + cookie.token},
-            body: JSON.stringify(VehicleRequest)
+            fetch(`http://${proxy}/api/vehicle/save`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + cookie.token
+                },
+                body: JSON.stringify(VehicleRequest)
             }).then((response) => {
                 return response.status;
             }).then((result) => {
-                if(result == 200) {
+                if (result == 200) {
                     window.location.reload();
                     alert("Update Successfull");
                 }
-                else{
+                else {
                     window.location.reload();
                     alert("Duplicate Vehicle! Unsuccessfull");
                 }
             }).catch((error) => {
                 console.error("Update failed:", error);
-            }); 
+            });
         }
-        else
-        {
-            if(!isValidLicensePlate(plate)) {
+        else {
+            if (!isValidLicensePlate(plate)) {
                 setPlateError(true);
             }
-            else
-            {
+            else {
                 setPlateError(false);
             }
-            if(!isValidMake(make)) {
+            if (!isValidMake(make)) {
                 setMakeError(true);
             }
-            else{
+            else {
                 setMakeError(false);
             }
-            if(!isValidModel(model)) {
+            if (!isValidModel(model)) {
                 setModelError(true);
             }
-            else
-            {
+            else {
                 setModelError(false);
             }
-            if(!isValidCarYear(year)) {
+            if (!isValidCarYear(year)) {
                 setYearError(true);
             }
-            else
-            {
+            else {
                 setYearError(false);
             }
-            if(!isValidMake(type)) {
+            if (!isValidMake(type)) {
                 setTypeError(true);
             }
-            else
-            {
+            else {
                 setTypeError(false);
             }
         }
@@ -145,14 +146,14 @@ function VehicleInformation({cookie}) {
 
     return (
         <div className="row">
-            {userInfo !== null ? ( 
+            {userInfo !== null ? (
                 <div>
                     <h1>Vehicle Information:</h1>
                     {editCar ? (
                         <div>
                             <input type="text" onChange={changePlate} placeholder="license plate"></input>
                             {plateError && <small>Invalid: Need 7 Digits.</small>}
-                            <input type="text" onChange={changeMake}placeholder="make"></input>
+                            <input type="text" onChange={changeMake} placeholder="make"></input>
                             {makeError && <small>Invalid: No Special Characters. Only Letters</small>}
                             <input type="text" onChange={changeModel} placeholder="model"></input>
                             {modelError && <small>Invalid: No special characters</small>}
@@ -160,18 +161,18 @@ function VehicleInformation({cookie}) {
                             {yearError && <small>Invalid: Needs 4 Digits/Too Old</small>}
                             <input type="text" onChange={changeType} placeholder="type"></input>
                             {typeError && <small>Invalid: Letters Only. No Special Characters</small>}
-                            <button onClick={() => {setEditCar(!editCar); resetBooleans()}}>Cancel</button>
+                            <button onClick={() => { setEditCar(!editCar); resetBooleans() }}>Cancel</button>
                             <button onClick={() => handleAdd()}>Submit</button>
                         </div>
-                    ):( 
+                    ) : (
                         <button onClick={() => setEditCar(!editCar)}>Add Vehicle</button>
                     )
                     }
-                    {vehics.map((number) => (<Vehicle key={number} number={number} cookie={cookie}/>))}
+                    {vehics.map((number) => (<Vehicle key={number} number={number} cookie={cookie} />))}
                 </div>
             ) : (
                 <p>Loading...</p>
-            )}  
+            )}
         </div>
     );
 }
