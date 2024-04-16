@@ -1,0 +1,56 @@
+version: "3"
+services:
+  letitfly-db:
+    container_name: letitfly-db-2.0 
+    image: quanghuyle3/letitfly-db:2.0 
+    ports:
+      - 3307:3306 
+    networks:
+      - letitfly-network  
+    environment:
+      MYSQL_DATABASE: let_it_fly
+      MYSQL_ROOT_PASSWORD: letitfly 
+    # Avoid loss data if container removed 
+    volumes:  
+      - letitfly-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysql", "-uroot", "-pletitfly", "-e", "show databases;"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
+    
+  letitfly-backend:
+    container_name: letitfly-backend-2.0 
+    image: quanghuyle3/letitfly-backend:2.0 
+    ports:
+      - 8081:8080
+    networks:
+      - letitfly-network
+    environment:
+      MYSQL_HOST: letitfly-db 
+      MYSQL_PORT: 3306
+      MYSQL_USER: root 
+      MYSQL_PASSWORD: letitfly 
+    # restart: always 
+    depends_on:
+      letitfly-db: 
+        condition: service_healthy
+
+  letitfly-frontend:
+    container_name: letitfly-frontend-2.0
+    image: quanghuyle3/letitfly-frontend:2.0 
+    ports:
+      - 3001:3000
+    networks:
+      - letitfly-network
+    depends_on:
+      - letitfly-backend
+      
+networks:
+  letitfly-network:
+    driver: bridge
+
+volumes:
+  letitfly-db-data:
+    driver: local
