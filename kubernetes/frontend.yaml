@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend-con
+          image: quanghuyle3/letitfly-frontend:4.0-url
+          ports:
+            - containerPort: 3000
+          env:
+            - name: REACT_APP_BACKEND_BASE_URL
+              value: a47b7c61ae9e04c76aa6f94b42c2af67-817017201.us-west-1.elb.amazonaws.com
+              # valueFrom:
+              #   configMapKeyRef:
+              #     name: backend-config
+              #     key: backend-url
+            - name: REACT_APP_GOOGLE_KEY
+              value: YOUR_API_KEY_HERE
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  labels:
+    app: frontend
+spec:
+  type: NodePort
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80 # 3000
+      targetPort: 3000
+      # nodePort: 30100
