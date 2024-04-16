@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -52,17 +53,23 @@ public class SecurityConfig {
                 return http.build();
         }
 
+        public void configure(final WebSecurity web) {
+                web.ignoring().requestMatchers(HttpMethod.OPTIONS);
+        }
+
         @Bean
         public FilterRegistrationBean corsFilter() {
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
                 CorsConfiguration config = new CorsConfiguration();
                 config.setAllowCredentials(true);
-                config.addAllowedOrigin("http://localhost:3000");
+                config.addAllowedOriginPattern("*"); // allow all origins (must enhance security from security group on
+                                                     // Cloud setting)
                 config.setAllowedHeaders(Arrays.asList(
                                 HttpHeaders.AUTHORIZATION,
                                 HttpHeaders.CONTENT_TYPE,
                                 HttpHeaders.ACCEPT));
                 config.setAllowedMethods(Arrays.asList(
+                                HttpMethod.OPTIONS.name(), // for preflight request from frontend
                                 HttpMethod.GET.name(),
                                 HttpMethod.POST.name(),
                                 HttpMethod.PUT.name(),
